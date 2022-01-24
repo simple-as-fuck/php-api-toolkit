@@ -1,5 +1,5 @@
 {
-    "name": "simple-as-fuck/php-package-template",
+    "name": "simple-as-fuck/php-api-toolkit",
     "require": {
         "php": "^7.4|^8.0"
     },
@@ -8,6 +8,6 @@
         "friendsofphp/php-cs-fixer": "^3.4"
     },
     "autoload": {
-        "psr-4": {"SimpleAsFuck\\PackageTemplate\\": "src/"}
+        "psr-4": {"SimpleAsFuck\\ApiToolkit\\": "src/"}
     }
 }

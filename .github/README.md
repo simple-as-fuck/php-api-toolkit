@@ -1,11 +1,11 @@
-# Simple as fuck / Php package template
+# Simple as fuck / Php api toolkit
 
-Template for php composer package with necessary minimum.
+Bunch of services for easies api implementations with standardized dependencies as possible.
 
 ## Installation
 
 ```console
-composer require simple-as-fuck/php-package-template
+composer require simple-as-fuck/php-api-toolkit
 ```
 
 ## Support

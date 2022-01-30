@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
-use Psr\Http\Message\MessageInterface;
+use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\StreamInterface;
+use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 use SimpleAsFuck\Validator\Rule\Url\ParseUrl;
 
@@ -16,20 +18,30 @@ final class Request
     private string $url;
     /** @var non-empty-string */
     private string $method;
-    private MessageInterface $message;
+    /** @var array<string, string>|array<string, array<string>> */
+    private array $headers;
+    private ?StreamInterface $body;
     /** @var non-empty-string|null */
     private ?string $baseUrl;
 
     /**
      * @param non-empty-string $method
      * @param non-empty-string $url
+     * @param array<mixed> $query
+     * @param array<string, string>|array<string, array<string>> $headers
      */
-    public function __construct(string $method, string $url, MessageInterface $message)
+    public function __construct(string $method, string $url, array $query = [], ?StreamInterface $body = null, array $headers = [])
     {
+        if (count($query)) {
+            $url = ParseUrl::make($url, [], [PHP_URL_QUERY, PHP_URL_FRAGMENT], '$url')->notNull();
+            $url .= '?'.\http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+        }
+
         $this->method = $method;
         /** @phpstan-ignore-next-line */
         $this->url = ParseUrl::make($url, [], [PHP_URL_SCHEME, PHP_URL_USER, PHP_URL_PASS, PHP_URL_HOST, PHP_URL_PORT], '$url')->notNull();
-        $this->message = $message;
+        $this->headers = $headers;
+        $this->body = $body;
         $this->baseUrl = null;
     }
 
@@ -38,8 +50,27 @@ final class Request
      */
     public function withBaseUrl(string $baseUrl): self
     {
-        $request = new self($this->method, $this->url, $this->message);
+        $request = new self($this->method, $this->url, $this->headers);
         $request->baseUrl = StringRule::make($baseUrl, '$baseUrl')->parseHttpUrl([], [PHP_URL_QUERY, PHP_URL_FRAGMENT])->notNull();
+        return $request;
+    }
+
+    /**
+     * @template TData
+     * @param TData $jsonData
+     * @param Transformer<TData>|null $transformer
+     */
+    public function withJson($jsonData, ?Transformer $transformer): self
+    {
+        if ($transformer) {
+            $jsonData = $transformer->toApi($jsonData);
+        }
+
+        $headers = $this->headers;
+        $headers['Content-Type'] = 'application/json';
+        $stream = Utils::streamFor(\GuzzleHttp\Utils::jsonEncode($jsonData));
+        $request = new self($this->method, $this->url, $headers, $stream);
+        $request->baseUrl = $this->baseUrl;
         return $request;
     }
 
@@ -55,13 +86,14 @@ final class Request
         }
 
         $request = $factory->createRequest($this->method, $this->baseUrl.$this->url);
-        foreach ($this->message->getHeaders() as $name => $header) {
+        foreach ($this->headers as $name => $header) {
             $request = $request->withHeader($name, $header);
         }
 
-        return $request
-            ->withProtocolVersion($this->message->getProtocolVersion())
-            ->withBody($this->message->getBody())
-        ;
+        if ($this->body) {
+            $request = $request->withBody($this->body);
+        }
+
+        return $request;
     }
 }

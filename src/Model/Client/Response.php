@@ -110,6 +110,9 @@ final class Response implements ResponseInterface
         return $this->response->getBody();
     }
 
+    /**
+     * @throws ApiException
+     */
     public function getJson(bool $allowInvalidJson = false): Rules
     {
         $exceptionFactory = new ApiClientException($this);

@@ -1,0 +1,150 @@
+<?php
+
+declare(strict_types=1);
+
+namespace SimpleAsFuck\ApiToolkit\Service\Client;
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\RequestFactoryInterface;
+use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\Request;
+use SimpleAsFuck\ApiToolkit\Model\Client\Response;
+use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
+use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
+use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
+use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
+
+class ApiClient
+{
+    private Repository $configRepository;
+    private Client $client;
+    private RequestFactoryInterface $requestFactory;
+
+    public function __construct(Repository $configRepository, Client $client, RequestFactoryInterface $requestFactory)
+    {
+        $this->configRepository = $configRepository;
+        $this->client = $client;
+        $this->requestFactory = $requestFactory;
+    }
+
+    /**
+     * @template TBody
+     * @param non-empty-string $apiName
+     * @param non-empty-string $method
+     * @param non-empty-string $urlWithQuery
+     * @param TBody|null $body
+     * @param Transformer<TBody>|null $bodyTransformer
+     * @param array<string, string>|array<string, array<string>> $headers
+     * @throws ApiException
+     */
+    public function request(string $apiName, string $method, string $urlWithQuery, $body = null, ?Transformer $bodyTransformer = null, array $headers = []): ObjectRule
+    {
+        $request = new Request($method, $urlWithQuery, [], null, $headers);
+        if ($body) {
+            $request = $request->withJson($body, $bodyTransformer);
+        }
+
+        return $this->waitObject($this->requestAsync($apiName, $request), true);
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     * @param non-empty-string $method
+     * @param non-empty-string $urlWithQuery
+     * @param array<string, string>|array<string, array<string>> $headers
+     * @throws ApiException
+     */
+    public function requestObject(string $apiName, string $method, string $urlWithQuery, array $headers = []): ObjectRule
+    {
+        return $this->waitObject($this->requestAsync($apiName, new Request($method, $urlWithQuery, [], null, $headers)));
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     * @param non-empty-string $method
+     * @param non-empty-string $url
+     * @param array<mixed> $query
+     * @param array<string, string>|array<string, array<string>> $headers
+     * @throws ApiException
+     */
+    public function requestArray(string $apiName, string $method, string $url, array $query = [], array $headers = []): ArrayRule
+    {
+        return $this->waitArray($this->requestAsync($apiName, new Request($method, $url, $query, null, $headers)));
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     * @throws ApiException
+     */
+    public function requestRaw(string $apiName, Request $request): Response
+    {
+        return $this->waitRaw($this->requestAsync($apiName, $request));
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     */
+    public function requestAsync(string $apiName, Request $request): PromiseInterface
+    {
+        $config = $this->configRepository->getClientConfig($apiName);
+        if (! $request->hasBaseUrl()) {
+            $request = $request->withBaseUrl($config->baseUrl());
+        }
+
+        $request = $request->createPsr($this->requestFactory);
+
+        $token = $config->bearerToken();
+        if (! $request->hasHeader('Authorization') && $token !== null) {
+            $request = $request->withHeader('Authorization', 'Bearer '.$token);
+        }
+
+        return $this->client->sendAsync($request, [RequestOptions::VERIFY => $config->verifyCerts()]);
+    }
+
+    /**
+     * @throws ApiException
+     */
+    public function waitRaw(PromiseInterface $promise): Response
+    {
+        try {
+            /** @phpstan-ignore-next-line */
+            $response = new Response($promise->wait());
+        } catch (RequestException $exception) {
+            $message = $exception->getMessage();
+            $response = $exception->getResponse();
+            if ($response) {
+                $response = new Response($response);
+                $jsonMessage = (string) $response->getJson(true)->object()->property('message')->string()->nullable();
+                if ($jsonMessage !== '') {
+                    $message = $jsonMessage;
+                }
+            }
+
+            throw new ApiException($message, null, $exception);
+        } catch (TransferException $exception) {
+            throw new ApiException($exception->getMessage(), null, $exception);
+        }
+
+        return $response;
+    }
+
+    /**
+     * @throws ApiException
+     */
+    public function waitObject(PromiseInterface $promise, bool $allowInvalidJson = false): ObjectRule
+    {
+        return $this->waitRaw($promise)->getJson($allowInvalidJson)->object();
+    }
+
+    /**
+     * @throws ApiException
+     */
+    public function waitArray(PromiseInterface $promise, bool $allowInvalidJson = false): ArrayRule
+    {
+        return $this->waitRaw($promise)->getJson($allowInvalidJson)->array();
+    }
+}

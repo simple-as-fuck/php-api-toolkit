@@ -10,7 +10,7 @@ final class ApiException extends \RuntimeException
 
     public function __construct(string $message = '', ?Response $response = null, \Throwable $previous = null)
     {
-        parent::__construct($message, 0, $previous);
+        parent::__construct($message, $response ? $response->getStatusCode() : 0, $previous);
         $this->response = $response;
     }
 

@@ -118,8 +118,8 @@ class ApiClient
             $response = $exception->getResponse();
             if ($response) {
                 $response = new Response($response);
-                $jsonMessage = (string) $response->getJson(true)->object()->property('message')->string()->nullable();
-                if ($jsonMessage !== '') {
+                $jsonMessage = $response->getJson(true)->object()->property('message')->string()->notEmpty()->nullable(true);
+                if ($jsonMessage !== null) {
                     $message = $jsonMessage;
                 }
             }

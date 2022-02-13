@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
-final class ApiException extends \RuntimeException
+class ApiException extends \RuntimeException
 {
     private ?Response $response;
 

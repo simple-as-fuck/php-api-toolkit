@@ -9,10 +9,17 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\RequestOptions;
+use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\BadRequestApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\ConflictApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\ForbiddenApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\NotFoundApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
+use SimpleAsFuck\ApiToolkit\Model\Client\ResponseApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\UnauthorizedApiException;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
@@ -122,6 +129,28 @@ class ApiClient
                 if ($jsonMessage !== null) {
                     $message = $jsonMessage;
                 }
+
+                if ($response->getStatusCode() === HttpCodes::HTTP_BAD_REQUEST) {
+                    throw new BadRequestApiException($response, $message, $exception);
+                }
+
+                if ($response->getStatusCode() === HttpCodes::HTTP_UNAUTHORIZED) {
+                    throw new UnauthorizedApiException($response, $message, $exception);
+                }
+
+                if ($response->getStatusCode() === HttpCodes::HTTP_FORBIDDEN) {
+                    throw new ForbiddenApiException($response, $message, $exception);
+                }
+
+                if ($response->getStatusCode() === HttpCodes::HTTP_NOT_FOUND) {
+                    throw new NotFoundApiException($response, $message, $exception);
+                }
+
+                if ($response->getStatusCode() === HttpCodes::HTTP_CONFLICT) {
+                    throw new ConflictApiException($response, $message, $exception);
+                }
+
+                throw new ResponseApiException($response, $message, $exception);
             }
 
             throw new ApiException($message, null, $exception);

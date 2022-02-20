@@ -7,7 +7,7 @@ namespace SimpleAsFuck\ApiToolkit\Model\Client;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use SimpleAsFuck\ApiToolkit\Factory\ApiClientException;
-use SimpleAsFuck\Validator\Model\Validated;
+use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
 final class Response implements ResponseInterface
@@ -115,19 +115,7 @@ final class Response implements ResponseInterface
      */
     public function getJson(bool $allowInvalidJson = false): Rules
     {
-        $exceptionFactory = new ApiClientException($this);
-
-        $content = $this->response->getBody()->getContents();
-        $content = \json_decode($content);
-        if (\json_last_error() !== JSON_ERROR_NONE) {
-            if ($allowInvalidJson) {
-                $content = null;
-            } else {
-                throw $exceptionFactory->create('Response body must be valid json');
-            }
-        }
-
-        return new Rules($exceptionFactory, 'Response body json', new Validated($content));
+        return MessageService::parseJsonFromBody(new ApiClientException($this), $this->response, 'Response body', $allowInvalidJson);
     }
 
     public function getStatusCode(): int

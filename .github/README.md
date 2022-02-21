@@ -17,6 +17,9 @@ consider package version as unsupported except last version.
 
 ## Usage
 
+- [Api client](#api-client-service)
+- [Api server](#api-server-controller-tools)
+
 ### Api client service
 
 Api client require guzzle client, psr client interface is not good enough because absence of async request.
@@ -81,6 +84,86 @@ catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
      */
     $exception->getCode(); // if exception contains http response, http status is here, otherwise zero is returned
     $exception->getMessage(); // if http response contains json object with message string property, json message overwrite exception message
+}
+
+```
+
+### Api server controller tools
+
+For request handling is prepared Validator and Response factories.
+More information about validation rules you can find in
+[Simple as fuck / Php Validator](https://github.com/simple-as-fuck/php-validator) readme.
+
+If you using symfony request and responses, you can use factories from different namespace, commented in example.
+
+```php
+
+// star of your action
+
+$rules = \SimpleAsFuck\ApiToolkit\Factory\Server\Validator::make($request);
+//$rules = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Validator::make($request);
+
+// validate some query parameter
+$someQueryValidValue = $rules->query()->key('someKey')->string()->parseInt()->min(1)->notNull();
+
+// validate something from request body with json format
+$someJsonValidValue = $rules->json()->object()->property('someProperty')->string()->notEmpty()->max(255)->notNull();
+
+
+
+// end fo your action
+
+/**
+ * @var YourClass $yourModelForResponseBody
+ * @var \SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer<YourClass> $transformer 
+ */
+
+// response with one object
+$response = \SimpleAsFuck\ApiToolkit\Factory\Server\Response::makeJson($yourModelForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Response::makeJson($yourModelForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
+
+// response with some array or collection (avoiding out of memory problem recommended some lazy loading iterator)
+$response = \SimpleAsFuck\ApiToolkit\Factory\Server\Response::makeJsonStream(new \ArrayIterator([$yourModelForResponseBody]), $transformer);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Response::makeJsonStream(new \ArrayIterator([$yourModelForResponseBody]), $transformer);
+
+```
+
+### Api server middleware tools
+
+If anything go wrong you can use Exception transformers in your exception catching middleware or in some exception handler.
+
+For laravel is prepared Laravel config adapter which load automatically configuration for ExceptionTransformer,
+you can easily get this transformer from DI, without any new configuration (standard configuration from Laravel is used).
+
+```php
+
+/**
+ * @var \SimpleAsFuck\ApiToolkit\Service\Config\Repository $configRepository
+ */
+
+try {
+    // some breakable logic
+}
+catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
+//catch(\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+    $response = \SimpleAsFuck\ApiToolkit\Factory\Server\Response::makeJson(
+    //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Response::makeJson(
+        $exception,
+        // transformer will convert exception in to json object with message property with original exception message
+        new \SimpleAsFuck\ApiToolkit\Service\Server\ApiExceptionTransformer(),
+        $exception->getStatusCode()
+    );
+}
+catch (\Throwable $exception) {
+    $response = \SimpleAsFuck\ApiToolkit\Factory\Server\Response::makeJson(
+    //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Response::makeJson(
+        $exception,
+        // transformer will convert exception in to json object with message property
+        // if application has turned off debug, message property contain only "Internal server error"
+        // but with enabled debug message contains exception type, message, file and line where was exception thrown
+        new \SimpleAsFuck\ApiToolkit\Service\Server\ExceptionTransformer($configRepository),
+        \Kayex\HttpCodes::HTTP_INTERNAL_SERVER_ERROR
+    );
 }
 
 ```

@@ -50,7 +50,7 @@ final class Request
      */
     public function withBaseUrl(string $baseUrl): self
     {
-        $request = new self($this->method, $this->url, $this->headers);
+        $request = new self($this->method, $this->url, [], $this->body, $this->headers);
         $request->baseUrl = StringRule::make($baseUrl, '$baseUrl')->parseHttpUrl([], [PHP_URL_QUERY, PHP_URL_FRAGMENT])->notNull();
         return $request;
     }
@@ -69,7 +69,7 @@ final class Request
         $headers = $this->headers;
         $headers['Content-Type'] = 'application/json';
         $stream = Utils::streamFor(\GuzzleHttp\Utils::jsonEncode($jsonData));
-        $request = new self($this->method, $this->url, $headers, $stream);
+        $request = new self($this->method, $this->url, [], $stream, $headers);
         $request->baseUrl = $this->baseUrl;
         return $request;
     }

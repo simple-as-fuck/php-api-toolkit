@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\RequestOptions;
 use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -22,6 +23,7 @@ use SimpleAsFuck\ApiToolkit\Model\Client\ResponseApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\UnauthorizedApiException;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
+use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 
@@ -124,12 +126,20 @@ class ApiClient
             $message = $exception->getMessage();
             $response = $exception->getResponse();
             if ($response) {
-                $response = new Response($response);
-                $jsonMessage = $response->getJson(true)->object()->property('message')->string()->notEmpty()->nullable(true);
+                $responseContent = $response->getBody()->getContents();
+                $jsonMessage = Validator::make(\json_decode($responseContent))
+                    ->object()
+                    ->property('message')
+                    ->string()
+                    ->notEmpty()
+                    ->nullable(true)
+                ;
                 if ($jsonMessage !== null) {
                     $message = $jsonMessage;
                 }
 
+                $response = $response->withBody((new HttpFactory())->createStream($responseContent));
+                $response = new Response($response);
                 if ($response->getStatusCode() === HttpCodes::HTTP_BAD_REQUEST) {
                     throw new BadRequestApiException($response, $message, $exception);
                 }

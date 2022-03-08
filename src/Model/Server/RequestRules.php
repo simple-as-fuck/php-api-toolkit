@@ -51,6 +51,6 @@ final class RequestRules
             }
         }
 
-        return new Rules($this->exceptionFactory, 'Request query json', new Validated($query));
+        return new Rules($this->exceptionFactory, 'Request query: json', new Validated($query));
     }
 }

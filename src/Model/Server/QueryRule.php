@@ -32,6 +32,6 @@ final class QueryRule
     {
         $ruleChain = new RuleChain();
         /** @phpstan-ignore-next-line */
-        return new StringTypedKey($ruleChain, new Key($this->exceptionFactory, $ruleChain, $this->queryParams, 'Request query parameter '.$key, $key));
+        return new StringTypedKey($ruleChain, new Key($this->exceptionFactory, $ruleChain, $this->queryParams, 'Request query parameter: '.$key, $key));
     }
 }

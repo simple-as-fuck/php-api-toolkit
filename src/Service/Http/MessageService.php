@@ -26,6 +26,6 @@ class MessageService
             }
         }
 
-        return new Rules($exceptionFactory, $messageBodyName.' json', new Validated($content));
+        return new Rules($exceptionFactory, $messageBodyName.': json', new Validated($content));
     }
 }

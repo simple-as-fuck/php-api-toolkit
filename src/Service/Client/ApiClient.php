@@ -16,6 +16,7 @@ use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ConflictApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ForbiddenApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\GoneApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\NotFoundApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
@@ -143,21 +144,20 @@ class ApiClient
                 if ($response->getStatusCode() === HttpCodes::HTTP_BAD_REQUEST) {
                     throw new BadRequestApiException($response, $message, $exception);
                 }
-
                 if ($response->getStatusCode() === HttpCodes::HTTP_UNAUTHORIZED) {
                     throw new UnauthorizedApiException($response, $message, $exception);
                 }
-
                 if ($response->getStatusCode() === HttpCodes::HTTP_FORBIDDEN) {
                     throw new ForbiddenApiException($response, $message, $exception);
                 }
-
                 if ($response->getStatusCode() === HttpCodes::HTTP_NOT_FOUND) {
                     throw new NotFoundApiException($response, $message, $exception);
                 }
-
                 if ($response->getStatusCode() === HttpCodes::HTTP_CONFLICT) {
                     throw new ConflictApiException($response, $message, $exception);
+                }
+                if ($response->getStatusCode() === HttpCodes::HTTP_GONE) {
+                    throw new GoneApiException($response, $message, $exception);
                 }
 
                 throw new ResponseApiException($response, $message, $exception);

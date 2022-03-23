@@ -36,12 +36,11 @@ final class ApiClientTest extends TestCase
 
         try {
             $this->apiClient->waitRaw($promise);
-        }
-        catch (ApiException $apiException) {
+        } catch (ApiException $apiException) {
             self::assertSame($expectedStatusCode, $apiException->getCode());
             self::assertSame($expectedMessage, $apiException->getMessage());
             $response = $apiException->response();
-            if($response) {
+            if ($response !== null) {
                 self::assertSame($expectedContent, $response->getBody()->getContents());
             }
         }

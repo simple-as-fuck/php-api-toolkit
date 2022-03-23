@@ -27,7 +27,7 @@ final class ResponseFactory
         $response = self::makeResponse($factory, $code, $headers);
 
         if ($body !== null) {
-            if ($transformer) {
+            if ($transformer !== null) {
                 $body = $transformer->toApi($body);
             }
         }
@@ -64,7 +64,7 @@ final class ResponseFactory
             }
 
             $responseData = $body->current();
-            if ($transformer) {
+            if ($transformer !== null) {
                 $responseData = $transformer->toApi($responseData);
             }
 

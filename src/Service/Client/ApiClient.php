@@ -53,7 +53,7 @@ class ApiClient
     public function request(string $apiName, string $method, string $urlWithQuery, $body = null, ?Transformer $bodyTransformer = null, array $headers = []): ObjectRule
     {
         $request = new Request($method, $urlWithQuery, [], null, $headers);
-        if ($body) {
+        if ($body !== null) {
             $request = $request->withJson($body, $bodyTransformer);
         }
 
@@ -125,7 +125,7 @@ class ApiClient
         } catch (RequestException $exception) {
             $message = $exception->getMessage();
             $response = $exception->getResponse();
-            if ($response) {
+            if ($response !== null) {
                 $responseContent = $response->getBody()->getContents();
                 $jsonMessage = Validator::make(\json_decode($responseContent))
                     ->object()

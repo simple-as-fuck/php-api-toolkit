@@ -32,7 +32,7 @@ final class Request
      */
     public function __construct(string $method, string $url, array $query = [], ?StreamInterface $body = null, array $headers = [])
     {
-        if (count($query)) {
+        if (count($query) !== 0) {
             $url = ParseUrl::make($url, [], [PHP_URL_QUERY, PHP_URL_FRAGMENT], '$url')->notNull();
             $url .= '?'.\http_build_query($query, '', '&', PHP_QUERY_RFC3986);
         }
@@ -62,7 +62,7 @@ final class Request
      */
     public function withJson($jsonData, ?Transformer $transformer): self
     {
-        if ($transformer) {
+        if ($transformer !== null) {
             $jsonData = $transformer->toApi($jsonData);
         }
 
@@ -90,7 +90,7 @@ final class Request
             $request = $request->withHeader($name, $header);
         }
 
-        if ($this->body) {
+        if ($this->body !== null) {
             $request = $request->withBody($this->body);
         }
 

@@ -11,6 +11,7 @@
         "kayex/http-codes": "^1.1",
         "guzzlehttp/psr7": "^2.1",
         "symfony/psr-http-message-bridge": "^2.1",
+        "symfony/http-foundation": "^5.4|^6.0",
         "symfony/http-kernel": "^5.4|^6.0"
     },
     "require-dev": {

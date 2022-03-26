@@ -27,7 +27,8 @@ class ExceptionTransformer implements Transformer
         $responseData = new \stdClass();
         $responseData->message = 'Internal server error';
         if ($this->configRepository->getServerConfig()->debug()) {
-            $responseData->message = 'Exception ('.\get_class($transformed).') message: "'.$transformed->getMessage().'" from: "'.$transformed->getFile().'":'.$transformed->getLine();
+            $responseData->message = 'Exception ('.\get_class($transformed).') message: \''.$transformed->getMessage().'\' from: '.$transformed->getFile().':'.$transformed->getLine();
+            $responseData->trace = array_map(fn (array $item): string => ($item['file'] ?? '-').':'.($item['line'] ?? '-'), $transformed->getTrace());
         }
 
         return $responseData;

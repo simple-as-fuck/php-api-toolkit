@@ -38,7 +38,6 @@ final class Request
         }
 
         $this->method = $method;
-        /** @phpstan-ignore-next-line */
         $this->url = ParseUrl::make($url, [], [PHP_URL_SCHEME, PHP_URL_USER, PHP_URL_PASS, PHP_URL_HOST, PHP_URL_PORT], '$url')->notNull();
         $this->headers = $headers;
         $this->body = $body;

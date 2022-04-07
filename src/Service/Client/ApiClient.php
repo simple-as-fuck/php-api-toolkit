@@ -12,6 +12,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\RequestOptions;
 use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ConflictApiException;
@@ -121,8 +122,9 @@ class ApiClient
     public function waitRaw(PromiseInterface $promise): Response
     {
         try {
-            /** @phpstan-ignore-next-line */
-            $response = new Response($promise->wait());
+            /** @var ResponseInterface $response */
+            $response = $promise->wait();
+            $response = new Response($response);
         } catch (RequestException $exception) {
             $message = $exception->getMessage();
             $response = $exception->getResponse();

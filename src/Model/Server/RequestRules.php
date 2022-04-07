@@ -23,8 +23,9 @@ final class RequestRules
 
     public function query(): QueryRule
     {
-        /** @phpstan-ignore-next-line */
-        return new QueryRule($this->exceptionFactory, new Validated($this->request->getQueryParams()));
+        /** @var Validated<array<mixed>> $validate */
+        $validate = new Validated($this->request->getQueryParams());
+        return new QueryRule($this->exceptionFactory, $validate);
     }
 
     public function json(bool $allowInvalidJson = false): Rules

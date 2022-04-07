@@ -30,8 +30,15 @@ final class QueryRule
      */
     public function key(string $key): StringTypedKey
     {
+        /** @var Validated<mixed> $validated */
+        $validated = $this->queryParams;
         $ruleChain = new RuleChain();
-        /** @phpstan-ignore-next-line */
-        return new StringTypedKey($ruleChain, new Key($this->exceptionFactory, $ruleChain, $this->queryParams, 'Request query parameter: '.$key, $key));
+        return new StringTypedKey(
+            $this->exceptionFactory,
+            $ruleChain,
+            $validated,
+            'Request query parameter: '.$key,
+            new Key($this->exceptionFactory, $ruleChain, $validated, '', '')
+        );
     }
 }

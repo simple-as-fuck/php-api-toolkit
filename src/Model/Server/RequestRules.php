@@ -21,6 +21,11 @@ final class RequestRules
         $this->request = $request;
     }
 
+    public function header(): HeaderRule
+    {
+        return new HeaderRule($this->exceptionFactory, new Validated($this->request->getHeaders()));
+    }
+
     public function query(): QueryRule
     {
         /** @var Validated<array<mixed>> $validate */

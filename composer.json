@@ -5,7 +5,7 @@
         "ext-json": "*",
         "psr/http-message": "^1.0",
         "psr/http-factory": "^1.0",
-        "simple-as-fuck/php-validator": "^0.2.5|^0.3.0",
+        "simple-as-fuck/php-validator": "^0.3.0",
         "guzzlehttp/guzzle": "^7.4",
         "illuminate/support": "^8.81|^9.0",
         "kayex/http-codes": "^1.1",

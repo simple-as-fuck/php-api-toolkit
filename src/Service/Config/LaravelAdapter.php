@@ -7,6 +7,7 @@ namespace SimpleAsFuck\ApiToolkit\Service\Config;
 use SimpleAsFuck\ApiToolkit\Model\Client\Config;
 use SimpleAsFuck\ApiToolkit\Model\Server\Config as ServerConfig;
 use SimpleAsFuck\Validator\Factory\Validator;
+use SimpleAsFuck\Validator\Rule\General\Rules;
 
 final class LaravelAdapter extends Repository
 {
@@ -20,16 +21,24 @@ final class LaravelAdapter extends Repository
     public function getClientConfig(string $apiName): Config
     {
         return new Config(
-            Validator::make($this->repository->get('services.'.$apiName.'.base_url'))->string()->notEmpty()->notNull(),
-            Validator::make($this->repository->get('services.'.$apiName.'.token'))->string()->notEmpty()->nullable(),
-            Validator::make($this->repository->get('services.'.$apiName.'.verify'))->bool()->nullable() ?? true,
+            $this->getValue('services.'.$apiName.'.base_url')->string()->notEmpty()->notNull(),
+            $this->getValue('services.'.$apiName.'.token')->string()->notEmpty()->nullable(),
+            $this->getValue('services.'.$apiName.'.verify')->bool()->nullable() ?? true,
         );
     }
 
     public function getServerConfig(): ServerConfig
     {
         return new ServerConfig(
-            Validator::make($this->repository->get('app.debug'))->bool()->nullable() ?? false
+            $this->getValue('app.debug')->bool()->nullable() ?? false
         );
+    }
+
+    /**
+     * @param non-empty-string $key
+     */
+    private function getValue(string $key): Rules
+    {
+        return Validator::make($this->repository->get($key), 'Config key '.$key);
     }
 }

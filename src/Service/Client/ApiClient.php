@@ -49,7 +49,7 @@ class ApiClient
      * @param non-empty-string $urlWithQuery
      * @param TBody|null $body
      * @param Transformer<TBody>|null $bodyTransformer
-     * @param array<string, string>|array<string, array<string>> $headers
+     * @param array<string, string|array<string>> $headers
      * @throws ApiException
      */
     public function request(string $apiName, string $method, string $urlWithQuery, $body = null, ?Transformer $bodyTransformer = null, array $headers = []): ObjectRule
@@ -66,7 +66,7 @@ class ApiClient
      * @param non-empty-string $apiName
      * @param non-empty-string $method
      * @param non-empty-string $urlWithQuery
-     * @param array<string, string>|array<string, array<string>> $headers
+     * @param array<string, string|array<string>> $headers
      * @throws ApiException
      */
     public function requestObject(string $apiName, string $method, string $urlWithQuery, array $headers = []): ObjectRule
@@ -79,7 +79,7 @@ class ApiClient
      * @param non-empty-string $method
      * @param non-empty-string $url
      * @param array<mixed> $query
-     * @param array<string, string>|array<string, array<string>> $headers
+     * @param array<string, string|array<string>> $headers
      * @throws ApiException
      */
     public function requestArray(string $apiName, string $method, string $url, array $query = [], array $headers = []): ArrayRule

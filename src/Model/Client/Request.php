@@ -18,7 +18,7 @@ final class Request
     private string $url;
     /** @var non-empty-string */
     private string $method;
-    /** @var array<string, string>|array<string, array<string>> */
+    /** @var array<string, string|array<string>> */
     private array $headers;
     private ?StreamInterface $body;
     /** @var non-empty-string|null */
@@ -28,7 +28,7 @@ final class Request
      * @param non-empty-string $method
      * @param non-empty-string $url
      * @param array<mixed> $query
-     * @param array<string, string>|array<string, array<string>> $headers
+     * @param array<string, string|array<string>> $headers
      */
     public function __construct(string $method, string $url, array $query = [], ?StreamInterface $body = null, array $headers = [])
     {

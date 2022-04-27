@@ -19,7 +19,6 @@ final class Validator
 
     /**
      * @param non-empty-string $name
-     * @return StringRule
      */
     public static function parameter(?string $value, string $name): StringRule
     {

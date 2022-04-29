@@ -23,10 +23,16 @@ use SimpleAsFuck\ApiToolkit\Model\Client\Response;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponseApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
 use SimpleAsFuck\ApiToolkit\Model\Client\UnauthorizedApiException;
+use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
+use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
+use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
+use SimpleAsFuck\ApiToolkit\Service\Webhook\ParamsTransformer;
+use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
+use SimpleAsFuck\Validator\Rule\String\StringRule;
 
 class ApiClient
 {
@@ -232,5 +238,42 @@ class ApiClient
     public function waitArray(ResponsePromise $promise, bool $allowInvalidJson = false): ArrayRule
     {
         return $this->waitRaw($promise)->getJson($allowInvalidJson)->array();
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     * @param non-empty-string $type
+     * @param non-empty-string $listeningUrl example: https://example.com/listening/...
+     * @param Priority::* $priority
+     * @param array<non-empty-string, string> $attributes required attributes without them can not be webhook dispatched
+     * @param array<string, string|array<string>> $requestHeaders
+     * @throws ApiException
+     */
+    public function addWebhookListener(string $apiName, string $type, string $listeningUrl, int $priority = Priority::NORMAL, array $attributes = [], array $requestHeaders = []): Webhook
+    {
+        return $this->request(
+            $apiName,
+            'POST',
+            '/webhook/'.$type,
+            new Params(
+                StringRule::make($listeningUrl, '$listeningUrl')->parseHttpUrl([PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PATH])->notNull(),
+                $priority,
+                $attributes
+            ),
+            new ParamsTransformer(),
+            $requestHeaders
+        )
+            ->class(new WebhookTransformer())->notNull()
+        ;
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     * @param array<string, string|array<string>> $requestHeaders
+     * @throws ApiException
+     */
+    public function removeWebhookListener(string $apiName, string $webhookId, array $requestHeaders = []): void
+    {
+        $this->request($apiName, 'DELETE', '/webhook/'.$webhookId, null, null, $requestHeaders);
     }
 }

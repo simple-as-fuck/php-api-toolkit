@@ -29,11 +29,11 @@ final class HeaderRule
     /**
      * @param non-empty-string $key
      */
-    public function key(string $key): StringRule
+    public function key(string $key, bool $caseSensitive = false): StringRule
     {
-        $value = $this->validated->value();
-        $value = $value[$key] ?? [];
-        $value = array_pop($value);
+        $values = $this->headerValues($caseSensitive);
+        $values = $values[$caseSensitive ? $key : strtolower($key)] ?? [];
+        $value = array_pop($values);
         /** @var mixed $value */
         return new StringRule($this->exceptionFactory, new RuleChain(), new Validated($value), 'Request header: '.$key);
     }
@@ -44,10 +44,10 @@ final class HeaderRule
      * @param callable(StringRule): TMapped $callable
      * @return Collection<TMapped>
      */
-    public function keyOf(string $key, callable $callable): Collection
+    public function keyOf(string $key, callable $callable, bool $caseSensitive = false): Collection
     {
-        $value = $this->validated->value();
-        $values = $value[$key] ?? null;
+        $values = $this->headerValues($caseSensitive);
+        $values = $values[$caseSensitive ? $key : strtolower($key)] ?? null;
         /** @var mixed $values */
         return new Collection(
             $this->exceptionFactory,
@@ -56,5 +56,18 @@ final class HeaderRule
             'Request header: '.$key,
             fn (TypedKey $index) => $callable($index->string())
         );
+    }
+
+    /**
+     * @return array<array<string>>|null
+     */
+    private function headerValues(bool $caseSensitive): ?array
+    {
+        $values = $this->validated->value();
+        if ($caseSensitive) {
+            return $values;
+        }
+
+        return $values !== null ? array_change_key_case($values, CASE_LOWER) : $values;
     }
 }

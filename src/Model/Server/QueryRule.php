@@ -33,12 +33,13 @@ final class QueryRule
         /** @var Validated<mixed> $validated */
         $validated = $this->queryParams;
         $ruleChain = new RuleChain();
+        $valueName = 'Request query parameter: '.$key;
         return new StringTypedKey(
             $this->exceptionFactory,
             $ruleChain,
             $validated,
-            'Request query parameter: '.$key,
-            new Key($this->exceptionFactory, $ruleChain, $validated, '', '')
+            $valueName,
+            new Key($this->exceptionFactory, $ruleChain, $validated, $valueName, $key)
         );
     }
 }

@@ -31,7 +31,7 @@ with structure:
 ```php
     'some_api_name' => [ // this key is value of first parameter ApiClient::request method
         'base_url' => 'https://some-host/some-base-url',
-        'token' => 'Bearer token', // optional default null
+        'token' => 'tokenexample', // optional default null, authentication token for https://swagger.io/docs/specification/authentication/bearer-authentication/
         'verify' => true, // optional default true, turn on/off certificates verification
     ],
 ```

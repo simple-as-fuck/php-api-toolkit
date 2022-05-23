@@ -254,9 +254,9 @@ class ApiClient
         return $this->request(
             $apiName,
             'POST',
-            '/webhook/'.$type,
+            '/webhook?type='.$type,
             new Params(
-                StringRule::make($listeningUrl, '$listeningUrl')->parseHttpUrl([PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PATH])->notNull(),
+                StringRule::make($listeningUrl, 'Parameter $listeningUrl')->parseHttpUrl([PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PATH])->notNull(),
                 $priority,
                 $attributes
             ),
@@ -274,6 +274,6 @@ class ApiClient
      */
     public function removeWebhookListener(string $apiName, string $webhookId, array $requestHeaders = []): void
     {
-        $this->request($apiName, 'DELETE', '/webhook/'.$webhookId, null, null, $requestHeaders);
+        $this->request($apiName, 'DELETE', '/webhook?webhookId='.$webhookId, null, null, $requestHeaders);
     }
 }

@@ -50,16 +50,17 @@ class ApiClient
      * @param TBody|null $body
      * @param Transformer<TBody>|null $bodyTransformer
      * @param array<string, string|array<string>> $headers
+     * @param array<RequestOptions::*, mixed> $options
      * @throws ApiException
      */
-    public function request(string $apiName, string $method, string $urlWithQuery, $body = null, ?Transformer $bodyTransformer = null, array $headers = []): ObjectRule
+    public function request(string $apiName, string $method, string $urlWithQuery, $body = null, ?Transformer $bodyTransformer = null, array $headers = [], array $options = []): ObjectRule
     {
         $request = new Request($method, $urlWithQuery, [], null, $headers);
         if ($body !== null) {
             $request = $request->withJson($body, $bodyTransformer);
         }
 
-        return $this->waitObject($this->requestAsync($apiName, $request), true);
+        return $this->waitObject($this->requestAsync($apiName, $request, $options), true);
     }
 
     /**
@@ -67,11 +68,12 @@ class ApiClient
      * @param non-empty-string $method
      * @param non-empty-string $urlWithQuery
      * @param array<string, string|array<string>> $headers
+     * @param array<RequestOptions::*, mixed> $options
      * @throws ApiException
      */
-    public function requestObject(string $apiName, string $method, string $urlWithQuery, array $headers = []): ObjectRule
+    public function requestObject(string $apiName, string $method, string $urlWithQuery, array $headers = [], array $options = []): ObjectRule
     {
-        return $this->waitObject($this->requestAsync($apiName, new Request($method, $urlWithQuery, [], null, $headers)));
+        return $this->waitObject($this->requestAsync($apiName, new Request($method, $urlWithQuery, [], null, $headers), $options));
     }
 
     /**
@@ -80,26 +82,29 @@ class ApiClient
      * @param non-empty-string $url
      * @param array<mixed> $query
      * @param array<string, string|array<string>> $headers
+     * @param array<RequestOptions::*, mixed> $options
      * @throws ApiException
      */
-    public function requestArray(string $apiName, string $method, string $url, array $query = [], array $headers = []): ArrayRule
+    public function requestArray(string $apiName, string $method, string $url, array $query = [], array $headers = [], array $options = []): ArrayRule
     {
-        return $this->waitArray($this->requestAsync($apiName, new Request($method, $url, $query, null, $headers)));
+        return $this->waitArray($this->requestAsync($apiName, new Request($method, $url, $query, null, $headers), $options));
     }
 
     /**
      * @param non-empty-string $apiName
+     * @param array<RequestOptions::*, mixed> $options
      * @throws ApiException
      */
-    public function requestRaw(string $apiName, Request $request): Response
+    public function requestRaw(string $apiName, Request $request, array $options = []): Response
     {
-        return $this->waitRaw($this->requestAsync($apiName, $request));
+        return $this->waitRaw($this->requestAsync($apiName, $request, $options));
     }
 
     /**
      * @param non-empty-string $apiName
+     * @param array<RequestOptions::*, mixed> $options
      */
-    public function requestAsync(string $apiName, Request $request): PromiseInterface
+    public function requestAsync(string $apiName, Request $request, array $options = []): PromiseInterface
     {
         $config = $this->configRepository->getClientConfig($apiName);
         if (! $request->hasBaseUrl()) {
@@ -113,7 +118,17 @@ class ApiClient
             $request = $request->withHeader('Authorization', 'Bearer '.$token);
         }
 
-        return $this->client->sendAsync($request, [RequestOptions::VERIFY => $config->verifyCerts()]);
+        $defaultOptions = [
+            RequestOptions::VERIFY => $config->verifyCerts(),
+        ];
+
+        foreach ($defaultOptions as $key => $defaultOption) {
+            if (! array_key_exists($key, $options)) {
+                $options[$key] = $defaultOption;
+            }
+        }
+
+        return $this->client->sendAsync($request, $options);
     }
 
     /**

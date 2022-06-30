@@ -10,6 +10,7 @@ use GuzzleHttp\Utils;
 use Kayex\HttpCodes;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use SimpleAsFuck\ApiToolkit\Service\Server\SpeedLimitService;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 
 final class ResponseFactory
@@ -72,13 +73,7 @@ final class ResponseFactory
             $body->next();
             if ($body->valid()) {
                 $item .= ',';
-                if ($speedLimit > 0) {
-                    $timeLimit = (strlen($item) / 1024) / $speedLimit;
-                    $timeOverHead = $timeLimit - (\microtime(true) - $previousItemTime);
-                    if ($timeOverHead > 0) {
-                        \usleep((int) ($timeOverHead * 1000000));
-                    }
-                }
+                SpeedLimitService::slowdownDataSending($speedLimit, strlen($item), $previousItemTime);
             } else {
                 $item .= ']';
             }

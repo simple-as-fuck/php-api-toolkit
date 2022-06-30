@@ -125,6 +125,7 @@ $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson($y
 // response with some array or collection (avoiding out of memory problem recommended some lazy loading iterator)
 $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourModelForResponseBody]), $transformer);
 //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourModelForResponseBody]), $transformer);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream([$yourModelForResponseBody], $transformer);
 
 ```
 

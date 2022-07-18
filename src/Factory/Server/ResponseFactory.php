@@ -24,6 +24,7 @@ final class ResponseFactory
      */
     public static function makeJson($body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
     {
+        $headers['Content-Type'] = 'application/json';
         $factory = new HttpFactory();
         $response = self::makeResponse($factory, $code, $headers);
 
@@ -45,6 +46,7 @@ final class ResponseFactory
      */
     public static function makeJsonStream(\Iterator $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = [], float $speedLimit = 0): ResponseInterface
     {
+        $headers['Content-Type'] = 'application/json';
         $factory = new HttpFactory();
         $response = self::makeResponse($factory, $code, $headers);
 

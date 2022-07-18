@@ -36,6 +36,7 @@ final class ResponseFactory
      */
     public static function makeJsonStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = [], float $speedLimit = 0): StreamedResponse
     {
+        $headers['Content-Type'] = 'application/json';
         return new StreamedResponse(
             static function () use ($body, $transformer, $speedLimit) {
                 $dataSeparator = '';

@@ -25,7 +25,7 @@ final class ParamsTransformer implements Transformer, UserClassRule
             $attributes[(string) $key] = $attribute;
         }
         return new Params(
-            $rule->property('listeningUrl')->string()->notEmpty()->notNull(),
+            $rule->property('listeningUrl')->string()->parseHttpUrl([PHP_URL_PATH])->notNull(),
             $rule->property('priority')->int()->in([Priority::HIGH, Priority::NORMAL, Priority::LOW])->notNull(),
             $attributes
         );

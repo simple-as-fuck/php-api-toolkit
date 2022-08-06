@@ -34,13 +34,9 @@ abstract class Repository
      * the method saves one unique webhook if the duplicate webhook exists method MUST return null
      *
      * unique webhook means that a combination of webhook $type and $params->listeningUrl
-     * without any required $params->attributes can be saved only once,
-     * webhooks listening url with required attributes can be saved unlimited times
-     * but a combination of $type, $params->listeningUrl and all $params->attributes (keys and values)
-     * can be saved agan only once
+     * can be saved only once
      *
      * the uniqueness of webhook causes than one listening url can listen to more webhook types
-     * and also listen to more required attributes,
      * but solves redundant tries to notify the same webhook type for one listener
      *
      * @param non-empty-string $type

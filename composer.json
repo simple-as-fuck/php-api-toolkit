@@ -8,6 +8,7 @@
         "psr/http-server-handler": "^1.0",
         "simple-as-fuck/php-validator": "^0.5.2",
         "guzzlehttp/guzzle": "^7.4",
+        "illuminate/database": "^8.81|^9.0|^10.0",
         "illuminate/log": "^8.81|^9.0|^10.0",
         "illuminate/support": "^8.81|^9.0|^10.0",
         "kayex/http-codes": "^1.1",

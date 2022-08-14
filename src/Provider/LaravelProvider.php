@@ -15,14 +15,16 @@ use SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger;
 use SimpleAsFuck\ApiToolkit\Service\Client\LaravelConfig;
 use SimpleAsFuck\ApiToolkit\Service\Config\LaravelAdapter;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
+use SimpleAsFuck\ApiToolkit\Service\Webhook\LaravelMysqlRepository;
 
 class LaravelProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
         $this->app->singleton(Config::class, LaravelConfig::class);
         $this->app->singleton(Repository::class, LaravelAdapter::class);
         $this->app->singleton(RequestFactoryInterface::class, HttpFactory::class);
+        $this->app->singleton(\SimpleAsFuck\ApiToolkit\Service\Webhook\Repository::class, LaravelMysqlRepository::class);
         $this->app->singleton(ApiClient::class, function (): ApiClient {
             /** @var \Illuminate\Contracts\Config\Repository $config */
             $config = $this->app->make(\Illuminate\Contracts\Config\Repository::class);
@@ -45,5 +47,14 @@ class LaravelProvider extends ServiceProvider
 
             return new ApiClient($apiConfig, $client, $requestFactory, $deprecationLogger);
         });
+
+        $this->mergeConfigFrom(__DIR__.'/../../config/laravel/webhook.php', 'webhook');
+    }
+
+    public function boot(): void
+    {
+        $this->publishes([
+            __DIR__.'/../../config/laravel/webhook.php' => $this->app->configPath('webhook.php'),
+        ], 'api-toolkit-config');
     }
 }

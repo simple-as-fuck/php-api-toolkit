@@ -81,4 +81,15 @@ final class HeaderRuleTest extends TestCase
             ['test1', 'Header1', true],
         ];
     }
+
+    public function testAuthorization(): void
+    {
+        /** @var array<array<string>> $testInput */
+        $testInput = ['Authorization' => ['Bearer TestToken']];
+        $headerRule = new HeaderRule(new UnexpectedValueException(), new Validated($testInput));
+
+        $authValue = $headerRule->authorization('Bearer')->nullable();
+
+        self::assertSame('TestToken', $authValue);
+    }
 }

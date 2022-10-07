@@ -9,6 +9,7 @@ use SimpleAsFuck\Validator\Model\RuleChain;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\ArrayRule\Collection;
 use SimpleAsFuck\Validator\Rule\ArrayRule\TypedKey;
+use SimpleAsFuck\Validator\Rule\String\RegexMatch;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
 final class HeaderRule
@@ -56,6 +57,20 @@ final class HeaderRule
             'Request header: '.$key,
             fn (TypedKey $index) => $callable($index->string())
         );
+    }
+
+    /**
+     * method will return rule with regex match for value of http standard authorization header
+     *
+     * @param non-empty-string $type
+     */
+    public function authorization(string $type): RegexMatch
+    {
+        return $this
+            ->key('Authorization')
+            ->regex('/^' . preg_quote($type, '/') . ' (?P<value>.+)$/')
+            ->match('value')
+        ;
     }
 
     /**

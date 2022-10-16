@@ -56,5 +56,9 @@ class LaravelProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../config/laravel/webhook.php' => $this->app->configPath('webhook.php'),
         ], 'api-toolkit-config');
+
+        $this->publishes([
+            __DIR__.'/../../src/Database/Migration/LaravelMysqlWebhookTables.php' => $this->app->databasePath('migrations/2022_10_15_163600_WebhookTables.php')
+        ], 'api-toolkit-migration');
     }
 }

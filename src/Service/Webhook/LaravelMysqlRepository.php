@@ -44,11 +44,11 @@ final class LaravelMysqlRepository extends Repository
 
         foreach ($connection->table('WebhookWithoutAttribute')->get() as $webhookMap) {
             /** @var \stdClass $webhookMap */
-            if (array_key_exists($webhookMap->WebhookId, $webhookMatches)) {
+            if (array_key_exists($webhookMap->webhookId, $webhookMatches)) {
                 continue;
             }
 
-            $webhookMatches[$webhookMap->WebhookId] = 0;
+            $webhookMatches[$webhookMap->webhookId] = 0;
         }
 
         $webhooks = [];
@@ -121,13 +121,13 @@ final class LaravelMysqlRepository extends Repository
 
                 if (count($webhookAttributeIds) === 0) {
                     $connection->statement('lock tables WebhookWithoutAttribute write');
-                    $connection->table('WebhookWithoutAttribute')->insert(['WebhookId' => $webhookId]);
+                    $connection->table('WebhookWithoutAttribute')->insert(['webhookId' => $webhookId]);
                 } else {
                     $connection->statement('lock tables WebhookRequiredAttribute write');
                     foreach ($webhookAttributeIds as $webhookAttributeId) {
                         $connection->table('WebhookRequiredAttribute')->insert([
-                            'WebhookId' => $webhookId,
-                            'WebhookAttributeId' => $webhookAttributeId,
+                            'webhookId' => $webhookId,
+                            'webhookAttributeId' => $webhookAttributeId,
                         ]);
                     }
                 }
@@ -150,8 +150,8 @@ final class LaravelMysqlRepository extends Repository
 
         $connection->beginTransaction();
         try {
-            $connection->table('WebhookRequiredAttribute')->where('WebhookId', '=', $webhookId)->delete();
-            $connection->table('WebhookWithoutAttribute')->where('WebhookId', '=', $webhookId)->delete();
+            $connection->table('WebhookRequiredAttribute')->where('webhookId', '=', $webhookId)->delete();
+            $connection->table('WebhookWithoutAttribute')->where('webhookId', '=', $webhookId)->delete();
             $connection->table('Webhook')->where('id', '=', $webhookId)->delete();
 
             $connection->commit();
@@ -178,9 +178,9 @@ final class LaravelMysqlRepository extends Repository
             foreach ($attributeIds as $attributeId) {
                 /** @var Collection<int, int> $webhookIds */
                 $webhookIds = $connection->table('WebhookRequiredAttribute')
-                    ->where('WebhookAttributeId', '=', $attributeId)
+                    ->where('webhookAttributeId', '=', $attributeId)
                     ->get()
-                    ->map(static fn ($row): int => ((object) $row)->WebhookId)
+                    ->map(static fn ($row): int => ((object) $row)->webhookId)
                 ;
 
                 foreach ($webhookIds as $webhookId) {
@@ -200,7 +200,7 @@ final class LaravelMysqlRepository extends Repository
     private function getWebhookRequiredAttributes(ConnectionInterface $connection, int $webhookId): array
     {
         $attributes = [];
-        foreach ($connection->table('WebhookRequiredAttribute')->where('WebhookId', '=', $webhookId)->get() as $requiredAttribute) {
+        foreach ($connection->table('WebhookRequiredAttribute')->where('webhookId', '=', $webhookId)->get() as $requiredAttribute) {
             /** @var \stdClass $requiredAttribute */
             /** @var \stdClass|null $storedAttribute */
             $storedAttribute = $connection->table('WebhookAttribute')->where('id', '=', $requiredAttribute->WebhookAttributeId)->first();

@@ -192,7 +192,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
 
                 /** @var \stdClass $dbRequiredAttribute */
                 $dbRequiredAttribute = $connection->selectOne('select * from WebhookAttribute where id = ?', [$dbRequiredAttributeMap->webhookAttributeId]);
-                self::assertSame($params->attributes()[$dbRequiredAttribute->key], $dbRequiredAttribute->vaule);
+                self::assertSame($params->attributes()[$dbRequiredAttribute->key], $dbRequiredAttribute->value);
             }
         }
 

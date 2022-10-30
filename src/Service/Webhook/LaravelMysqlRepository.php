@@ -59,7 +59,9 @@ final class LaravelMysqlRepository extends Repository
                 continue;
             }
 
-            $webhooks[] = new Webhook($webhook->id, $webhook->type, new Params($webhook->listeningUrl, $webhook->priority, $attributes));
+            /** @var non-empty-string $webhookId */
+            $webhookId = (string) $webhook->id;
+            $webhooks[] = new Webhook($webhookId, $webhook->type, new Params($webhook->listeningUrl, $webhook->priority, $attributes));
         }
 
         usort($webhooks, static function (Webhook $a, Webhook $b) use ($webhookMatches): int {

@@ -23,9 +23,16 @@ final class LaravelMysqlRepositoryTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        $pdo = new \PDO('mysql:dbname=database;host=database', 'root', 'password');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_NATURAL);
+        $pdo->setAttribute(\PDO::ATTR_ORACLE_NULLS, \PDO::NULL_NATURAL);
+        $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+        $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+
         self::$connectionResolver = new ConnectionResolver();
         self::$connectionResolver->setDefaultConnection('default');
-        self::$connectionResolver->addConnection('default', new MySqlConnection(new \PDO('mysql:dbname=database;host=database', 'root', 'password')));
+        self::$connectionResolver->addConnection('default', new MySqlConnection($pdo));
         DB::swap(self::$connectionResolver);
 
         $migration = include __DIR__.'/../../../src/Database/Migration/LaravelMysqlWebhookTables.php';

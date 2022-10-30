@@ -203,7 +203,7 @@ final class LaravelMysqlRepository extends Repository
         foreach ($connection->table('WebhookRequiredAttribute')->where('webhookId', '=', $webhookId)->get() as $requiredAttribute) {
             /** @var \stdClass $requiredAttribute */
             /** @var \stdClass|null $storedAttribute */
-            $storedAttribute = $connection->table('WebhookAttribute')->where('id', '=', $requiredAttribute->WebhookAttributeId)->first();
+            $storedAttribute = $connection->table('WebhookAttribute')->where('id', '=', $requiredAttribute->webhookAttributeId)->first();
             if ($storedAttribute !== null) {
                 $attributes[$storedAttribute->key] = $storedAttribute->value;
             }

@@ -113,15 +113,15 @@ final class LaravelMysqlRepositoryTest extends TestCase
     {
         return [
             [
-                ['http://test/without/attributes', 'http://test/with/attributes', 'http://test/with/two/attributes'],
-                'test', ['test_key' => 'test_value'],
+                ['http://test/without/attributes', 'http://test/with/attributes'],
+                'test', ['test_key' => 'test_value', 'another_key' => 'another_value'],
             ],
             [
                 ['http://test/without/attributes', 'http://test/with/two/attributes', 'http://test/with/attributes'],
                 'test', ['second_key' => 'second_value', 'test_key' => 'test_value'],
             ],
             [
-                ['http://test/without/attributes', 'http://test/with/two/attributes'],
+                ['http://test/without/attributes'],
                 'test', ['second_key' => 'second_value'],
             ],
             [

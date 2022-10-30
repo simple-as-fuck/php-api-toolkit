@@ -120,6 +120,7 @@ final class LaravelMysqlRepository extends Repository
                 ]);
 
                 if (count($webhookAttributeIds) === 0) {
+                    $connection->statement('lock tables WebhookWithoutAttribute write');
                     $connection->table('WebhookWithoutAttribute')->insert(['WebhookId' => $webhookId]);
                 } else {
                     $connection->statement('lock tables WebhookRequiredAttribute write');

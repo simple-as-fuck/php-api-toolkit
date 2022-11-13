@@ -28,7 +28,7 @@ jobs:
         run: vendor/bin/php-cs-fixer fix --dry-run --no-interaction
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse
+        run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
         run: vendor/bin/phpunit test/
@@ -51,7 +51,7 @@ jobs:
         run: composer update --no-interaction --with illuminate/support:^8.81 --with symfony/http-kernel:^5.4 --with symfony/http-foundation:^5.4 --with simple-as-fuck/php-validator:^0.3.0
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse
+        run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
         run: vendor/bin/phpunit test/
@@ -74,7 +74,7 @@ jobs:
         run: composer install --no-interaction
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse
+        run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
         run: vendor/bin/phpunit test/
@@ -97,7 +97,7 @@ jobs:
         run: composer install --no-interaction
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse
+        run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
         run: vendor/bin/phpunit test/

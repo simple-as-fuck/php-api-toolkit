@@ -101,46 +101,29 @@ final class LaravelMysqlRepository extends Repository
             unset($webhookAttributeId);
         }
 
-        $connection->statement('set autocommit=0');
-        $connection->statement('lock tables Webhook write');
+        $connection->beginTransaction();
         try {
-            $existingWebhook = $connection->table('Webhook')
-                ->where('type', '=', $type)
-                ->where('listeningUrl', '=', $params->listeningUrl())
-                ->first()
-            ;
-            if ($existingWebhook !== null) {
-                return null;
-            }
+            $webhookId = $connection->table('Webhook')->insertGetId([
+                'type' => $type,
+                'listeningUrl' => $params->listeningUrl(),
+                'priority' => $params->priority(),
+            ]);
 
-            $connection->beginTransaction();
-            try {
-                $webhookId = $connection->table('Webhook')->insertGetId([
-                    'type' => $type,
-                    'listeningUrl' => $params->listeningUrl(),
-                    'priority' => $params->priority(),
-                ]);
-
-                if (count($webhookAttributeIds) === 0) {
-                    $connection->statement('lock tables WebhookWithoutAttribute write');
-                    $connection->table('WebhookWithoutAttribute')->insert(['webhookId' => $webhookId]);
-                } else {
-                    $connection->statement('lock tables WebhookRequiredAttribute write');
-                    foreach ($webhookAttributeIds as $webhookAttributeId) {
-                        $connection->table('WebhookRequiredAttribute')->insert([
-                            'webhookId' => $webhookId,
-                            'webhookAttributeId' => $webhookAttributeId,
-                        ]);
-                    }
+            if (count($webhookAttributeIds) === 0) {
+                $connection->table('WebhookWithoutAttribute')->insert(['webhookId' => $webhookId]);
+            } else {
+                foreach ($webhookAttributeIds as $webhookAttributeId) {
+                    $connection->table('WebhookRequiredAttribute')->insert([
+                        'webhookId' => $webhookId,
+                        'webhookAttributeId' => $webhookAttributeId,
+                    ]);
                 }
-
-                $connection->commit();
-            } catch (\Throwable $exception) {
-                $connection->rollBack();
-                throw $exception;
             }
-        } finally {
-            $connection->statement('unlock tables');
+
+            $connection->commit();
+        } catch (\Throwable $exception) {
+            $connection->rollBack();
+            throw $exception;
         }
 
         return new Webhook((string) $webhookId, $type, $params);

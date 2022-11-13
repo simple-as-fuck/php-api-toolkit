@@ -15,7 +15,7 @@ return new class () extends Migration {
                 `listeningUrl` VARCHAR(2000) CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL,
                 `priority` SMALLINT(6) NOT NULL,
                 PRIMARY KEY (`id`),
-                INDEX `listeningUrl_idx` (`listeningUrl` ASC)
+                UNIQUE INDEX `webhook_unique_idx` (`type` ASC, `listeningUrl` ASC)
             )
             ENGINE = InnoDB
             DEFAULT CHARACTER SET = utf8

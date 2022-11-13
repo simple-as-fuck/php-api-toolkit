@@ -6,6 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
@@ -121,6 +122,13 @@ final class LaravelMysqlRepository extends Repository
             }
 
             $connection->commit();
+        } catch (QueryException $exception) {
+            $connection->rollBack();
+
+            if (($exception->errorInfo[1] ?? null) !== 1062) {
+                throw $exception;
+            }
+            return null;
         } catch (\Throwable $exception) {
             $connection->rollBack();
             throw $exception;

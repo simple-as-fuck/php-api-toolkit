@@ -68,7 +68,7 @@ final class HeaderRule
     {
         return $this
             ->key('Authorization')
-            ->regex('/^' . preg_quote($type, '/') . ' (?P<value>.+)$/')
+            ->parseRegex('/^' . preg_quote($type, '/') . ' (?P<value>.+)$/')
             ->match('value')
         ;
     }

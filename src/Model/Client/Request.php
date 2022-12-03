@@ -10,7 +10,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
-use SimpleAsFuck\Validator\Rule\Url\ParseUrl;
 
 final class Request
 {
@@ -33,12 +32,13 @@ final class Request
     public function __construct(string $method, string $url, array $query = [], ?StreamInterface $body = null, array $headers = [])
     {
         if (count($query) !== 0) {
-            $url = ParseUrl::make($url, [], [PHP_URL_QUERY, PHP_URL_FRAGMENT], 'Parameter $url')->notNull();
+            StringRule::make($url, 'Parameter $url')->url([], [PHP_URL_QUERY, PHP_URL_FRAGMENT])->notNull();
             $url .= '?'.\http_build_query($query, '', '&', PHP_QUERY_RFC3986);
         }
 
+        StringRule::make($url, 'Parameter $url')->url([], [PHP_URL_SCHEME, PHP_URL_USER, PHP_URL_PASS, PHP_URL_HOST, PHP_URL_PORT])->notNull();
         $this->method = $method;
-        $this->url = ParseUrl::make($url, [], [PHP_URL_SCHEME, PHP_URL_USER, PHP_URL_PASS, PHP_URL_HOST, PHP_URL_PORT], 'Parameter $url')->notNull();
+        $this->url = $url;
         $this->headers = $headers;
         $this->body = $body;
         $this->baseUrl = null;
@@ -50,7 +50,7 @@ final class Request
     public function withBaseUrl(string $baseUrl): self
     {
         $request = new self($this->method, $this->url, [], $this->body, $this->headers);
-        $request->baseUrl = StringRule::make($baseUrl, 'Parameter $baseUrl')->parseHttpUrl([], [PHP_URL_QUERY, PHP_URL_FRAGMENT])->notNull();
+        $request->baseUrl = StringRule::make($baseUrl, 'Parameter $baseUrl')->httpUrl([], [PHP_URL_QUERY, PHP_URL_FRAGMENT])->notNull();
         return $request;
     }
 

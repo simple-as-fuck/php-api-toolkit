@@ -256,7 +256,7 @@ class ApiClient
             'POST',
             '/webhook?type='.$type,
             new Params(
-                StringRule::make($listeningUrl, 'Parameter $listeningUrl')->parseHttpUrl([PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PATH])->notNull(),
+                StringRule::make($listeningUrl, 'Parameter $listeningUrl')->httpUrl([PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PATH])->notNull(),
                 $priority,
                 $attributes
             ),

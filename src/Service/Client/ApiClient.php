@@ -7,12 +7,10 @@ namespace SimpleAsFuck\ApiToolkit\Service\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\RequestOptions;
 use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ConflictApiException;
@@ -22,6 +20,7 @@ use SimpleAsFuck\ApiToolkit\Model\Client\NotFoundApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponseApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
 use SimpleAsFuck\ApiToolkit\Model\Client\UnauthorizedApiException;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
@@ -31,15 +30,12 @@ use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 
 class ApiClient
 {
-    private Repository $configRepository;
-    private Client $client;
-    private RequestFactoryInterface $requestFactory;
-
-    public function __construct(Repository $configRepository, Client $client, RequestFactoryInterface $requestFactory)
-    {
-        $this->configRepository = $configRepository;
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
+    public function __construct(
+        private Repository $configRepository,
+        private Client $client,
+        private RequestFactoryInterface $requestFactory,
+        private ?DeprecationsLogger $deprecationsLogger = null
+    ) {
     }
 
     /**
@@ -104,7 +100,7 @@ class ApiClient
      * @param non-empty-string $apiName
      * @param array<RequestOptions::*, mixed> $options
      */
-    public function requestAsync(string $apiName, Request $request, array $options = []): PromiseInterface
+    public function requestAsync(string $apiName, Request $request, array $options = []): ResponsePromise
     {
         $config = $this->configRepository->getClientConfig($apiName);
         if (! $request->hasBaseUrl()) {
@@ -128,22 +124,22 @@ class ApiClient
             }
         }
 
-        return $this->client->sendAsync($request, $options);
+        return new ResponsePromise($apiName, $request, $this->client->sendAsync($request, $options));
     }
 
     /**
      * @throws ApiException
      */
-    public function waitRaw(PromiseInterface $promise): Response
+    public function waitRaw(ResponsePromise $promise): Response
     {
         try {
-            /** @var ResponseInterface $response */
             $response = $promise->wait();
-            $response = new Response($response);
         } catch (RequestException $exception) {
             $message = $exception->getMessage();
             $response = $exception->getResponse();
             if ($response !== null) {
+                $this->deprecationsLogger?->logDeprecation($promise->apiName(), $promise->request(), $response);
+
                 $responseContent = $response->getBody()->getContents();
                 $jsonMessage = Validator::make(\json_decode($responseContent))
                     ->object()
@@ -185,13 +181,14 @@ class ApiClient
             throw new ApiException($exception->getMessage(), null, $exception);
         }
 
+        $this->deprecationsLogger?->logDeprecation($promise->apiName(), $promise->request(), $response);
         return $response;
     }
 
     /**
      * @throws ApiException
      */
-    public function waitObject(PromiseInterface $promise, bool $allowInvalidJson = false): ObjectRule
+    public function waitObject(ResponsePromise $promise, bool $allowInvalidJson = false): ObjectRule
     {
         return $this->waitRaw($promise)->getJson($allowInvalidJson)->object();
     }
@@ -199,7 +196,7 @@ class ApiClient
     /**
      * @throws ApiException
      */
-    public function waitArray(PromiseInterface $promise, bool $allowInvalidJson = false): ArrayRule
+    public function waitArray(ResponsePromise $promise, bool $allowInvalidJson = false): ArrayRule
     {
         return $this->waitRaw($promise)->getJson($allowInvalidJson)->array();
     }

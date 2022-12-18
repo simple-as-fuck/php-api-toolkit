@@ -6,21 +6,17 @@ namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
 final class Config
 {
-    /** @var non-empty-string */
-    private string $baseUrl;
-    /** @var non-empty-string|null */
-    private ?string $bearerToken;
-    private bool $verifyCerts;
-
     /**
      * @param non-empty-string $baseUrl
      * @param non-empty-string|null $bearerToken
+     * @param non-empty-string $deprecatedHeader
      */
-    public function __construct(string $baseUrl, ?string $bearerToken, bool $verifyCerts = true)
-    {
-        $this->baseUrl = $baseUrl;
-        $this->bearerToken = $bearerToken;
-        $this->verifyCerts = $verifyCerts;
+    public function __construct(
+        private string $baseUrl,
+        private ?string $bearerToken,
+        private bool $verifyCerts = true,
+        private string $deprecatedHeader = 'Deprecated'
+    ) {
     }
 
     /**
@@ -42,5 +38,13 @@ final class Config
     public function verifyCerts(): bool
     {
         return $this->verifyCerts;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function deprecatedHeader(): string
+    {
+        return $this->deprecatedHeader;
     }
 }

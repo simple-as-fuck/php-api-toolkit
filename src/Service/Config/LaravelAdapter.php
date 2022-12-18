@@ -11,11 +11,9 @@ use SimpleAsFuck\Validator\Rule\General\Rules;
 
 final class LaravelAdapter extends Repository
 {
-    private \Illuminate\Contracts\Config\Repository $repository;
-
-    public function __construct(\Illuminate\Contracts\Config\Repository $repository)
-    {
-        $this->repository = $repository;
+    public function __construct(
+        private \Illuminate\Contracts\Config\Repository $repository
+    ) {
     }
 
     public function getClientConfig(string $apiName): Config
@@ -24,6 +22,7 @@ final class LaravelAdapter extends Repository
             $this->getValue('services.'.$apiName.'.base_url')->string()->notEmpty()->notNull(),
             $this->getValue('services.'.$apiName.'.token')->string()->notEmpty()->nullable(),
             $this->getValue('services.'.$apiName.'.verify')->bool()->nullable() ?? true,
+            $this->getValue('services.'.$apiName.'deprecated_header')->string()->notEmpty()->nullable() ?? 'Deprecated'
         );
     }
 

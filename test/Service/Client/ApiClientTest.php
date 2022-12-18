@@ -10,20 +10,22 @@ use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
+use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
 use SimpleAsFuck\ApiToolkit\Service\Client\ApiClient;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 
 final class ApiClientTest extends TestCase
 {
     private ApiClient $apiClient;
+    private HttpFactory $httpFactory;
 
     protected function setUp(): void
     {
         $configRepository = $this->createMock(Repository::class);
         $client = $this->createMock(Client::class);
-        $guzzleFactory = new HttpFactory();
+        $this->httpFactory = new HttpFactory();
 
-        $this->apiClient = new ApiClient($configRepository, $client, $guzzleFactory);
+        $this->apiClient = new ApiClient($configRepository, $client, $this->httpFactory);
     }
 
     /**
@@ -33,6 +35,7 @@ final class ApiClientTest extends TestCase
     {
         $promise = $this->createMock(PromiseInterface::class);
         $promise->method('wait')->willThrowException($exception);
+        $promise = new ResponsePromise('test', $this->httpFactory->createRequest('GET', 'http://test'), $promise);
 
         try {
             $this->apiClient->waitRaw($promise);

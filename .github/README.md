@@ -22,26 +22,43 @@ consider package version as unsupported except last version.
 
 ### Api client service
 
-Api client require guzzle client, psr client interface is not good enough because absence of async request.
+Api client requires guzzle client, psr client interface is not good enough because absence of async request.
 Second main dependency is some config repository, you can implement yours configuration loading.
+Optionally, you can add deprecations logger for automated logging of `Deprecated`
+or [Sunset](https://datatracker.ietf.org/doc/html/rfc8594) response header.
 
-For laravel is prepared Laravel config adapter which load automatically configuration from services.php config,
-with structure:
+Laravel config adapter load automatically configuration from `services.php` config, with structure:
 
 ```php
     'some_api_name' => [ // this key is value of first parameter ApiClient::request method
         'base_url' => 'https://some-host/some-base-url',
         'token' => 'tokenexample', // optional default null, authentication token for https://swagger.io/docs/specification/authentication/bearer-authentication/
         'verify' => true, // optional default true, turn on/off certificates verification
+        'deprecated_header' => 'Deprecated', // optional default 'Deprecated', define name of deprecated response header logged into deprecation log
     ],
 ```
+
+If you have in Laravel defined config key [logging.deprecations](https://laravel.com/docs/logging#logging-deprecation-warnings),
+Deprecated or Sunset headers will be logged into defined log channel.
 
 ```php
 /**
  * @var \SimpleAsFuck\ApiToolkit\Service\Config\Repository $configRepository
+ * @var \Psr\Log\LoggerInterface $logger
  */
 
-$client = new \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient($configRepository, new \GuzzleHttp\Client(), new \GuzzleHttp\Psr7\HttpFactory());
+/** @var \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger|null $deprecationsLogger */
+$deprecationsLogger = new \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger(
+    $logger,
+    $configRepository
+);
+
+$client = new \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient(
+    $configRepository,
+    new \GuzzleHttp\Client(),
+    new \GuzzleHttp\Psr7\HttpFactory(),
+    $deprecationsLogger
+);
 
 /**
  * with transformer, YourClass can be converted into different api structure

@@ -57,12 +57,40 @@ final class ApiClientTest extends TestCase
         $httpFactory = new HttpFactory();
         $request = $httpFactory->createRequest('GET', '');
         $response = new Response($httpFactory->createResponse(400));
-        $jsonBody = $httpFactory->createStream('{"message":"Json message"}');
 
         return [
             [0, 'Exception message', '', new TransferException('Exception message')],
             [400, 'Exception message', '', new RequestException('Exception message', $request, $response)],
-            [400, 'Json message', '{"message":"Json message"}', new RequestException('Exception message', $request, $response->withBody($jsonBody))],
+            [
+                400,
+                'Json message',
+                '{"message":"Json message"}',
+                new RequestException(
+                    'Exception message',
+                    $request,
+                    $response->withBody($httpFactory->createStream('{"message":"Json message"}'))
+                ),
+            ],
+            [
+                400,
+                'Json title',
+                '{"title":"Json title"}',
+                new RequestException(
+                    'Exception message',
+                    $request,
+                    $response->withBody($httpFactory->createStream('{"title":"Json title"}'))
+                ),
+            ],
+            [
+                400,
+                'Error type: "/test/error" Json title status (401) instance: "/test/url"',
+                '{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}',
+                new RequestException(
+                    'Exception message',
+                    $request,
+                    $response->withBody($httpFactory->createStream('{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}'))
+                ),
+            ],
         ];
     }
 }

@@ -141,15 +141,43 @@ class ApiClient
                 $this->deprecationsLogger?->logDeprecation($promise->apiName(), $promise->request(), $response);
 
                 $responseContent = $response->getBody()->getContents();
-                $jsonMessage = Validator::make(\json_decode($responseContent))
-                    ->object()
-                    ->property('message')
-                    ->string()
-                    ->notEmpty()
-                    ->nullable(true)
+                $errorObject = Validator::make(\json_decode($responseContent))->object();
+                $errorParts = [];
+
+                // https://datatracker.ietf.org/doc/html/rfc7807
+                $errorType = $errorObject->property('type')->string()->notEmpty()->nullable(true);
+                if ($errorType !== null) {
+                    $errorParts[] = 'Error type: "'.$errorType.'"';
+                }
+
+                $errorMessage =
+                    $errorObject
+                        ->property('title')
+                        ->string()
+                        ->notEmpty()
+                        ->nullable(true)
+                    ??
+                    $errorObject
+                        ->property('message')
+                        ->string()
+                        ->notEmpty()
+                        ->nullable(true)
                 ;
-                if ($jsonMessage !== null) {
-                    $message = $jsonMessage;
+                if ($errorMessage !== null) {
+                    $errorParts[] = $errorMessage;
+                }
+
+                if (count($errorParts) !== 0) {
+                    $errorStatus = $errorObject->property('status')->int()->nullable(true);
+                    if ($errorStatus !== null) {
+                        $errorParts[] = 'status ('.$errorStatus.')';
+                    }
+                    $errorInstance = $errorObject->property('instance')->string()->notEmpty()->nullable(true);
+                    if ($errorInstance !== null) {
+                        $errorParts[] = 'instance: "'.$errorInstance.'"';
+                    }
+
+                    $message = implode(' ', $errorParts);
                 }
 
                 $response = $response->withBody((new HttpFactory())->createStream($responseContent));

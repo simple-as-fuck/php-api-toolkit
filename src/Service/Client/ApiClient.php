@@ -16,6 +16,7 @@ use SimpleAsFuck\ApiToolkit\Model\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ConflictApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ForbiddenApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\GoneApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\InternalServerErrorApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\NotFoundApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
@@ -199,6 +200,9 @@ class ApiClient
                 }
                 if ($response->getStatusCode() === HttpCodes::HTTP_GONE) {
                     throw new GoneApiException($response, $message, $exception);
+                }
+                if ($response->getStatusCode() === HttpCodes::HTTP_INTERNAL_SERVER_ERROR) {
+                    throw new InternalServerErrorApiException($response, $message, $exception);
                 }
 
                 throw new ResponseApiException($response, $message, $exception);

@@ -30,6 +30,29 @@ jobs:
       - name: Run tests
         run: vendor/bin/phpunit test/
 
+  php82a:
+    name: "php 8.2, laravel 9, PSR log 2"
+    runs-on: ubuntu-latest
+    container: "nofutur3/php-tests:8.2"
+    services:
+      database:
+        image: "mysql:5.7"
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: database
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: composer update --no-interaction --with illuminate/support:^9.0 --with psr/log:^2.0
+
+      - name: Run static analysis
+        run: vendor/bin/phpstan analyse --memory-limit=-1
+
+      - name: Run tests
+        run: vendor/bin/phpunit test/
+
   php81:
     name: "php 8.1"
     runs-on: ubuntu-latest

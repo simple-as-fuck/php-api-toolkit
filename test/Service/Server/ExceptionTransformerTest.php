@@ -32,7 +32,7 @@ final class ExceptionTransformerTest extends TestCase
                 self::assertNotSame('', $item);
             }
         } else {
-            self::assertObjectNotHasAttribute('trace', $transformedData);
+            self::assertNull($transformedData->trace ?? null);
         }
     }
 

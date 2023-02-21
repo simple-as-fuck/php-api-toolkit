@@ -8,7 +8,7 @@ use SimpleAsFuck\ApiToolkit\Model\Server\QueryRule;
 use SimpleAsFuck\Validator\Rule\Custom\UserArrayRule;
 
 /**
- * @template TClass
+ * @template TClass of object
  * @extends UserArrayRule<QueryRule, TClass>
  */
 interface UserQueryRule extends UserArrayRule

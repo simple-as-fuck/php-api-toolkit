@@ -48,10 +48,12 @@ final class QueryRule
      */
     public function class(UserQueryRule $userQueryRule): ClassFromArray
     {
+        /** @var Validated<mixed> $validated */
+        $validated = $this->queryParams;
         return new ClassFromArray(
             $this->exceptionFactory,
             new RuleChain(),
-            $this->queryParams,
+            $validated,
             'Request query',
             $this,
             $userQueryRule

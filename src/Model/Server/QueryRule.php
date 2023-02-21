@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Server;
 
+use SimpleAsFuck\ApiToolkit\Service\Server\UserQueryRule;
 use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\RuleChain;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\ArrayRule\Key;
 use SimpleAsFuck\Validator\Rule\ArrayRule\StringTypedKey;
+use SimpleAsFuck\Validator\Rule\Object\ClassFromArray;
 
 final class QueryRule
 {
-    private Exception $exceptionFactory;
-    /** @var Validated<array<mixed>> */
-    private Validated $queryParams;
-
     /**
      * @param Validated<array<mixed>> $queryParams
      */
-    public function __construct(Exception $exceptionFactory, Validated $queryParams)
-    {
-        $this->exceptionFactory = $exceptionFactory;
-        $this->queryParams = $queryParams;
+    public function __construct(
+        private Exception $exceptionFactory,
+        private Validated $queryParams
+    ) {
     }
 
     /**
@@ -40,6 +38,23 @@ final class QueryRule
             $validated,
             $valueName,
             new Key($this->exceptionFactory, $ruleChain, $validated, $valueName, $key)
+        );
+    }
+
+    /**
+     * @template TClass of object
+     * @param UserQueryRule<TClass> $userQueryRule
+     * @return ClassFromArray<QueryRule, TClass>
+     */
+    public function class(UserQueryRule $userQueryRule): ClassFromArray
+    {
+        return new ClassFromArray(
+            $this->exceptionFactory,
+            new RuleChain(),
+            $this->queryParams,
+            'Request query',
+            $this,
+            $userQueryRule
         );
     }
 }

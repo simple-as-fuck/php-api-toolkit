@@ -85,14 +85,14 @@ final class YourTransformer implements \SimpleAsFuck\ApiToolkit\Service\Transfor
  */
 
 try {
-    $response = $client->request('some_api_name', 'POST', '/to-some-action', $yourModelForRequestBody, new YourTransformer());
+    $responseObject = $client->requestObject('some_api_name', 'POST', '/to-some-action', $yourModelForRequestBody, new YourTransformer());
     /*
      * response has getter for json decoded body which is validated after decoding by rule chain
      * request method return object rule, so you can easily validate response json structure
      * is recommended use some you class rule documented here: https://github.com/simple-as-fuck/php-validator#user-class-rule
      * and convert api data structure into some your concrete object instance
      */
-    $yourModelFromResponseBody = $response->class($classRuleForResponseModel)->notNull();
+    $yourModelFromResponseBody = $responseObject->class($classRuleForResponseModel)->notNull();
 }
 catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
     /*

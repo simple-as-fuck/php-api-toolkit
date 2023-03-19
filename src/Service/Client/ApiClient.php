@@ -251,7 +251,7 @@ class ApiClient
      */
     public function addWebhookListener(string $apiName, string $type, string $listeningUrl, int $priority = Priority::NORMAL, array $attributes = [], array $requestHeaders = []): Webhook
     {
-        return $this->request(
+        return $this->requestObject(
             $apiName,
             'POST',
             '/webhook?type='.$type,

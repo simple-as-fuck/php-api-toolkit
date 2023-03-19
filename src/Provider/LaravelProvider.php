@@ -10,7 +10,9 @@ use Illuminate\Log\LogManager;
 use Illuminate\Support\ServiceProvider;
 use Psr\Http\Message\RequestFactoryInterface;
 use SimpleAsFuck\ApiToolkit\Service\Client\ApiClient;
+use SimpleAsFuck\ApiToolkit\Service\Client\Config;
 use SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger;
+use SimpleAsFuck\ApiToolkit\Service\Client\LaravelConfig;
 use SimpleAsFuck\ApiToolkit\Service\Config\LaravelAdapter;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 
@@ -18,19 +20,20 @@ class LaravelProvider extends ServiceProvider
 {
     public function register()
     {
+        $this->app->singleton(Config::class, LaravelConfig::class);
         $this->app->singleton(Repository::class, LaravelAdapter::class);
         $this->app->singleton(RequestFactoryInterface::class, HttpFactory::class);
         $this->app->singleton(ApiClient::class, function (): ApiClient {
             /** @var \Illuminate\Contracts\Config\Repository $config */
             $config = $this->app->make(\Illuminate\Contracts\Config\Repository::class);
-            /** @var Repository $apiConfig */
-            $apiConfig = $this->app->make(Repository::class);
+            /** @var Config $apiConfig */
+            $apiConfig = $this->app->make(Config::class);
 
             $deprecationLogger = $config->get('logging.deprecations');
             if (is_string($deprecationLogger)) {
                 /** @var LogManager $logManager */
                 $logManager = $this->app->make(LogManager::class);
-                $deprecationLogger = new DeprecationsLogger($logManager->channel($deprecationLogger), $apiConfig);
+                $deprecationLogger = new DeprecationsLogger($apiConfig, $logManager->channel($deprecationLogger));
             } else {
                 $deprecationLogger = null;
             }

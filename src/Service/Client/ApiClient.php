@@ -23,7 +23,6 @@ use SimpleAsFuck\ApiToolkit\Model\Client\Response;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponseApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
 use SimpleAsFuck\ApiToolkit\Model\Client\UnauthorizedApiException;
-use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
@@ -32,7 +31,7 @@ use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 class ApiClient
 {
     public function __construct(
-        private Repository $configRepository,
+        private Config $config,
         private Client $client,
         private RequestFactoryInterface $requestFactory,
         private ?DeprecationsLogger $deprecationsLogger = null
@@ -103,20 +102,19 @@ class ApiClient
      */
     public function requestAsync(string $apiName, Request $request, array $options = []): ResponsePromise
     {
-        $config = $this->configRepository->getClientConfig($apiName);
         if (! $request->hasBaseUrl()) {
-            $request = $request->withBaseUrl($config->baseUrl());
+            $request = $request->withBaseUrl($this->config->getBaseUrl($apiName));
         }
 
         $request = $request->createPsr($this->requestFactory);
 
-        $token = $config->bearerToken();
+        $token = $this->config->getBearerToken($apiName);
         if (! $request->hasHeader('Authorization') && $token !== null) {
             $request = $request->withHeader('Authorization', 'Bearer '.$token);
         }
 
         $defaultOptions = [
-            RequestOptions::VERIFY => $config->verifyCerts(),
+            RequestOptions::VERIFY => $this->config->getVerifyCerts($apiName),
         ];
 
         foreach ($defaultOptions as $key => $defaultOption) {

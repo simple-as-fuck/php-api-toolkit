@@ -12,7 +12,7 @@ use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
 use SimpleAsFuck\ApiToolkit\Service\Client\ApiClient;
-use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
+use SimpleAsFuck\ApiToolkit\Service\Client\Config;
 
 final class ApiClientTest extends TestCase
 {
@@ -21,11 +21,11 @@ final class ApiClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $configRepository = $this->createMock(Repository::class);
+        $config = $this->createMock(Config::class);
         $client = $this->createMock(Client::class);
         $this->httpFactory = new HttpFactory();
 
-        $this->apiClient = new ApiClient($configRepository, $client, $this->httpFactory);
+        $this->apiClient = new ApiClient($config, $client, $this->httpFactory);
     }
 
     /**

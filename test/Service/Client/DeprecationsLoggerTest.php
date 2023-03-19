@@ -6,9 +6,8 @@ use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use SimpleAsFuck\ApiToolkit\Model\Client\Config;
+use SimpleAsFuck\ApiToolkit\Service\Client\Config;
 use SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger;
-use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 
 /**
  * @covers \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger
@@ -30,12 +29,13 @@ final class DeprecationsLoggerTest extends TestCase
             $psrLogger->expects(self::once())->method('warning')->with($expectedLogMessage, $expectedContext);
         }
 
-        $configRepository = $this->createMock(Repository::class);
-        $configRepository->method('getClientConfig')->willReturn(new Config('https://test', null));
+        $config = $this->createMock(Config::class);
+        $config->method('getBaseUrl')->willReturn('https://test');
+        $config->method('getDeprecatedHeader')->willReturn('Deprecated');
 
         $httpFactory = new HttpFactory();
 
-        $logger = new DeprecationsLogger($psrLogger, $configRepository);
+        $logger = new DeprecationsLogger($config, $psrLogger);
         $logger->logDeprecation('test', $httpFactory->createRequest('GET', 'https://test'), $response);
     }
 

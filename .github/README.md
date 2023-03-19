@@ -23,11 +23,11 @@ consider package version as unsupported except last version.
 ### Api client service
 
 Api client requires guzzle client, psr client interface is not good enough because absence of async request.
-Second main dependency is some config repository, you can implement yours configuration loading.
+Second main dependency is some config, you can implement yours configuration loading.
 Optionally, you can add deprecations logger for automated logging of `Deprecated`
 or [Sunset](https://datatracker.ietf.org/doc/html/rfc8594) response header.
 
-Laravel config adapter load automatically configuration from `services.php` config, with structure:
+Laravel config load automatically configuration from `services.php` config, with structure:
 
 ```php
     'some_api_name' => [ // this key is value of first parameter ApiClient::request method
@@ -43,18 +43,18 @@ Deprecated or Sunset headers will be logged into defined log channel.
 
 ```php
 /**
- * @var \SimpleAsFuck\ApiToolkit\Service\Config\Repository $configRepository
+ * @var \SimpleAsFuck\ApiToolkit\Service\Client\Config $config
  * @var \Psr\Log\LoggerInterface $logger
  */
 
 /** @var \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger|null $deprecationsLogger */
 $deprecationsLogger = new \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger(
-    $logger,
-    $configRepository
+    $config,
+    $logger
 );
 
 $client = new \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient(
-    $configRepository,
+    $config,
     new \GuzzleHttp\Client(),
     new \GuzzleHttp\Psr7\HttpFactory(),
     $deprecationsLogger

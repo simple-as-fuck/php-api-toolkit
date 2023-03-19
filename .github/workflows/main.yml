@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction
 
+      - name: Chesk code style
+        run: vendor/bin/php-cs-fixer fix --dry-run --no-interaction
+
       - name: Run static analysis
         run: vendor/bin/phpstan analyse --memory-limit=-1
 
@@ -69,9 +72,6 @@ jobs:
 
       - name: Install dependencies
         run: composer install --no-interaction
-
-      - name: Chesk code style
-        run: vendor/bin/php-cs-fixer fix --dry-run --no-interaction
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse --memory-limit=-1

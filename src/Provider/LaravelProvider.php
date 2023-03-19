@@ -28,20 +28,20 @@ class LaravelProvider extends ServiceProvider
             $config = $this->app->make(\Illuminate\Contracts\Config\Repository::class);
             /** @var Config $apiConfig */
             $apiConfig = $this->app->make(Config::class);
+            /** @var RequestFactoryInterface $requestFactory */
+            $requestFactory = $this->app->make(RequestFactoryInterface::class);
 
             $deprecationLogger = $config->get('logging.deprecations');
             if (is_string($deprecationLogger)) {
                 /** @var LogManager $logManager */
                 $logManager = $this->app->make(LogManager::class);
-                $deprecationLogger = new DeprecationsLogger($apiConfig, $logManager->channel($deprecationLogger));
+                $deprecationLogger = new DeprecationsLogger($apiConfig, $logManager->channel($deprecationLogger), $requestFactory);
             } else {
                 $deprecationLogger = null;
             }
 
             /** @var Client $client */
             $client = $this->app->make(Client::class);
-            /** @var RequestFactoryInterface $requestFactory */
-            $requestFactory = $this->app->make(RequestFactoryInterface::class);
 
             return new ApiClient($apiConfig, $client, $requestFactory, $deprecationLogger);
         });

@@ -6,6 +6,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Service\Client\Config;
 use SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger;
 
@@ -30,13 +31,12 @@ final class DeprecationsLoggerTest extends TestCase
         }
 
         $config = $this->createMock(Config::class);
-        $config->method('getBaseUrl')->willReturn('https://test');
         $config->method('getDeprecatedHeader')->willReturn('Deprecated');
 
         $httpFactory = new HttpFactory();
 
-        $logger = new DeprecationsLogger($config, $psrLogger);
-        $logger->logDeprecation('test', $httpFactory->createRequest('GET', 'https://test'), $response);
+        $logger = new DeprecationsLogger($config, $psrLogger, $httpFactory);
+        $logger->logDeprecation('test', (new Request('GET', '/'))->withBaseUrl('https://test'), $response);
     }
 
     /**
@@ -49,7 +49,7 @@ final class DeprecationsLoggerTest extends TestCase
         return [
             [null, [], $httpFactory->createResponse()],
             [
-                'Api: test method: GET uri: "https://test" call is deprecated',
+                'Api: test method: GET uri: "https://test/" call is deprecated',
                 [
                     'Sunset' => '2022-12-15T21:46:37+00:00',
                     'Link' => 'https://example.net/sunset',
@@ -62,7 +62,7 @@ final class DeprecationsLoggerTest extends TestCase
                 ,
             ],
             [
-                'Api: test method: GET uri: "https://test" call is deprecated',
+                'Api: test method: GET uri: "https://test/" call is deprecated',
                 [
                     'Sunset' => 'Some sunset header with incorrect format',
                     'Link' => 'Some sunset link with incorrect format',

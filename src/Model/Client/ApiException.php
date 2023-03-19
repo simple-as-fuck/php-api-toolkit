@@ -6,12 +6,18 @@ namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
 class ApiException extends \RuntimeException
 {
-    private ?Response $response;
+    public function __construct(
+        string $message,
+        private Request $request,
+        private ?Response $response = null,
+        \Throwable $previous = null
+    ) {
+        parent::__construct($message, $response?->getStatusCode() ?? 0, $previous);
+    }
 
-    public function __construct(string $message = '', ?Response $response = null, \Throwable $previous = null)
+    public function request(): Request
     {
-        parent::__construct($message, $response !== null ? $response->getStatusCode() : 0, $previous);
-        $this->response = $response;
+        return $this->request;
     }
 
     public function response(): ?Response

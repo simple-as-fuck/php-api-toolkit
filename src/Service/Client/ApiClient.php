@@ -106,11 +106,11 @@ class ApiClient
             $request = $request->withBaseUrl($this->config->getBaseUrl($apiName));
         }
 
-        $request = $request->createPsr($this->requestFactory);
+        $psrRequest = $request->createPsr($this->requestFactory);
 
         $token = $this->config->getBearerToken($apiName);
-        if (! $request->hasHeader('Authorization') && $token !== null) {
-            $request = $request->withHeader('Authorization', 'Bearer '.$token);
+        if (! $psrRequest->hasHeader('Authorization') && $token !== null) {
+            $psrRequest = $psrRequest->withHeader('Authorization', 'Bearer '.$token);
         }
 
         $defaultOptions = [
@@ -123,7 +123,7 @@ class ApiClient
             }
         }
 
-        return new ResponsePromise($apiName, $request, $this->client->sendAsync($request, $options));
+        return new ResponsePromise($apiName, $request, $this->client->sendAsync($psrRequest, $options));
     }
 
     /**
@@ -180,35 +180,35 @@ class ApiClient
                 }
 
                 $response = $response->withBody((new HttpFactory())->createStream($responseContent));
-                $response = new Response($response);
+                $response = new Response($promise->request(), $response);
                 if ($response->getStatusCode() === HttpCodes::HTTP_BAD_REQUEST) {
-                    throw new BadRequestApiException($response, $message, $exception);
+                    throw new BadRequestApiException($message, $promise->request(), $response, $exception);
                 }
                 if ($response->getStatusCode() === HttpCodes::HTTP_UNAUTHORIZED) {
-                    throw new UnauthorizedApiException($response, $message, $exception);
+                    throw new UnauthorizedApiException($message, $promise->request(), $response, $exception);
                 }
                 if ($response->getStatusCode() === HttpCodes::HTTP_FORBIDDEN) {
-                    throw new ForbiddenApiException($response, $message, $exception);
+                    throw new ForbiddenApiException($message, $promise->request(), $response, $exception);
                 }
                 if ($response->getStatusCode() === HttpCodes::HTTP_NOT_FOUND) {
-                    throw new NotFoundApiException($response, $message, $exception);
+                    throw new NotFoundApiException($message, $promise->request(), $response, $exception);
                 }
                 if ($response->getStatusCode() === HttpCodes::HTTP_CONFLICT) {
-                    throw new ConflictApiException($response, $message, $exception);
+                    throw new ConflictApiException($message, $promise->request(), $response, $exception);
                 }
                 if ($response->getStatusCode() === HttpCodes::HTTP_GONE) {
-                    throw new GoneApiException($response, $message, $exception);
+                    throw new GoneApiException($message, $promise->request(), $response, $exception);
                 }
                 if ($response->getStatusCode() === HttpCodes::HTTP_INTERNAL_SERVER_ERROR) {
-                    throw new InternalServerErrorApiException($response, $message, $exception);
+                    throw new InternalServerErrorApiException($message, $promise->request(), $response, $exception);
                 }
 
-                throw new ResponseApiException($response, $message, $exception);
+                throw new ResponseApiException($message, $promise->request(), $response, $exception);
             }
 
-            throw new ApiException($message, null, $exception);
+            throw new ApiException($message, $promise->request(), null, $exception);
         } catch (TransferException $exception) {
-            throw new ApiException($exception->getMessage(), null, $exception);
+            throw new ApiException($exception->getMessage(), $promise->request(), null, $exception);
         }
 
         $this->deprecationsLogger?->logDeprecation($promise->apiName(), $promise->request(), $response);

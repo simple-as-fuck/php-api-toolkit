@@ -6,12 +6,13 @@ namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
 class ResponseApiException extends ApiException
 {
-    private Response $response;
-
-    final public function __construct(Response $response, string $message = '', \Throwable $previous = null)
-    {
-        parent::__construct($message, $response, $previous);
-        $this->response = $response;
+    final public function __construct(
+        string $message,
+        Request $request,
+        private Response $response,
+        \Throwable $previous = null
+    ) {
+        parent::__construct($message, $request, $response, $previous);
     }
 
     final public function response(): Response

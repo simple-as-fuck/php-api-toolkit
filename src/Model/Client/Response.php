@@ -12,11 +12,10 @@ use SimpleAsFuck\Validator\Rule\General\Rules;
 
 final class Response implements ResponseInterface
 {
-    private ResponseInterface $response;
-
-    public function __construct(ResponseInterface $response)
-    {
-        $this->response = $response;
+    public function __construct(
+        private Request $request,
+        private ResponseInterface $response
+    ) {
     }
 
     /**
@@ -24,7 +23,7 @@ final class Response implements ResponseInterface
      */
     public function withProtocolVersion($version): self
     {
-        return new self($this->response->withProtocolVersion($version));
+        return new self($this->request, $this->response->withProtocolVersion($version));
     }
 
     /**
@@ -33,7 +32,7 @@ final class Response implements ResponseInterface
      */
     public function withHeader($name, $value): self
     {
-        return new self($this->response->withHeader($name, $value));
+        return new self($this->request, $this->response->withHeader($name, $value));
     }
 
     /**
@@ -42,7 +41,7 @@ final class Response implements ResponseInterface
      */
     public function withAddedHeader($name, $value): self
     {
-        return new self($this->response->withAddedHeader($name, $value));
+        return new self($this->request, $this->response->withAddedHeader($name, $value));
     }
 
     /**
@@ -50,12 +49,12 @@ final class Response implements ResponseInterface
      */
     public function withoutHeader($name): self
     {
-        return new self($this->response->withoutHeader($name));
+        return new self($this->request, $this->response->withoutHeader($name));
     }
 
     public function withBody(StreamInterface $body): self
     {
-        return new self($this->response->withBody($body));
+        return new self($this->request, $this->response->withBody($body));
     }
 
     /**
@@ -64,7 +63,7 @@ final class Response implements ResponseInterface
      */
     public function withStatus($code, $reasonPhrase = ''): self
     {
-        return new self($this->response->withStatus($code, $reasonPhrase));
+        return new self($this->request, $this->response->withStatus($code, $reasonPhrase));
     }
 
     public function getProtocolVersion(): string
@@ -115,7 +114,7 @@ final class Response implements ResponseInterface
      */
     public function getJson(bool $allowInvalidJson = false): Rules
     {
-        return MessageService::parseJsonFromBody(new ParseResponseException($this), $this->response, 'Response body', $allowInvalidJson);
+        return MessageService::parseJsonFromBody(new ParseResponseException($this->request, $this), $this->response, 'Response body', $allowInvalidJson);
     }
 
     public function getStatusCode(): int

@@ -50,7 +50,8 @@ Deprecated or Sunset headers will be logged into defined log channel.
 /** @var \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger|null $deprecationsLogger */
 $deprecationsLogger = new \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger(
     $config,
-    $logger
+    $logger,
+    new \GuzzleHttp\Psr7\HttpFactory()
 );
 
 $client = new \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient(

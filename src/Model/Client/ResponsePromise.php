@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
 use GuzzleHttp\Promise\PromiseInterface;
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 final class ResponsePromise
@@ -15,7 +14,7 @@ final class ResponsePromise
      */
     public function __construct(
         private string $apiName,
-        private RequestInterface $request,
+        private Request $request,
         private PromiseInterface $promise
     ) {
     }
@@ -28,7 +27,7 @@ final class ResponsePromise
         return $this->apiName;
     }
 
-    public function request(): RequestInterface
+    public function request(): Request
     {
         return $this->request;
     }
@@ -37,6 +36,6 @@ final class ResponsePromise
     {
         /** @var ResponseInterface $response */
         $response = $this->promise->wait();
-        return new Response($response);
+        return new Response($this->request, $response);
     }
 }

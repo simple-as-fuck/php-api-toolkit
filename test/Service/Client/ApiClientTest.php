@@ -9,6 +9,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
+use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
 use SimpleAsFuck\ApiToolkit\Service\Client\ApiClient;
@@ -17,15 +18,14 @@ use SimpleAsFuck\ApiToolkit\Service\Client\Config;
 final class ApiClientTest extends TestCase
 {
     private ApiClient $apiClient;
-    private HttpFactory $httpFactory;
 
     protected function setUp(): void
     {
         $config = $this->createMock(Config::class);
         $client = $this->createMock(Client::class);
-        $this->httpFactory = new HttpFactory();
+        $httpFactory = new HttpFactory();
 
-        $this->apiClient = new ApiClient($config, $client, $this->httpFactory);
+        $this->apiClient = new ApiClient($config, $client, $httpFactory);
     }
 
     /**
@@ -35,7 +35,7 @@ final class ApiClientTest extends TestCase
     {
         $promise = $this->createMock(PromiseInterface::class);
         $promise->method('wait')->willThrowException($exception);
-        $promise = new ResponsePromise('test', $this->httpFactory->createRequest('GET', 'http://test'), $promise);
+        $promise = new ResponsePromise('test', new Request('GET', '/'), $promise);
 
         try {
             $this->apiClient->waitRaw($promise);
@@ -55,8 +55,8 @@ final class ApiClientTest extends TestCase
     public function dataProviderWaitRawFail(): array
     {
         $httpFactory = new HttpFactory();
-        $request = $httpFactory->createRequest('GET', '');
-        $response = new Response($httpFactory->createResponse(400));
+        $request = $httpFactory->createRequest('GET', '/');
+        $response = new Response(new Request('GET', '/'), $httpFactory->createResponse(400));
 
         return [
             [0, 'Exception message', '', new TransferException('Exception message')],

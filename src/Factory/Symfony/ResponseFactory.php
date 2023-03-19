@@ -15,12 +15,12 @@ final class ResponseFactory
 {
     /**
      * @template TBody
-     * @param TBody|null $body
+     * @param TBody|null $body will be encoded as json
      * @param Transformer<TBody>|null $transformer
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeJson($body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): \Symfony\Component\HttpFoundation\Response
+    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): \Symfony\Component\HttpFoundation\Response
     {
         $factory = new HttpFoundationFactory();
         return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson($body, $transformer, $code, $headers));
@@ -28,7 +28,7 @@ final class ResponseFactory
 
     /**
      * @template TBody
-     * @param iterable<TBody> $body
+     * @param iterable<TBody> $body will be encoded as json
      * @param Transformer<TBody>|null $transformer
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers

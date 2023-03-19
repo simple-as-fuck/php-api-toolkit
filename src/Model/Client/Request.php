@@ -59,7 +59,7 @@ final class Request
      * @param TData $jsonData
      * @param Transformer<TData>|null $transformer
      */
-    public function withJson($jsonData, ?Transformer $transformer): self
+    public function withJson(mixed $jsonData, ?Transformer $transformer): self
     {
         if ($transformer !== null) {
             $jsonData = $transformer->toApi($jsonData);

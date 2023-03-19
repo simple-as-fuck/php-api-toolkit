@@ -43,33 +43,36 @@ class ApiClient
      * @param non-empty-string $apiName
      * @param non-empty-string $method
      * @param non-empty-string $urlWithQuery
-     * @param TBody|null $body
+     * @param TBody|null $body will be encoded as json
      * @param Transformer<TBody>|null $bodyTransformer
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
      * @throws ApiException
      */
-    public function request(string $apiName, string $method, string $urlWithQuery, $body = null, ?Transformer $bodyTransformer = null, array $headers = [], array $options = []): ObjectRule
+    public function request(string $apiName, string $method, string $urlWithQuery, mixed $body = null, ?Transformer $bodyTransformer = null, array $headers = [], array $options = []): Response
     {
         $request = new Request($method, $urlWithQuery, [], null, $headers);
         if ($body !== null) {
             $request = $request->withJson($body, $bodyTransformer);
         }
 
-        return $this->waitObject($this->requestAsync($apiName, $request, $options), true);
+        return $this->waitRaw($this->requestAsync($apiName, $request, $options));
     }
 
     /**
+     * @template TBody
      * @param non-empty-string $apiName
      * @param non-empty-string $method
      * @param non-empty-string $urlWithQuery
+     * @param TBody|null $body will be encoded as json
+     * @param Transformer<TBody>|null $bodyTransformer
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
      * @throws ApiException
      */
-    public function requestObject(string $apiName, string $method, string $urlWithQuery, array $headers = [], array $options = []): ObjectRule
+    public function requestObject(string $apiName, string $method, string $urlWithQuery, mixed $body = null, ?Transformer $bodyTransformer = null, array $headers = [], array $options = []): ObjectRule
     {
-        return $this->waitObject($this->requestAsync($apiName, new Request($method, $urlWithQuery, [], null, $headers), $options));
+        return $this->request($apiName, $method, $urlWithQuery, $body, $bodyTransformer, $headers, $options)->getJson()->object();
     }
 
     /**

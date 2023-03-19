@@ -17,12 +17,12 @@ final class ResponseFactory
 {
     /**
      * @template TBody
-     * @param TBody|null $body
+     * @param TBody|null $body will be encoded as json
      * @param Transformer<TBody>|null $transformer
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeJson($body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
+    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
     {
         $headers['Content-Type'] = 'application/json';
         $factory = new HttpFactory();
@@ -38,7 +38,7 @@ final class ResponseFactory
 
     /**
      * @template TBody
-     * @param \Iterator<TBody> $body
+     * @param \Iterator<TBody> $body will be encoded as json
      * @param Transformer<TBody>|null $transformer
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers

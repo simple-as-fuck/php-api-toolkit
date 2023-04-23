@@ -6,24 +6,15 @@ namespace SimpleAsFuck\ApiToolkit\Model\Webhook;
 
 final class Webhook
 {
-    /** @var non-empty-string */
-    private string $id;
-    /** @var non-empty-string */
-    private string $type;
-    private Params $params;
-
     /**
      * @param non-empty-string $id
      * @param non-empty-string $type
      */
     public function __construct(
-        string $id,
-        string $type,
-        Params $params
+        private string $id,
+        private string $type,
+        private Params $params
     ) {
-        $this->id = $id;
-        $this->type = $type;
-        $this->params = $params;
     }
 
     /**

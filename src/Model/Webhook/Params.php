@@ -6,26 +6,16 @@ namespace SimpleAsFuck\ApiToolkit\Model\Webhook;
 
 final class Params
 {
-    /** @var non-empty-string */
-    private string $listeningUrl;
-    /** @var Priority::* */
-    private int $priority;
-    /** @var array<string, string> */
-    private array $attributes;
-
     /**
      * @param non-empty-string $listeningUrl
      * @param Priority::* $priority
      * @param array<string, string> $attributes
      */
     public function __construct(
-        string $listeningUrl,
-        int $priority,
-        array $attributes
+        private string $listeningUrl,
+        private int $priority,
+        private array $attributes
     ) {
-        $this->listeningUrl = $listeningUrl;
-        $this->priority = $priority;
-        $this->attributes = $attributes;
     }
 
     /**

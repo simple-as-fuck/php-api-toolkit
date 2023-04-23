@@ -17,11 +17,9 @@ use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 
 final class AddListener implements RequestHandlerInterface
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
-    {
-        $this->repository = $repository;
+    public function __construct(
+        private Repository $repository
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface

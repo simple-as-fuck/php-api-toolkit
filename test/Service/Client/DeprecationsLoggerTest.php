@@ -42,7 +42,7 @@ final class DeprecationsLoggerTest extends TestCase
     /**
      * @return non-empty-array<array{non-empty-string|null, array<non-empty-string, string>, ResponseInterface}>
      */
-    public function dataProviderLogDeprecation(): array
+    public static function dataProviderLogDeprecation(): array
     {
         $httpFactory = new HttpFactory();
 

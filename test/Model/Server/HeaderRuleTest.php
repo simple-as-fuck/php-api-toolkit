@@ -41,7 +41,7 @@ final class HeaderRuleTest extends TestCase
     /**
      * @return non-empty-array<non-empty-array<mixed>>
      */
-    public function dataProviderKeyOf(): array
+    public static function dataProviderKeyOf(): array
     {
         return [
             [null, 'notFound', false],
@@ -69,7 +69,7 @@ final class HeaderRuleTest extends TestCase
     /**
      * @return non-empty-array<non-empty-array<mixed>>
      */
-    public function dataProviderKey(): array
+    public static function dataProviderKey(): array
     {
         return [
             [null, 'notFound', false],

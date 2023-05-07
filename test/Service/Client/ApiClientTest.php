@@ -52,7 +52,7 @@ final class ApiClientTest extends TestCase
     /**
      * @return array<array<mixed>>
      */
-    public function dataProviderWaitRawFail(): array
+    public static function dataProviderWaitRawFail(): array
     {
         $httpFactory = new HttpFactory();
         $request = $httpFactory->createRequest('GET', '/');

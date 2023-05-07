@@ -39,7 +39,7 @@ final class ExceptionTransformerTest extends TestCase
     /**
      * @return array<array<mixed>>
      */
-    public function dataProviderToApi(): array
+    public static function dataProviderToApi(): array
     {
         return [
             ['Internal server error', false],

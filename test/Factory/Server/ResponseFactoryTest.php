@@ -22,7 +22,7 @@ final class ResponseFactoryTest extends TestCase
     /**
      * @return array<array<mixed>>
      */
-    public function dataProviderMakeJsonStream(): array
+    public static function dataProviderMakeJsonStream(): array
     {
         return [
             ['[548846,"sadasjkfghjsg"]', [548846, 'sadasjkfghjsg']],

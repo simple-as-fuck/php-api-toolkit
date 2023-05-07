@@ -11,6 +11,7 @@ use Kayex\HttpCodes;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Service\Server\SpeedLimitService;
+use SimpleAsFuck\ApiToolkit\Service\Transformation\Nullable;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 
 final class ResponseFactory
@@ -28,11 +29,10 @@ final class ResponseFactory
         $factory = new HttpFactory();
         $response = self::makeResponse($factory, $code, $headers);
 
-        if ($body !== null) {
-            if ($transformer !== null) {
-                $body = $transformer->toApi($body);
-            }
+        if ($transformer !== null) {
+            $body = Nullable::toApi($body, $transformer);
         }
+
         return $response->withBody($factory->createStream(Utils::jsonEncode($body)));
     }
 

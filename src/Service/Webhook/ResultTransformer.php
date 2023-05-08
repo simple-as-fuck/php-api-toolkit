@@ -25,6 +25,6 @@ final class ResultTransformer implements UserClassRule, Transformer
      */
     public function toApi($transformed): \stdClass
     {
-        return (object) ['stopDispatching' => $transformed->shopDispatching()];
+        return (object) ['stopDispatching' => $transformed->stopDispatching()];
     }
 }

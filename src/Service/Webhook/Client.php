@@ -52,7 +52,7 @@ abstract class Client
                     ->notNull()
                 ;
 
-                if ($callResult->shopDispatching()) {
+                if ($callResult->stopDispatching()) {
                     break;
                 }
             } catch (\Throwable $exception) {

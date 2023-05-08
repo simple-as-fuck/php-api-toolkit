@@ -7,12 +7,12 @@ namespace SimpleAsFuck\ApiToolkit\Model\Webhook;
 final class Result
 {
     public function __construct(
-        private bool $shopDispatching = false
+        private bool $stopDispatching = false,
     ) {
     }
 
-    public function shopDispatching(): bool
+    public function stopDispatching(): bool
     {
-        return $this->shopDispatching;
+        return $this->stopDispatching;
     }
 }

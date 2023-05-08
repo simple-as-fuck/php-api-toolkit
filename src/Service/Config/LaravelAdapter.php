@@ -18,14 +18,14 @@ final class LaravelAdapter extends Repository
     public function getServerConfig(): ServerConfig
     {
         return new ServerConfig(
-            $this->getValue('app.debug')->bool()->nullable() ?? false
+            $this->get('app.debug')->bool()->nullable() ?? false
         );
     }
 
     /**
      * @param non-empty-string $key
      */
-    private function getValue(string $key): Rules
+    public function get(string $key): Rules
     {
         return Validator::make($this->repository->get($key), 'Config key '.$key);
     }

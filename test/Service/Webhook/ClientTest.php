@@ -64,7 +64,7 @@ final class ClientTest extends TestCase
     /**
      * @return non-empty-list<non-empty-list<mixed>>
      */
-    public function dataCallWebhooks(): array
+    public static function dataCallWebhooks(): array
     {
         return [
             [

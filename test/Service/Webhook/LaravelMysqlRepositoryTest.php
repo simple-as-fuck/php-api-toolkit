@@ -116,7 +116,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
     /**
      * @return non-empty-array<array{array<non-empty-string>, non-empty-string, array<string, string>}>
      */
-    public function dataProviderLoadForDispatching(): array
+    public static function dataProviderLoadForDispatching(): array
     {
         return [
             [
@@ -233,7 +233,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
     /**
      * @return non-empty-array<array{non-empty-string, Params}>
      */
-    public function dataProviderSaveAndDelete(): array
+    public static function dataProviderSaveAndDelete(): array
     {
         return [
             ['test_with_attributes', new Params('http://test/url', Priority::NORMAL, ['test_key' => 'test_value'])],

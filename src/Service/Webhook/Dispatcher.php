@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 
+use GuzzleHttp\RequestOptions;
+
 class Dispatcher
 {
     public function __construct(
         private Repository $repository,
-        private Client $client
+        private Client $client,
     ) {
     }
 
@@ -16,7 +18,7 @@ class Dispatcher
      * @param non-empty-string $type
      * @param array<string, string> $attributes
      * @param array<non-empty-string, string|array<string>> $headers to apply for http request
-     * @param array<non-empty-string, mixed> $options to apply for http request, see \GuzzleHttp\RequestOptions
+     * @param array<RequestOptions::*, mixed> $options to apply for http request
      */
     public function dispatch(string $type, array $attributes, bool $synchronouslyFirstTry = false, array $headers = [], array $options = []): void
     {
@@ -35,7 +37,7 @@ class Dispatcher
      * @param array<string, string> $attributes
      * @param positive-int $delayInSeconds
      * @param array<non-empty-string, string|array<string>> $headers to apply on http requests
-     * @param array<non-empty-string, mixed> $options to apply on http requests, see \GuzzleHttp\RequestOptions
+     * @param array<RequestOptions::*, mixed> $options to apply on http requests
      */
     public function dispatchWithDelay(string $type, array $attributes, int $delayInSeconds, array $headers = [], array $options = []): void
     {

@@ -14,15 +14,10 @@ use SimpleAsFuck\Validator\Factory\Validator;
 
 final class LaravelMysqlRepository extends Repository
 {
-    private ConnectionResolverInterface $connectionResolver;
-    private \Illuminate\Contracts\Config\Repository $config;
-
     public function __construct(
-        ConnectionResolverInterface $connectionResolver,
-        \Illuminate\Contracts\Config\Repository $config
+        private ConnectionResolverInterface $connectionResolver,
+        private \Illuminate\Contracts\Config\Repository $config,
     ) {
-        $this->connectionResolver = $connectionResolver;
-        $this->config = $config;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 
+use GuzzleHttp\RequestOptions;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,7 +20,7 @@ final class LaravelCallWebhooksJob implements ShouldQueue
     /**
      * @param iterable<Webhook> $webhooks
      * @param array<string, string|array<string>> $callHeaders
-     * @param array<non-empty-string, mixed> $callOptions
+     * @param array<RequestOptions::*, mixed> $callOptions
      */
     public function __construct(
         private iterable $webhooks,

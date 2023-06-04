@@ -15,14 +15,14 @@ abstract class Client
     public function __construct(
         private Config $config,
         private \GuzzleHttp\Client $client,
-        private ?LoggerInterface $logger
+        private ?LoggerInterface $logger,
     ) {
     }
 
     /**
      * @param iterable<Webhook> $webhooks
      * @param array<string, string|array<string>> $headers
-     * @param array<non-empty-string, mixed> $options
+     * @param array<RequestOptions::*, mixed> $options
      */
     final public function callWebhooks(iterable $webhooks, int $tries, array $headers, array $options): void
     {
@@ -81,7 +81,7 @@ abstract class Client
      * @param iterable<Webhook> $webhooks
      * @param int<0, max> $delayInSeconds
      * @param array<string, string|array<string>> $headers
-     * @param array<non-empty-string, mixed> $options
+     * @param array<RequestOptions::*, mixed> $options
      */
     abstract public function dispatchWebhooks(iterable $webhooks, int $delayInSeconds, int $tries, array $headers, array $options): void;
 }

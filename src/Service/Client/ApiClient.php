@@ -245,11 +245,11 @@ class ApiClient
      * @param non-empty-string $type
      * @param non-empty-string $listeningUrl example: https://example.com/listening/...
      * @param Priority::* $priority
-     * @param array<non-empty-string, string> $attributes required attributes without them can not be webhook dispatched
+     * @param array<non-empty-string, string> $requiredAttributes without them can not be webhook dispatched
      * @param array<string, string|array<string>> $requestHeaders
      * @throws ApiException
      */
-    public function addWebhookListener(string $apiName, string $type, string $listeningUrl, int $priority = Priority::NORMAL, array $attributes = [], array $requestHeaders = []): Webhook
+    public function addWebhookListener(string $apiName, string $type, string $listeningUrl, int $priority = Priority::NORMAL, array $requiredAttributes = [], array $requestHeaders = []): Webhook
     {
         return $this->requestObject(
             $apiName,
@@ -258,7 +258,7 @@ class ApiClient
             new Params(
                 StringRule::make($listeningUrl, 'Parameter $listeningUrl')->httpUrl([PHP_URL_SCHEME, PHP_URL_HOST, PHP_URL_PATH])->notNull(),
                 $priority,
-                $attributes
+                $requiredAttributes
             ),
             new ParamsTransformer(),
             $requestHeaders
@@ -269,11 +269,12 @@ class ApiClient
 
     /**
      * @param non-empty-string $apiName
+     * @param non-empty-string $webhookId
      * @param array<string, string|array<string>> $requestHeaders
      * @throws ApiException
      */
     public function removeWebhookListener(string $apiName, string $webhookId, array $requestHeaders = []): void
     {
-        $this->request($apiName, 'DELETE', '/webhook?webhookId='.$webhookId, null, null, $requestHeaders);
+        $this->request($apiName, 'DELETE', '/webhook?webhookId='.$webhookId, headers: $requestHeaders);
     }
 }

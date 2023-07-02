@@ -106,6 +106,39 @@ catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
 
 ```
 
+### Api client webhook tools
+
+Api client service has two helper methods for registering and unregistering webhook listening url.
+Helper methods calls http requests with data structures compatible with these controllers
+[AddListener](../src/Controller/Webhook/AddListener.php), [RemoveListener](../src/Controller/Webhook/RemoveListener.php).
+
+```php
+
+/**
+ * @var SimpleAsFuck\ApiToolkit\Service\Client\ApiClient $client
+ */
+
+// method call POST /webhook request
+$webhook = $client->addWebhookListener('some_api_name', 'some_webhook_type', 'httsp://some-client/listening-url');
+
+// you can save webhook identifier for future use
+// deletion while listening is no longer needed, or some data loading in listening url
+$webhook->id();
+
+```
+
+```php
+
+/**
+ * @var \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient $client
+ * @var non-empty-string $webhookId
+ */
+
+// method call DELETE /webhook request
+$client->removeWebhookListener('some_api_name', $webhookId);
+
+```
+
 ### Api server controller tools
 
 For request handling is prepared Validator and Response factories.

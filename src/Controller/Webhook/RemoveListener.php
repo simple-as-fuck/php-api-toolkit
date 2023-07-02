@@ -13,11 +13,9 @@ use SimpleAsFuck\ApiToolkit\Service\Webhook\Repository;
 
 final class RemoveListener implements RequestHandlerInterface
 {
-    private Repository $repository;
-
-    public function __construct(Repository $repository)
-    {
-        $this->repository = $repository;
+    public function __construct(
+        private Repository $repository,
+    ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface

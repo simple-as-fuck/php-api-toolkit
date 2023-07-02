@@ -15,12 +15,9 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 final class Symfony
 {
-    private Repository $repository;
-
     public function __construct(
-        Repository $repository
+        private Repository $repository,
     ) {
-        $this->repository = $repository;
     }
 
     public function addListener(Request $request): Response

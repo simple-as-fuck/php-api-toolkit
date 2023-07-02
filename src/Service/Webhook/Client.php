@@ -66,7 +66,10 @@ abstract class Client
 
         if (count($nextTryWebhooks) !== 0) {
             ++$tries;
-            if ($tries >= $this->config->getMaxTries()) {
+            $maximumTries = $this->config->getMaxTries();
+            if ($tries >= $maximumTries) {
+                $webhookIdsWithoutRetry = implode(', ', array_map(static fn (Webhook $webhook): string => '"'.$webhook->id().'"', $nextTryWebhooks));
+                $this->logger?->error('Call webhooks: '.$webhookIdsWithoutRetry.' fail without any retry, maximum tries: '.$maximumTries);
                 return;
             }
             $this->dispatchWebhooks($nextTryWebhooks, $this->config->getDelayBetweenTries(), $tries, $headers, $options);

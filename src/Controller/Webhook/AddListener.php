@@ -18,7 +18,7 @@ use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 final class AddListener implements RequestHandlerInterface
 {
     public function __construct(
-        private Repository $repository
+        private Repository $repository,
     ) {
     }
 

@@ -19,6 +19,7 @@ consider package version as unsupported except last version.
 
 - [Api client](#api-client-service)
 - [Api server](#api-server-controller-tools)
+- [Api webhook](#api-server-webhook-tools)
 
 ### Api client service
 
@@ -115,11 +116,11 @@ Helper methods calls http requests with data structures compatible with these co
 ```php
 
 /**
- * @var SimpleAsFuck\ApiToolkit\Service\Client\ApiClient $client
+ * @var \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient $client
  */
 
 // method call POST /webhook request
-$webhook = $client->addWebhookListener('some_api_name', 'some_webhook_type', 'httsp://some-client/listening-url');
+$webhook = $client->addWebhookListener('some_api_name', 'some_webhook_event_type', 'https://some-client/listening-url');
 
 // you can save webhook identifier for future use
 // deletion while listening is no longer needed, or some data loading in listening url
@@ -162,7 +163,7 @@ $someJsonValidValue = $rules->json()->object()->property('someProperty')->string
 
 
 
-// end fo your action
+// end of your action
 
 /**
  * @var YourClass $yourModelForResponseBody
@@ -219,3 +220,71 @@ catch (\Throwable $exception) {
 }
 
 ```
+
+### Api server webhook tools
+
+For webhook dispatching from server site to a client is here prepared Dispatcher.
+Dispatcher will find necessary webhooks for calling by using abstract webhook [Repository](../src/Service/Webhook/Repository.php)
+and after then call them by abstract webhook [Client](../src/Service/Webhook/Client.php).
+
+You need to implement webhook Repository, webhook Client and have prepared
+some storage for persisting webhooks, also you need to prepare some queue
+for webhook call retries.
+
+For Laravel are prepared [LaravelMysqlRepository](../src/Service/Webhook/LaravelMysqlRepository.php) and
+[LaravelClient](../src/Service/Webhook/LaravelClient.php) using Laravel [queues](https://laravel.com/docs/queues).
+
+Laravel webhook implementation load automatically configuration from [webhook.php](../config/laravel/webhook.php) config,
+which can be published from this package.
+
+```console
+php artisan vendor:publish --tag=api-toolkit-config
+```
+
+Webhooks are stored in MySql database tables, they are defined in Laravel migration publishable from this package.
+
+```console
+php artisan vendor:publish --tag=api-toolkit-migration
+```
+
+```php
+
+/**
+ * @var \SimpleAsFuck\ApiToolkit\Service\Webhook\Repository $webhookRepository
+ * @var \SimpleAsFuck\ApiToolkit\Service\Webhook\Client $webhookClient
+ */
+
+$dispatcher = new \SimpleAsFuck\ApiToolkit\Service\Webhook\Dispatcher($webhookRepository, $webhookClient);
+
+// simplest dispatch, when something happened on the server side,
+// webhooks calls are added into a queue
+$dispatcher->dispatch('some_webhook_event_type');
+
+// webhook call with some attribute,
+// for example, you can dispatch an event type with some concrete entity id
+$dispatcher->dispatch('some_webhook_event_type', ['some_attribute' => '1256']);
+
+// webhook dispatch with third parameter $synchronouslyFirstTry as true
+// will first webhook call try immediately without adding call into queue
+// only if the first call fails, webhook call is added into queue for retry
+$dispatcher->dispatch('some_webhook_event_type', [], true);
+
+// simple dispatch when the first call will try after 1 minute
+$dispatcher->dispatchWithDelay('some_webhook_event_type', [], 60);
+
+```
+
+For webhook listener registration on server site, you can use controllers [AddListener](../src/Controller/Webhook/AddListener.php),
+[RemoveListener](../src/Controller/Webhook/RemoveListener.php), [Symfony](../src/Controller/Webhook/Symfony.php) equivalent
+or just use webhook [Repository](../src/Service/Webhook/Repository.php) in any action and persist webhook with a processed model
+and controllers from here use only as inspiration.
+
+Controllers from this package do not have any publish functionality or not provide any auto-registration in your router,
+because of security reasons. You should always have full control in your application, what will be listened to!
+
+You can copy controllers by hand into your app and put them among your other controllers. 
+You should add before webhook actions same authentication middleware as before other actions,
+so can be same secure.
+
+If you register `AddListener` on POST /webhook route and `RemoveListener` on DELETE /webhook,
+your webhook actions will be compatible with [API client](#api-client-webhook-tools) helper methods for webhooks.

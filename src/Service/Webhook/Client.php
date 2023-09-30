@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 
 use GuzzleHttp\RequestOptions;
-use GuzzleHttp\Utils;
 use Psr\Log\LoggerInterface;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
-use SimpleAsFuck\Validator\Factory\Validator;
+use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
+use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 
 abstract class Client
 {
@@ -47,7 +47,8 @@ abstract class Client
                 $requestOptions[RequestOptions::JSON] = (new WebhookTransformer())->toApi($webhook);
 
                 $response = $this->client->request('POST', $webhook->params()->listeningUrl(), $requestOptions);
-                $callResult = Validator::make(Utils::jsonDecode($response->getBody()->getContents()), 'Webhook response body')
+
+                $callResult = MessageService::parseJsonFromBody(new UnexpectedValueException(), $response, 'Webhook response body', false)
                     ->object()->class(new ResultTransformer())
                     ->notNull()
                 ;

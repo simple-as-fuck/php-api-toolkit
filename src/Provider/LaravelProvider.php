@@ -80,7 +80,7 @@ class LaravelProvider extends ServiceProvider
         ], 'api-toolkit-config');
 
         $this->publishes([
-            __DIR__.'/../../src/Database/Migration/LaravelMysqlWebhookTables.php' => $this->app->databasePath('migrations/2022_10_15_163600_WebhookTables.php')
+            __DIR__.'/../../src/Database/Migration/LaravelMysqlWebhookTables.php' => $this->app->databasePath('migrations/2022_10_15_163600_webhook_tables.php')
         ], 'api-toolkit-migration');
     }
 }

@@ -109,8 +109,8 @@ catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
 
 ### Api client webhook tools
 
-Api client service has two helper methods for registering and unregistering webhook listening url.
-Helper methods calls http requests with data structures compatible with these controllers
+Api client service has two helper methods for registering and unregistering webhook listening URL.
+Helper methods calls HTTP requests with data structures compatible with these controllers
 [AddListener](../src/Controller/Webhook/AddListener.php), [RemoveListener](../src/Controller/Webhook/RemoveListener.php).
 
 ```php
@@ -121,6 +121,23 @@ Helper methods calls http requests with data structures compatible with these co
 
 // method call POST /webhook request
 $webhook = $client->addWebhookListener('some_api_name', 'some_webhook_event_type', 'https://some-client/listening-url');
+
+// you can register listener URL with priority and required webhook attributes,
+// it means than listener SHOULD be called only if server dispatch webhook type
+// with attributes containing all specified attributes in webhook registration
+// (webhook dispatch can contain more attributes than required)
+// priority specified which webhook listener SHOULD be called first,
+// if on server is more than one listener for same webhook type,
+// this behaviours is implemented in server services in this package,
+// but other server implementations can behave differently
+// or webhook functionality may not be implemented, so always read concrete API documentation!
+$webhook = $client->addWebhookListener(
+    'some_api_name',
+    'some_webhook_event_type',
+    'https://some-client/listening-url',
+    \SimpleAsFuck\ApiToolkit\Model\Webhook\Priority::NORMAL,
+    ['some_key' => '89']
+);
 
 // you can save webhook identifier for future use
 // deletion while listening is no longer needed, or some data loading in listening url
@@ -138,6 +155,59 @@ $webhook->id();
 // method call DELETE /webhook request
 $client->removeWebhookListener('some_api_name', $webhookId);
 
+```
+
+For listening dispatched webhooks, you need prepare some POST action on URL reachable from server site.
+Action will receive dispatched webhook instance in json body.
+Your registered URL SHOULD be unmodified by server, this is default behavior of server services in this package.
+
+You can add before webhook listening actions some authentication middleware,
+server services in this package allow dispatching with custom HTTP headers
+and support automatically adding https://swagger.io/docs/specification/authentication/bearer-authentication/.
+
+```php
+class YourListeningController
+{
+    public function handle(
+        \Psr\Http\Message\ServerRequestInterface $request
+        //\Symfony\Component\HttpFoundation\Request $request
+    ): \Psr\Http\Message\ResponseInterface {
+    //): \Symfony\Component\HttpFoundation\Response {
+        $webhook = \SimpleAsFuck\ApiToolkit\Factory\Server\Validator::make($request)
+        //$webhook = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Validator::make($request)
+            ->json()
+            ->object()
+            ->class(new \SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer())
+            ->notNull()
+        ;
+
+        // run some you logic
+        // you should expect than listening action can be called multiple times
+        // because of some network error or another failure
+
+        $result = new \SimpleAsFuck\ApiToolkit\Model\Webhook\Result();
+        $result = new \SimpleAsFuck\ApiToolkit\Model\Webhook\Result(
+            // you can inform server site application to stop
+            // dispatching webhook for another listener after current listener
+            // which has less priority
+            // server services in this package support this functionality
+            stopDispatching: true
+        )
+        // you SHOULD return valid json object,
+        // server services in this package expect to receive result object,
+        // otherwise dispatch can be detected as failed because of some syntax error
+        // and server can dispatch webhook agan
+        return \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson(
+        //return \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson(
+            $result,
+            new \SimpleAsFuck\ApiToolkit\Service\Webhook\ResultTransformer(),
+            // you MUST return successful response, otherwise
+            // server site application can send webhook agan
+            // because error response will look like failed dispatch
+            \Kayex\HttpCodes::HTTP_OK
+        );
+    }
+}
 ```
 
 ### Api server controller tools
@@ -267,7 +337,7 @@ $dispatcher->dispatch('some_webhook_event_type', ['some_attribute' => '1256']);
 // webhook dispatch with third parameter $synchronouslyFirstTry as true
 // will first webhook call try immediately without adding call into queue
 // only if the first call fails, webhook call is added into queue for retry
-$dispatcher->dispatch('some_webhook_event_type', [], true);
+$dispatcher->dispatch('some_webhook_event_type', [], synchronouslyFirstTry: true);
 
 // simple dispatch when the first call will try after 1 minute
 $dispatcher->dispatchWithDelay('some_webhook_event_type', [], 60);
@@ -283,7 +353,7 @@ Controllers from this package do not have any publish functionality or not provi
 because of security reasons. You should always have full control in your application, what will be listened to!
 
 You can copy controllers by hand into your app and put them among your other controllers. 
-You should add before webhook actions same authentication middleware as before other actions,
+You SHOULD add before webhook actions same authentication middleware as before other actions,
 so can be same secure.
 
 If you register `AddListener` on POST /webhook route and `RemoveListener` on DELETE /webhook,

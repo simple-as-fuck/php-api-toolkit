@@ -16,7 +16,7 @@ class Dispatcher
 
     /**
      * @param non-empty-string $type
-     * @param array<string, string> $attributes
+     * @param array<non-empty-string, string> $attributes
      * @param array<non-empty-string, string|array<string>> $headers to apply for http request
      * @param array<RequestOptions::*, mixed> $options to apply for http request
      */
@@ -34,7 +34,7 @@ class Dispatcher
 
     /**
      * @param non-empty-string $type
-     * @param array<string, string> $attributes
+     * @param array<non-empty-string, string> $attributes
      * @param positive-int $delayInSeconds
      * @param array<non-empty-string, string|array<string>> $headers to apply on http requests
      * @param array<RequestOptions::*, mixed> $options to apply on http requests

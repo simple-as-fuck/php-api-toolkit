@@ -130,7 +130,7 @@ $webhook = $client->addWebhookListener('some_api_name', 'some_webhook_event_type
 // if on server is more than one listener for same webhook type,
 // this behaviours is implemented in server services in this package,
 // but other server implementations can behave differently
-// or webhook functionality may not be implemented, so always read concrete API documentation!
+// or webhook functionality may not be implemented, so always read specific API documentation!
 $webhook = $client->addWebhookListener(
     'some_api_name',
     'some_webhook_event_type',

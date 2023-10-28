@@ -9,7 +9,7 @@ final class Params
     /**
      * @param non-empty-string $listeningUrl
      * @param Priority::* $priority
-     * @param array<string, string> $attributes
+     * @param array<non-empty-string, non-empty-string> $attributes
      */
     public function __construct(
         private string $listeningUrl,
@@ -35,7 +35,7 @@ final class Params
     }
 
     /**
-     * @return array<string, string>
+     * @return array<non-empty-string, non-empty-string>
      */
     public function attributes(): array
     {

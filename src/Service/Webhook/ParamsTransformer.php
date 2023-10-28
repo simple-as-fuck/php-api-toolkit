@@ -7,7 +7,6 @@ namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
-use SimpleAsFuck\Validator\Rule\ArrayRule\TypedKey;
 use SimpleAsFuck\Validator\Rule\Custom\UserClassRule;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 
@@ -19,10 +18,9 @@ final class ParamsTransformer implements Transformer, UserClassRule
 {
     public function validate(ObjectRule $rule): Params
     {
-        $attributeType = static fn (TypedKey $key): string => $key->string()->notNull();
         $attributes = [];
-        foreach ($rule->property('attributes')->array()->of($attributeType)->notNull() as $key => $attribute) {
-            $attributes[(string) $key] = $attribute;
+        foreach ($rule->property('attributes')->array()->ofObject()->notNull() as $object) {
+            $attributes[$object->property('key')->string()->notEmpty()->notNull()] = $object->property('value')->string()->notEmpty()->notNull();
         }
         return new Params(
             $rule->property('listeningUrl')->string()->httpUrl([PHP_URL_PATH])->notNull(),
@@ -36,11 +34,18 @@ final class ParamsTransformer implements Transformer, UserClassRule
      */
     public function toApi($transformed): \stdClass
     {
-        $apiData = new \stdClass();
-        $apiData->listeningUrl = $transformed->listeningUrl();
-        $apiData->priority = $transformed->priority();
-        $apiData->attributes = $transformed->attributes();
+        $attributes = [];
+        foreach ($transformed->attributes() as $key => $value) {
+            $attributes[] = (object) [
+                'key' => $key,
+                'value' => $value,
+            ];
+        }
 
-        return $apiData;
+        return (object) [
+            'listeningUrl' => $transformed->listeningUrl(),
+            'priority' => $transformed->priority(),
+            'attributes' => $attributes,
+        ];
     }
 }

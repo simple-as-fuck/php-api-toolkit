@@ -25,7 +25,7 @@ abstract class Repository
      * than listeners who accept anything
      *
      * @param non-empty-string $type
-     * @param array<string, string> $attributes with webhook will be dispatched
+     * @param array<non-empty-string, non-empty-string> $attributes with webhook will be dispatched
      * @return iterable<Webhook>
      */
     abstract public function loadForDispatching(string $type, array $attributes): iterable;

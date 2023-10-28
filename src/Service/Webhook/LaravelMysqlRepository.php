@@ -22,7 +22,7 @@ final class LaravelMysqlRepository extends Repository
 
     /**
      * @param non-empty-string $type
-     * @param array<string, string> $attributes
+     * @param array<non-empty-string, non-empty-string> $attributes
      * @return iterable<Webhook>
      */
     public function loadForDispatching(string $type, array $attributes): iterable
@@ -150,7 +150,7 @@ final class LaravelMysqlRepository extends Repository
     }
 
     /**
-     * @param array<string, string> $attributes
+     * @param array<non-empty-string, non-empty-string> $attributes
      * @return array<int>
      */
     private function getWebhooksForAttributes(ConnectionInterface $connection, array $attributes): array
@@ -183,7 +183,7 @@ final class LaravelMysqlRepository extends Repository
     }
 
     /**
-     * @return array<string, string>
+     * @return array<non-empty-string, non-empty-string>
      */
     private function getWebhookRequiredAttributes(ConnectionInterface $connection, int $webhookId): array
     {
@@ -197,13 +197,13 @@ final class LaravelMysqlRepository extends Repository
             }
         }
 
-        /** @var array<string, string> */
+        /** @var array<non-empty-string, non-empty-string> */
         return $attributes;
     }
 
     /**
-     * @param array<string, string> $requiredAttributes
-     * @param array<string, string> $attributes
+     * @param array<non-empty-string, non-empty-string> $requiredAttributes
+     * @param array<non-empty-string, non-empty-string> $attributes
      */
     private function haveAttributesRequiredAttributes(array $requiredAttributes, array $attributes): bool
     {

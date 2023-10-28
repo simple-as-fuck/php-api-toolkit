@@ -29,7 +29,7 @@ final class AddListener implements RequestHandlerInterface
 
         $webhook = $this->repository->save($type, $params);
         if ($webhook === null) {
-            throw new ApiException('Webhook: \''.$params->listeningUrl().'\' with type: \''.$type.'\' and attribute array already exist', HttpCodes::HTTP_CONFLICT);
+            throw new ApiException('Webhook: \''.$params->listeningUrl().'\' with type: \''.$type.'\' already exist', HttpCodes::HTTP_CONFLICT);
         }
 
         return ResponseFactory::makeJson($webhook, new WebhookTransformer());

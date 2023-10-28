@@ -27,7 +27,7 @@ final class Symfony
 
         $webhook = $this->repository->save($type, $params);
         if ($webhook === null) {
-            throw new ConflictHttpException('Webhook: \''.$params->listeningUrl().'\' with type: \''.$type.'\' and attribute array already exist');
+            throw new ConflictHttpException('Webhook: \''.$params->listeningUrl().'\' with type: \''.$type.'\' already exist');
         }
 
         return ResponseFactory::makeJson($webhook, new WebhookTransformer());

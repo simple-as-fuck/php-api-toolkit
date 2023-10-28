@@ -63,7 +63,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
      *
      * @param array<non-empty-string> $expectedUrls
      * @param non-empty-string $type
-     * @param array<string, string> $attributes
+     * @param array<non-empty-string, non-empty-string> $attributes
      */
     public function testLoadForDispatching(array $expectedUrls, string $type, array $attributes): void
     {

@@ -245,7 +245,7 @@ class ApiClient
      * @param non-empty-string $type
      * @param non-empty-string $listeningUrl example: https://example.com/listening/...
      * @param Priority::* $priority
-     * @param array<non-empty-string, string> $requiredAttributes without them can not be webhook dispatched
+     * @param array<non-empty-string, non-empty-string> $requiredAttributes without them can not be webhook dispatched
      * @param array<string, string|array<string>> $requestHeaders
      * @throws ApiException
      */

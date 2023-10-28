@@ -33,11 +33,11 @@ final class ClientTest extends TestCase
         $httpClient = $this->createMock(\GuzzleHttp\Client::class);
         $httpClient->method('request')->willReturnCallback(static function (string $method, string $uri, array $options) use (&$httpCalls): Response {
             $httpCalls++;
-            if (($options[RequestOptions::JSON]->params->attributes['call'] ?? null) === 'fail') {
+            if (($options[RequestOptions::JSON]->params->attributes[0]->value ?? null) === 'fail') {
                 throw new \RuntimeException();
             }
 
-            if (($options[RequestOptions::JSON]->params->attributes['call'] ?? null) === 'stop') {
+            if (($options[RequestOptions::JSON]->params->attributes[0]->value ?? null) === 'stop') {
                 return new Response(200, body: '{"stopDispatching":true}');
             }
 

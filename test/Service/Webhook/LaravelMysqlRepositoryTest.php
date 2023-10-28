@@ -110,7 +110,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
 
         $webhooks = $repository->loadForDispatching($type, $attributes);
 
-        self::assertEquals($expectedWebhooks, $webhooks);
+        self::assertEquals(new \ArrayIterator($expectedWebhooks), $webhooks);
     }
 
     /**

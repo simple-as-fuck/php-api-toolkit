@@ -26,7 +26,7 @@ abstract class Repository
      *
      * @param non-empty-string $type
      * @param array<non-empty-string, non-empty-string> $attributes with webhook will be dispatched
-     * @return iterable<Webhook>
+     * @return iterable<Webhook>&\Countable
      */
     abstract public function loadForDispatching(string $type, array $attributes): iterable;
 

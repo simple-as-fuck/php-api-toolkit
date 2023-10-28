@@ -23,7 +23,7 @@ final class LaravelMysqlRepository extends Repository
     /**
      * @param non-empty-string $type
      * @param array<non-empty-string, non-empty-string> $attributes
-     * @return iterable<Webhook>
+     * @return iterable<Webhook>&\Countable
      */
     public function loadForDispatching(string $type, array $attributes): iterable
     {
@@ -68,7 +68,7 @@ final class LaravelMysqlRepository extends Repository
             return $diff;
         });
 
-        return $webhooks;
+        return new \ArrayIterator($webhooks);
     }
 
     /**

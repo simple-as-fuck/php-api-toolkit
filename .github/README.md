@@ -293,8 +293,8 @@ catch (\Throwable $exception) {
 
 ### Api server webhook tools
 
-For webhook dispatching from server site to a client is here prepared Dispatcher.
-Dispatcher will find necessary webhooks for calling by using abstract webhook [Repository](../src/Service/Webhook/Repository.php)
+For webhook dispatching from server site to a client is here prepared WebhookDispatcher.
+WebhookDispatcher will find necessary webhooks for calling by using abstract webhook [Repository](../src/Service/Webhook/Repository.php)
 and after then call them by abstract webhook [Client](../src/Service/Webhook/Client.php).
 
 You need to implement webhook Repository, webhook Client and have prepared
@@ -324,7 +324,7 @@ php artisan vendor:publish --tag=api-toolkit-migration
  * @var \SimpleAsFuck\ApiToolkit\Service\Webhook\Client $webhookClient
  */
 
-$dispatcher = new \SimpleAsFuck\ApiToolkit\Service\Webhook\Dispatcher($webhookRepository, $webhookClient);
+$dispatcher = new \SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookDispatcher($webhookRepository, $webhookClient);
 
 // simplest dispatch, when something happened on the server side,
 // webhooks calls are added into a queue

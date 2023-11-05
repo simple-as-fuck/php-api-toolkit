@@ -107,26 +107,3 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/phpunit test/
-
-  php80:
-    name: "php 8.0"
-    runs-on: ubuntu-latest
-    container: "nofutur3/php-tests:8.0"
-    services:
-      database:
-        image: "mysql:5.7"
-        env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: database
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: composer install --no-interaction
-
-      - name: Run static analysis
-        run: vendor/bin/phpstan analyse --memory-limit=-1
-
-      - name: Run tests
-        run: vendor/bin/phpunit test/

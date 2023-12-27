@@ -230,6 +230,10 @@ $someQueryValidValue = $rules->query()->key('someKey')->string()->parseInt()->mi
 
 // validate something from request body with json format
 $someJsonValidValue = $rules->json()->object()->property('someProperty')->string()->notEmpty()->max(255)->notNull();
+/**
+ * @var \SimpleAsFuck\Validator\Rule\Custom\UserClassRule<YourClass> $yourClassRule
+ */
+$yourModelFromRequestBody = $rules->json()->object()->class($yourClassRule)->notNull();
 
 
 

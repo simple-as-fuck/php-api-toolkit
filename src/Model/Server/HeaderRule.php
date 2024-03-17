@@ -14,17 +14,13 @@ use SimpleAsFuck\Validator\Rule\String\StringRule;
 
 final class HeaderRule
 {
-    private Exception $exceptionFactory;
-    /** @var Validated<array<array<string>>> */
-    private Validated $validated;
-
     /**
      * @param Validated<array<array<string>>> $validated
      */
-    public function __construct(Exception $exceptionFactory, Validated $validated)
-    {
-        $this->exceptionFactory = $exceptionFactory;
-        $this->validated = $validated;
+    public function __construct(
+        private readonly Exception $exceptionFactory,
+        private readonly Validated $validated,
+    ) {
     }
 
     /**
@@ -78,7 +74,7 @@ final class HeaderRule
      */
     private function headerValues(bool $caseSensitive): ?array
     {
-        $values = $this->validated->value();
+        $values = $this->validated->value;
         if ($caseSensitive) {
             return $values;
         }

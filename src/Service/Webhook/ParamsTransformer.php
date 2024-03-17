@@ -19,7 +19,7 @@ final class ParamsTransformer implements Transformer, UserClassRule
     public function validate(ObjectRule $rule): Params
     {
         $attributes = [];
-        foreach ($rule->property('attributes')->array()->ofObject()->notNull() as $object) {
+        foreach ($rule->property('attributes')->array()->ofObject()->nullable() ?? [] as $object) {
             $attributes[$object->property('key')->string()->notEmpty()->notNull()] = $object->property('value')->string()->notEmpty()->notNull();
         }
         return new Params(

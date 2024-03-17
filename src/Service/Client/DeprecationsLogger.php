@@ -8,14 +8,15 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
+use SimpleAsFuck\Validator\Rule\DateTime\ParseDateTime;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
 class DeprecationsLogger
 {
     public function __construct(
-        private Config $config,
-        private LoggerInterface $logger,
-        private RequestFactoryInterface $requestFactory
+        private readonly Config $config,
+        private readonly LoggerInterface $logger,
+        private readonly RequestFactoryInterface $requestFactory
     ) {
     }
 
@@ -33,8 +34,11 @@ class DeprecationsLogger
         // https://datatracker.ietf.org/doc/html/rfc8594
         if ($response->hasHeader('Sunset')) {
             $sunset = $response->getHeaderLine('Sunset');
-            $deprecatedContext['Sunset'] = StringRule::make($sunset)
-                ->parseDateTime(\DateTimeInterface::RFC7231)
+            $deprecatedContext['Sunset'] = ParseDateTime::make(
+                $sunset,
+                \DateTimeInterface::RFC7231,
+                \DateTimeImmutable::class
+            )
                 ->nullable(true)
                 ?->format(\DateTimeInterface::ATOM)
                 ??

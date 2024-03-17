@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 final class Symfony
 {
     public function __construct(
-        private Repository $repository,
+        private readonly Repository $repository,
     ) {
     }
 

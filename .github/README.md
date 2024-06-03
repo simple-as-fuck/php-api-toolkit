@@ -228,14 +228,14 @@ $rules = \SimpleAsFuck\ApiToolkit\Factory\Server\Validator::make($request);
 // validate some query parameter
 $someQueryValidValue = $rules->query()->key('someKey')->string()->parseInt()->min(1)->notNull();
 
+/** @var \SimpleAsFuck\ApiToolkit\Service\Server\UserQueryRule<YourClass> $yourQueryRule */
+$yourObjectFromRequestQuery = $rules->query()->class($yourQueryRule)->notNull();
+
 // validate something from request body with json format
 $someJsonValidValue = $rules->json()->object()->property('someProperty')->string()->notEmpty()->max(255)->notNull();
-/**
- * @var \SimpleAsFuck\Validator\Rule\Custom\UserClassRule<YourClass> $yourClassRule
- */
-$yourModelFromRequestBody = $rules->json()->object()->class($yourClassRule)->notNull();
 
-
+/** @var \SimpleAsFuck\Validator\Rule\Custom\UserClassRule<YourClass> $yourClassRule */
+$yourObjectFromRequestBody = $rules->json()->object()->class($yourClassRule)->notNull();
 
 // end of your action
 

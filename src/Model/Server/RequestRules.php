@@ -33,9 +33,12 @@ final class RequestRules
         return new QueryRule($this->exceptionFactory, $validate);
     }
 
-    public function json(bool $allowInvalidJson = false): Rules
+    /**
+     * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     */
+    public function json(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
     {
-        return MessageService::parseJsonFromBody($this->exceptionFactory, $this->request, 'Request body', $allowInvalidJson);
+        return MessageService::parseJsonFromBody($this->exceptionFactory, $this->request, 'Request body', $allowInvalidJson, $jsonDecodeFlags);
     }
 
     /**

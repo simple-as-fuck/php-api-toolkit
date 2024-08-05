@@ -58,8 +58,9 @@ final class Request
      * @template TData
      * @param TData $jsonData
      * @param Transformer<TData>|null $transformer
+     * @param int $jsonEncodeFlags bitmask https://www.php.net/manual/en/function.json-encode.php
      */
-    public function withJson(mixed $jsonData, ?Transformer $transformer): self
+    public function withJson(mixed $jsonData, ?Transformer $transformer, int $jsonEncodeFlags = 0): self
     {
         if ($transformer !== null) {
             $jsonData = $transformer->toApi($jsonData);
@@ -67,7 +68,7 @@ final class Request
 
         $headers = $this->headers;
         $headers['Content-Type'] = 'application/json';
-        $stream = Utils::streamFor(\GuzzleHttp\Utils::jsonEncode($jsonData));
+        $stream = Utils::streamFor(\GuzzleHttp\Utils::jsonEncode($jsonData, $jsonEncodeFlags));
         $request = new self($this->method, $this->url, [], $stream, $headers);
         $request->baseUrl = $this->baseUrl;
         return $request;

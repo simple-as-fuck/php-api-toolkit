@@ -37,10 +37,10 @@ use SimpleAsFuck\Validator\Rule\String\StringRule;
 class ApiClient
 {
     public function __construct(
-        private Config $config,
-        private Client $client,
-        private RequestFactoryInterface $requestFactory,
-        private ?DeprecationsLogger $deprecationsLogger = null
+        private readonly Config $config,
+        private readonly Client $client,
+        private readonly RequestFactoryInterface $requestFactory,
+        private readonly ?DeprecationsLogger $deprecationsLogger = null
     ) {
     }
 
@@ -53,13 +53,22 @@ class ApiClient
      * @param Transformer<TBody>|null $bodyTransformer
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
+     * @param int $requestJsonFlags bitmask https://www.php.net/manual/en/function.json-encode.php
      * @throws ApiException
      */
-    public function request(string $apiName, string $method, string $urlWithQuery, mixed $body = null, ?Transformer $bodyTransformer = null, array $headers = [], array $options = []): Response
-    {
+    public function request(
+        string $apiName,
+        string $method,
+        string $urlWithQuery,
+        mixed $body = null,
+        ?Transformer $bodyTransformer = null,
+        array $headers = [],
+        array $options = [],
+        int $requestJsonFlags = 0
+    ): Response {
         $request = new Request($method, $urlWithQuery, [], null, $headers);
         if ($body !== null) {
-            $request = $request->withJson($body, $bodyTransformer);
+            $request = $request->withJson($body, $bodyTransformer, $requestJsonFlags);
         }
 
         return $this->waitRaw($this->requestAsync($apiName, $request, $options));
@@ -74,11 +83,26 @@ class ApiClient
      * @param Transformer<TBody>|null $bodyTransformer
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
+     * @param int $requestJsonFlags bitmask https://www.php.net/manual/en/function.json-encode.php
+     * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function requestObject(string $apiName, string $method, string $urlWithQuery, mixed $body = null, ?Transformer $bodyTransformer = null, array $headers = [], array $options = []): ObjectRule
-    {
-        return $this->request($apiName, $method, $urlWithQuery, $body, $bodyTransformer, $headers, $options)->getJson()->object();
+    public function requestObject(
+        string $apiName,
+        string $method,
+        string $urlWithQuery,
+        mixed $body = null,
+        ?Transformer $bodyTransformer = null,
+        array $headers = [],
+        array $options = [],
+        int $requestJsonFlags = 0,
+        int $responseJsonFlags = 0
+    ): ObjectRule {
+        return $this
+            ->request($apiName, $method, $urlWithQuery, $body, $bodyTransformer, $headers, $options, $requestJsonFlags)
+            ->getJson(jsonDecodeFlags: $responseJsonFlags)
+            ->object()
+        ;
     }
 
     /**
@@ -88,11 +112,19 @@ class ApiClient
      * @param array<mixed> $query
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
+     * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function requestArray(string $apiName, string $method, string $url, array $query = [], array $headers = [], array $options = []): ArrayRule
-    {
-        return $this->waitArray($this->requestAsync($apiName, new Request($method, $url, $query, null, $headers), $options));
+    public function requestArray(
+        string $apiName,
+        string $method,
+        string $url,
+        array $query = [],
+        array $headers = [],
+        array $options = [],
+        int $responseJsonFlags = 0
+    ): ArrayRule {
+        return $this->waitArray($this->requestAsync($apiName, new Request($method, $url, $query, null, $headers), $options), responseJsonFlags: $responseJsonFlags);
     }
 
     /**
@@ -225,19 +257,21 @@ class ApiClient
     }
 
     /**
+     * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function waitObject(ResponsePromise $promise, bool $allowInvalidJson = false): ObjectRule
+    public function waitObject(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): ObjectRule
     {
-        return $this->waitRaw($promise)->getJson($allowInvalidJson)->object();
+        return $this->waitRaw($promise)->getJson($allowInvalidJson, $responseJsonFlags)->object();
     }
 
     /**
+     * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function waitArray(ResponsePromise $promise, bool $allowInvalidJson = false): ArrayRule
+    public function waitArray(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): ArrayRule
     {
-        return $this->waitRaw($promise)->getJson($allowInvalidJson)->array();
+        return $this->waitRaw($promise)->getJson($allowInvalidJson, $responseJsonFlags)->array();
     }
 
     /**
@@ -247,10 +281,22 @@ class ApiClient
      * @param Priority::* $priority
      * @param array<non-empty-string, non-empty-string> $requiredAttributes without them can not be webhook dispatched
      * @param array<string, string|array<string>> $requestHeaders
+     * @param array<RequestOptions::*, mixed> $requestOptions
+     * @param int $requestJsonFlags bitmask https://www.php.net/manual/en/function.json-encode.php
+     * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function addWebhookListener(string $apiName, string $type, string $listeningUrl, int $priority = Priority::NORMAL, array $requiredAttributes = [], array $requestHeaders = []): Webhook
-    {
+    public function addWebhookListener(
+        string $apiName,
+        string $type,
+        string $listeningUrl,
+        int $priority = Priority::NORMAL,
+        array $requiredAttributes = [],
+        array $requestHeaders = [],
+        array $requestOptions = [],
+        int $requestJsonFlags = 0,
+        int $responseJsonFlags = 0
+    ): Webhook {
         return $this->requestObject(
             $apiName,
             'POST',
@@ -261,7 +307,10 @@ class ApiClient
                 $requiredAttributes
             ),
             new ParamsTransformer(),
-            $requestHeaders
+            $requestHeaders,
+            $requestOptions,
+            $requestJsonFlags,
+            $responseJsonFlags,
         )
             ->class(new WebhookTransformer())->notNull()
         ;
@@ -271,10 +320,11 @@ class ApiClient
      * @param non-empty-string $apiName
      * @param non-empty-string $webhookId
      * @param array<string, string|array<string>> $requestHeaders
+     * @param array<RequestOptions::*, mixed> $requestOptions
      * @throws ApiException
      */
-    public function removeWebhookListener(string $apiName, string $webhookId, array $requestHeaders = []): void
+    public function removeWebhookListener(string $apiName, string $webhookId, array $requestHeaders = [], array $requestOptions = []): void
     {
-        $this->request($apiName, 'DELETE', '/webhook?webhookId='.$webhookId, headers: $requestHeaders);
+        $this->request($apiName, 'DELETE', '/webhook?webhookId='.$webhookId, headers: $requestHeaders, options: $requestOptions);
     }
 }

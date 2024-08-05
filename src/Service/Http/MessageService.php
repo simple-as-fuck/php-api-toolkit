@@ -13,11 +13,17 @@ class MessageService
 {
     /**
      * @param non-empty-string $messageBodyName
+     * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      */
-    public static function parseJsonFromBody(Exception $exceptionFactory, MessageInterface $message, string $messageBodyName, bool $allowInvalidJson): Rules
-    {
+    public static function parseJsonFromBody(
+        Exception $exceptionFactory,
+        MessageInterface $message,
+        string $messageBodyName,
+        bool $allowInvalidJson,
+        int $jsonDecodeFlags = 0
+    ): Rules {
         $content = $message->getBody()->getContents();
-        $content = \json_decode($content);
+        $content = \json_decode($content, flags: $jsonDecodeFlags);
         if (\json_last_error() !== JSON_ERROR_NONE) {
             if ($allowInvalidJson) {
                 $content = null;

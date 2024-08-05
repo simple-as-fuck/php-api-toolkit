@@ -110,11 +110,12 @@ final class Response implements ResponseInterface
     }
 
     /**
+     * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function getJson(bool $allowInvalidJson = false): Rules
+    public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
     {
-        return MessageService::parseJsonFromBody(new ParseResponseException($this->request, $this), $this->response, 'Response body', $allowInvalidJson);
+        return MessageService::parseJsonFromBody(new ParseResponseException($this->request, $this), $this->response, 'Response body', $allowInvalidJson, $jsonDecodeFlags);
     }
 
     public function getStatusCode(): int

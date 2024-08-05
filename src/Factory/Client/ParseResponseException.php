@@ -11,8 +11,8 @@ use SimpleAsFuck\Validator\Factory\Exception;
 final class ParseResponseException extends Exception
 {
     public function __construct(
-        private Request $request,
-        private Response $response
+        private readonly Request $request,
+        private readonly Response $response
     ) {
     }
 

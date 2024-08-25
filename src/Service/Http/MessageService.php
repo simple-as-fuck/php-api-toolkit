@@ -22,13 +22,15 @@ class MessageService
         bool $allowInvalidJson,
         int $jsonDecodeFlags = 0
     ): Rules {
-        $content = $message->getBody()->getContents();
-        $content = \json_decode($content, flags: $jsonDecodeFlags);
+        $contentRaw = $message->getBody()->getContents();
+        $content = \json_decode($contentRaw, flags: $jsonDecodeFlags);
         if (\json_last_error() !== JSON_ERROR_NONE) {
             if ($allowInvalidJson) {
                 $content = null;
             } else {
-                throw $exceptionFactory->create($messageBodyName.' must be valid json');
+                $truncated = strlen($contentRaw) > 200;
+                $contentRaw = substr($contentRaw, 0, 200);
+                throw $exceptionFactory->create($messageBodyName.' must be valid json, invalid content: \''.$contentRaw.'\''.($truncated ? ' (truncated)' : ''));
             }
         }
 

@@ -8,3 +8,6 @@ parameters:
         - '#Call to deprecated method make\(\) of class SimpleAsFuck\\Validator\\Rule\\String\\StringRule#'
         - '#Call to deprecated method string\(\) of class SimpleAsFuck\\Validator\\Rule\\ArrayRule\\TypedKey#'
         - '#Call to deprecated method string\(\) of class SimpleAsFuck\\Validator\\Rule\\ArrayRule\\StringTypedKey#'
+
+        - '#Cannot access property \$id on mixed#'
+        - '#Cannot access property \$webhookId on mixed#'

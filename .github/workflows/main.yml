@@ -37,7 +37,7 @@ jobs:
         run: tools/phpunit test/ --bootstrap vendor/autoload.php
 
   php83a:
-    name: "php 8.3, validator 0.5, laravel 10"
+    name: "php 8.3, validator 0.6, laravel 10"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.3"
     services:
@@ -54,10 +54,10 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.5.0 --with illuminate/support:^10.0
+        run: composer update --no-interaction --with simple-as-fuck/php-validator:^0.6.0 --with illuminate/support:^10.0
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse --memory-limit=-1 --configuration=phpstan-validator-0.5.neon.dist
+        run: vendor/bin/phpstan analyse --memory-limit=-1 --configuration=phpstan-laravel-10.neon.dist
 
       - name: Run tests
         run: tools/phpunit test/ --bootstrap vendor/autoload.php
@@ -89,7 +89,7 @@ jobs:
         run: tools/phpunit test/ --bootstrap vendor/autoload.php
 
   php82a:
-    name: "php 8.2, laravel 9, PSR log 2, symfony 6"
+    name: "php 8.2, laravel 9, PSR log 2, symfony 6, validator 0.5"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.2"
     services:
@@ -106,10 +106,10 @@ jobs:
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
       - name: Install dependencies
-        run: composer update --no-interaction --with illuminate/support:^9.0 --with psr/log:^2.0 --with symfony/http-foundation:^6.0 --with symfony/http-kernel:^6.0 --with symfony/psr-http-message-bridge:^6.0
+        run: composer update --no-interaction --with illuminate/support:^9.0 --with psr/log:^2.0 --with symfony/http-foundation:^6.0 --with symfony/http-kernel:^6.0 --with symfony/psr-http-message-bridge:^6.0 --with simple-as-fuck/php-validator:^0.5.2
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse --memory-limit=-1
+        run: vendor/bin/phpstan analyse --memory-limit=-1 --configuration=phpstan-validator-0.5.neon.dist
 
       - name: Run tests
         run: tools/phpunit test/ --bootstrap vendor/autoload.php
@@ -132,7 +132,7 @@ jobs:
         run: composer install --no-interaction
 
       - name: Run static analysis
-        run: vendor/bin/phpstan analyse --memory-limit=-1
+        run: vendor/bin/phpstan analyse --memory-limit=-1 --configuration=phpstan-laravel-10.neon.dist
 
       - name: Run tests
         run: vendor/bin/phpunit test/

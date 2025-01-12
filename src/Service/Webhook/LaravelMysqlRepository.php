@@ -15,8 +15,8 @@ use SimpleAsFuck\Validator\Factory\Validator;
 final class LaravelMysqlRepository extends Repository
 {
     public function __construct(
-        private ConnectionResolverInterface $connectionResolver,
-        private \Illuminate\Contracts\Config\Repository $config,
+        private readonly ConnectionResolverInterface $connectionResolver,
+        private readonly \Illuminate\Contracts\Config\Repository $config,
     ) {
     }
 
@@ -161,14 +161,14 @@ final class LaravelMysqlRepository extends Repository
                 ->where('key', '=', $key)
                 ->where('value', '=', $value)
                 ->get()
-                ->map(static fn ($row): int => ((object) $row)->id)
+                ->map(static fn ($row): int => $row->id)
             ;
             foreach ($attributeIds as $attributeId) {
                 /** @var Collection<int, int> $webhookIds */
                 $webhookIds = $connection->table('WebhookRequiredAttribute')
                     ->where('webhookAttributeId', '=', $attributeId)
                     ->get()
-                    ->map(static fn ($row): int => ((object) $row)->webhookId)
+                    ->map(static fn ($row): int => $row->webhookId)
                 ;
 
                 foreach ($webhookIds as $webhookId) {

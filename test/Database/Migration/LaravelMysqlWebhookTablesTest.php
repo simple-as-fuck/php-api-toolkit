@@ -19,14 +19,14 @@ final class LaravelMysqlWebhookTablesTest extends TestCase
         DB::swap($connectionResolver);
 
         $migration = include __DIR__.'/../../../src/Database/Migration/LaravelMysqlWebhookTables.php';
-
+        /** @phpstan-ignore-next-line */
         $migration->up();
 
         self::assertNull($connection->selectOne('select * from Webhook'));
         self::assertNull($connection->selectOne('select * from WebhookAttribute'));
         self::assertNull($connection->selectOne('select * from WebhookRequiredAttribute'));
         self::assertNull($connection->selectOne('select * from WebhookWithoutAttribute'));
-
+        /** @phpstan-ignore-next-line */
         $migration->down();
 
         try {
@@ -49,14 +49,14 @@ final class LaravelMysqlWebhookTablesTest extends TestCase
         } catch (\Throwable $e) {
             self::assertInstanceOf(\PDOException::class, $e);
         }
-
+        /** @phpstan-ignore-next-line */
         $migration->up();
 
         self::assertNull($connection->selectOne('select * from Webhook'));
         self::assertNull($connection->selectOne('select * from WebhookAttribute'));
         self::assertNull($connection->selectOne('select * from WebhookRequiredAttribute'));
         self::assertNull($connection->selectOne('select * from WebhookWithoutAttribute'));
-
+        /** @phpstan-ignore-next-line */
         $migration->down();
     }
 }

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\RequestOptions as RequestOptions;
+use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
-use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority as Priority;
+use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Client;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Config;
+use SimpleAsFuck\Validator\Factory\Validator;
 
 /**
  * @covers \SimpleAsFuck\ApiToolkit\Service\Webhook\Client
@@ -33,11 +33,14 @@ final class ClientTest extends TestCase
         $httpClient = $this->createMock(\GuzzleHttp\Client::class);
         $httpClient->method('request')->willReturnCallback(static function (string $method, string $uri, array $options) use (&$httpCalls): Response {
             $httpCalls++;
-            if (($options[RequestOptions::JSON]->params->attributes[0]->value ?? null) === 'fail') {
+            $jsonObject = Validator::make($options)->array()->key(RequestOptions::JSON)->object();
+            $value = $jsonObject->property('params')->object()->property('attributes')->array()->key(0)->object()->property('value')->nullable();
+
+            if ($value === 'fail') {
                 throw new \RuntimeException();
             }
 
-            if (($options[RequestOptions::JSON]->params->attributes[0]->value ?? null) === 'stop') {
+            if ($value === 'stop') {
                 return new Response(200, body: '{"stopDispatching":true}');
             }
 

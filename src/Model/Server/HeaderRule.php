@@ -31,7 +31,6 @@ final class HeaderRule
         $values = $this->headerValues($caseSensitive);
         $values = $values[$caseSensitive ? $key : strtolower($key)] ?? [];
         $value = array_pop($values);
-        /** @var mixed $value */
         return new StringRule($this->exceptionFactory, new RuleChain(), new Validated($value), 'Request header: '.$key);
     }
 
@@ -45,9 +44,9 @@ final class HeaderRule
     {
         $values = $this->headerValues($caseSensitive);
         $values = $values[$caseSensitive ? $key : strtolower($key)] ?? null;
-        /** @var mixed $values */
         return new Collection(
             $this->exceptionFactory,
+            /** @phpstan-ignore-next-line */
             new RuleChain(),
             new Validated($values),
             'Request header: '.$key,

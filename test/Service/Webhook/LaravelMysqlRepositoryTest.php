@@ -36,6 +36,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
         DB::swap(self::$connectionResolver);
 
         $migration = include __DIR__.'/../../../src/Database/Migration/LaravelMysqlWebhookTables.php';
+        /** @phpstan-ignore-next-line */
         $migration->up();
     }
 
@@ -55,6 +56,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         $migration = include __DIR__.'/../../../src/Database/Migration/LaravelMysqlWebhookTables.php';
+        /** @phpstan-ignore-next-line */
         $migration->down();
     }
 
@@ -88,12 +90,10 @@ final class LaravelMysqlRepositoryTest extends TestCase
         $connection = self::$connectionResolver->connection('default');
 
         $expectedWebhooks = array_map(function (string $url) use ($connection, $attributes): Webhook {
-            /** @var \stdClass $dbWebhook */
+            /** @var object{id: int, type: non-empty-string, listeningUrl: non-empty-string, priority: 50|100|200} $dbWebhook */
             $dbWebhook = $connection->selectOne('select * from Webhook where listeningUrl = ?', [$url]);
-            /** @var non-empty-string $webhookId */
-            $webhookId = (string) $dbWebhook->id;
             return new Webhook(
-                $webhookId,
+                (string) $dbWebhook->id,
                 $dbWebhook->type,
                 new Params(
                     $dbWebhook->listeningUrl,
@@ -170,7 +170,6 @@ final class LaravelMysqlRepositoryTest extends TestCase
             $this->config
         );
 
-        /** @var Webhook $webhook */
         $webhook = $repository->save($type, $params);
         self::assertNotNull($webhook);
         self::assertSame($type, $webhook->type());
@@ -178,15 +177,16 @@ final class LaravelMysqlRepositoryTest extends TestCase
 
         $connection = self::$connectionResolver->connection('default');
 
-        /** @var \stdClass $dbWebhook */
+        /** @var object{id: int, type: string, listeningUrl: string, priority: int} $dbWebhook */
         $dbWebhook = $connection->selectOne('select * from Webhook where id = ?', [$webhook->id()]);
         self::assertSame($webhook->id(), (string) $dbWebhook->id);
         self::assertSame($type, $dbWebhook->type);
         self::assertSame($params->listeningUrl(), $dbWebhook->listeningUrl);
         self::assertSame($params->priority(), $dbWebhook->priority);
 
+        /** @var array<object{webhookId: int, webhookAttributeId: int}> $dbRequiredAttributeMaps */
         $dbRequiredAttributeMaps = $connection->select('select * from WebhookRequiredAttribute where webhookId = ?', [$webhook->id()]);
-        /** @var \stdClass $dbWithoutAttribute */
+        /** @var object{webhookId: int} $dbWithoutAttribute */
         $dbWithoutAttribute = $connection->selectOne('select * from WebhookWithoutAttribute where webhookId = ?', [$webhook->id()]);
 
         if (count($params->attributes()) === 0) {

@@ -39,7 +39,7 @@ final class LaravelMysqlRepository extends Repository
         }
 
         foreach ($connection->table('WebhookWithoutAttribute')->get() as $webhookMap) {
-            /** @var \stdClass $webhookMap */
+            /** @phpstan-ignore-next-line */
             if (array_key_exists($webhookMap->webhookId, $webhookMatches)) {
                 continue;
             }
@@ -49,15 +49,13 @@ final class LaravelMysqlRepository extends Repository
 
         $webhooks = [];
         foreach ($webhookMatches as $webhookId => $matchCount) {
-            /** @var \stdClass|null $webhook */
+            /** @var object{id: int, type: non-empty-string, listeningUrl: non-empty-string, priority: 50|100|200}|null $webhook */
             $webhook = $connection->table('Webhook')->where('id', '=', $webhookId)->where('type', '=', $type)->first();
             if ($webhook === null) {
                 continue;
             }
 
-            /** @var non-empty-string $webhookId */
-            $webhookId = (string) $webhook->id;
-            $webhooks[] = new Webhook($webhookId, $webhook->type, new Params($webhook->listeningUrl, $webhook->priority, $attributes));
+            $webhooks[] = new Webhook((string) $webhook->id, $webhook->type, new Params($webhook->listeningUrl, $webhook->priority, $attributes));
         }
 
         usort($webhooks, static function (Webhook $a, Webhook $b) use ($webhookMatches): int {
@@ -161,14 +159,14 @@ final class LaravelMysqlRepository extends Repository
                 ->where('key', '=', $key)
                 ->where('value', '=', $value)
                 ->get()
-                ->map(static fn ($row): int => $row->id)
+                ->map(static fn ($row) => $row->id)
             ;
             foreach ($attributeIds as $attributeId) {
                 /** @var Collection<int, int> $webhookIds */
                 $webhookIds = $connection->table('WebhookRequiredAttribute')
                     ->where('webhookAttributeId', '=', $attributeId)
                     ->get()
-                    ->map(static fn ($row): int => $row->webhookId)
+                    ->map(static fn ($row) => $row->webhookId)
                 ;
 
                 foreach ($webhookIds as $webhookId) {

@@ -18,8 +18,8 @@ final class QueryRule
      * @param Validated<array<mixed>> $queryParams
      */
     public function __construct(
-        private Exception $exceptionFactory,
-        private Validated $queryParams
+        private readonly Exception $exceptionFactory,
+        private readonly Validated $queryParams
     ) {
     }
 
@@ -28,16 +28,22 @@ final class QueryRule
      */
     public function key(string $key): StringTypedKey
     {
-        /** @var Validated<mixed> $validated */
-        $validated = $this->queryParams;
         $ruleChain = new RuleChain();
         $valueName = 'Request query parameter: '.$key;
         return new StringTypedKey(
             $this->exceptionFactory,
+            /** @phpstan-ignore-next-line */
             $ruleChain,
-            $validated,
+            $this->queryParams,
             $valueName,
-            new Key($this->exceptionFactory, $ruleChain, $validated, $valueName, $key)
+            new Key(
+                $this->exceptionFactory,
+                /** @phpstan-ignore-next-line */
+                $ruleChain,
+                $this->queryParams,
+                $valueName,
+                $key
+            )
         );
     }
 
@@ -48,12 +54,11 @@ final class QueryRule
      */
     public function class(UserQueryRule $userQueryRule): ClassFromArray
     {
-        /** @var Validated<mixed> $validated */
-        $validated = $this->queryParams;
         return new ClassFromArray(
             $this->exceptionFactory,
+            /** @phpstan-ignore-next-line */
             new RuleChain(),
-            $validated,
+            $this->queryParams,
             'Request query',
             $this,
             $userQueryRule

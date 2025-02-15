@@ -76,6 +76,7 @@ final class Response implements ResponseInterface
      */
     public function getHeaders(): array
     {
+        /** @var array<string, array<string>> */
         return $this->response->getHeaders();
     }
 

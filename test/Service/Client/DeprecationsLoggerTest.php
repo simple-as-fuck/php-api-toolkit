@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use GuzzleHttp\Psr7\HttpFactory;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -44,10 +45,8 @@ final class DeprecationsLoggerTest extends TestCase
      */
     public static function dataProviderLogDeprecation(): array
     {
-        $httpFactory = new HttpFactory();
-
         return [
-            [null, [], $httpFactory->createResponse()],
+            [null, [], new Response()],
             [
                 'Api: test method: GET uri: "https://test/" call is deprecated',
                 [
@@ -55,11 +54,13 @@ final class DeprecationsLoggerTest extends TestCase
                     'Link' => 'https://example.net/sunset',
                     'Deprecated' => 'Some deprecated description',
                 ],
-                $httpFactory->createResponse()
-                    ->withHeader('Sunset', 'Thu, 15 Dec 2022 21:46:37 GMT')
-                    ->withHeader('Link', '<https://example.net/sunset>;rel="sunset";type="text/html"')
-                    ->withHeader('Deprecated', 'Some deprecated description')
-                ,
+                new Response(
+                    headers: [
+                        'Sunset' => 'Thu, 15 Dec 2022 21:46:37 GMT',
+                        'Link' => '<https://example.net/sunset>;rel="sunset";type="text/html"',
+                        'Deprecated' => 'Some deprecated description',
+                    ],
+                ),
             ],
             [
                 'Api: test method: GET uri: "https://test/" call is deprecated',
@@ -67,11 +68,12 @@ final class DeprecationsLoggerTest extends TestCase
                     'Sunset' => 'Some sunset header with incorrect format',
                     'Link' => 'Some sunset link with incorrect format',
                 ],
-                $httpFactory->createResponse()
-                    ->withHeader('Sunset', 'Some sunset header with incorrect format')
-                    ->withHeader('Link', 'Some another link')
-                    ->withHeader('Link', 'Some sunset link with incorrect format')
-                ,
+                new Response(
+                    headers: [
+                        'Sunset' => 'Some sunset header with incorrect format',
+                        'Link' => 'Some sunset link with incorrect format',
+                    ],
+                ),
             ],
         ];
     }

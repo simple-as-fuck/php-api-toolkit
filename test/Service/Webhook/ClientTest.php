@@ -34,7 +34,7 @@ final class ClientTest extends TestCase
         $httpClient->method('request')->willReturnCallback(static function (string $method, string $uri, array $options) use (&$httpCalls): Response {
             $httpCalls++;
             $jsonObject = Validator::make($options)->array()->key(RequestOptions::JSON)->object();
-            $value = $jsonObject->property('params')->object()->property('attributes')->array()->key(0)->object()->property('value')->nullable();
+            $value = $jsonObject->property('params')->object()->property('attributes')->array()->key(0)->object()->property('value')->string()->nullable();
 
             if ($value === 'fail') {
                 throw new \RuntimeException();

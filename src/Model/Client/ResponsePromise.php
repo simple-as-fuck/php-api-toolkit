@@ -13,13 +13,14 @@ final class ResponsePromise
      * @param non-empty-string $apiName
      */
     public function __construct(
-        private string $apiName,
-        private Request $request,
-        private PromiseInterface $promise
+        public readonly string $apiName,
+        public readonly Request $request,
+        public readonly PromiseInterface $promise,
     ) {
     }
 
     /**
+     * @deprecated will be removed
      * @return non-empty-string
      */
     public function apiName(): string
@@ -27,11 +28,17 @@ final class ResponsePromise
         return $this->apiName;
     }
 
+    /**
+     * @deprecated will be removed
+     */
     public function request(): Request
     {
         return $this->request;
     }
 
+    /**
+     * @deprecated will be removed
+     */
     public function wait(): Response
     {
         /** @var ResponseInterface $response */

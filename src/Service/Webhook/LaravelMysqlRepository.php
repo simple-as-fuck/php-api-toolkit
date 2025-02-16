@@ -9,6 +9,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
+use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
 use SimpleAsFuck\Validator\Factory\Validator;
 
@@ -49,7 +50,7 @@ final class LaravelMysqlRepository extends Repository
 
         $webhooks = [];
         foreach ($webhookMatches as $webhookId => $matchCount) {
-            /** @var object{id: int, type: non-empty-string, listeningUrl: non-empty-string, priority: 50|100|200}|null $webhook */
+            /** @var object{id: int, type: non-empty-string, listeningUrl: non-empty-string, priority: Priority::*}|null $webhook */
             $webhook = $connection->table('Webhook')->where('id', '=', $webhookId)->where('type', '=', $type)->first();
             if ($webhook === null) {
                 continue;

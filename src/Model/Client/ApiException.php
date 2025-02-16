@@ -8,8 +8,8 @@ class ApiException extends \RuntimeException
 {
     public function __construct(
         string $message,
-        private Request $request,
-        private ?Response $response = null,
+        private readonly Request $request,
+        private readonly ?Response $response = null,
         \Throwable $previous = null
     ) {
         parent::__construct($message, $response?->getStatusCode() ?? 0, $previous);

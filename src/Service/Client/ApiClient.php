@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\RequestOptions;
 use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ConflictApiException;
@@ -173,12 +174,17 @@ class ApiClient
     public function waitRaw(ResponsePromise $promise): Response
     {
         try {
-            $response = $promise->wait();
+            /**
+             * @var ResponseInterface $response
+             * @throws RequestException|TransferException
+             */
+            $response = $promise->promise->wait();
+            $response = new Response($promise->request, $response);
         } catch (RequestException $exception) {
             $message = $exception->getMessage();
             $response = $exception->getResponse();
             if ($response !== null) {
-                $this->deprecationsLogger?->logDeprecation($promise->apiName(), $promise->request(), $response);
+                $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);
 
                 $responseContent = $response->getBody()->getContents();
                 $errorObject = Validator::make(\json_decode($responseContent))->object();
@@ -221,38 +227,26 @@ class ApiClient
                 }
 
                 $response = $response->withBody((new HttpFactory())->createStream($responseContent));
-                $response = new Response($promise->request(), $response);
-                if ($response->getStatusCode() === HttpCodes::HTTP_BAD_REQUEST) {
-                    throw new BadRequestApiException($message, $promise->request(), $response, $exception);
-                }
-                if ($response->getStatusCode() === HttpCodes::HTTP_UNAUTHORIZED) {
-                    throw new UnauthorizedApiException($message, $promise->request(), $response, $exception);
-                }
-                if ($response->getStatusCode() === HttpCodes::HTTP_FORBIDDEN) {
-                    throw new ForbiddenApiException($message, $promise->request(), $response, $exception);
-                }
-                if ($response->getStatusCode() === HttpCodes::HTTP_NOT_FOUND) {
-                    throw new NotFoundApiException($message, $promise->request(), $response, $exception);
-                }
-                if ($response->getStatusCode() === HttpCodes::HTTP_CONFLICT) {
-                    throw new ConflictApiException($message, $promise->request(), $response, $exception);
-                }
-                if ($response->getStatusCode() === HttpCodes::HTTP_GONE) {
-                    throw new GoneApiException($message, $promise->request(), $response, $exception);
-                }
-                if ($response->getStatusCode() === HttpCodes::HTTP_INTERNAL_SERVER_ERROR) {
-                    throw new InternalServerErrorApiException($message, $promise->request(), $response, $exception);
-                }
+                $response = new Response($promise->request, $response);
 
-                throw new ResponseApiException($message, $promise->request(), $response, $exception);
+                match ($response->getStatusCode()) {
+                    HttpCodes::HTTP_BAD_REQUEST => throw new BadRequestApiException($message, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_UNAUTHORIZED => throw new UnauthorizedApiException($message, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_FORBIDDEN => throw new ForbiddenApiException($message, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_NOT_FOUND => throw new NotFoundApiException($message, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($message, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_GONE => throw new GoneApiException($message, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($message, $promise->request, $response, $exception),
+                    default => throw new ResponseApiException($message, $promise->request, $response, $exception),
+                };
             }
 
-            throw new ApiException($message, $promise->request(), null, $exception);
+            throw new ApiException($message, $promise->request, null, $exception);
         } catch (TransferException $exception) {
-            throw new ApiException($exception->getMessage(), $promise->request(), null, $exception);
+            throw new ApiException($exception->getMessage(), $promise->request, null, $exception);
         }
 
-        $this->deprecationsLogger?->logDeprecation($promise->apiName(), $promise->request(), $response);
+        $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);
         return $response;
     }
 

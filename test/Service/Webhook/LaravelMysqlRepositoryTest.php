@@ -90,7 +90,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
         $connection = self::$connectionResolver->connection('default');
 
         $expectedWebhooks = array_map(function (string $url) use ($connection, $attributes): Webhook {
-            /** @var object{id: int, type: non-empty-string, listeningUrl: non-empty-string, priority: 50|100|200} $dbWebhook */
+            /** @var object{id: int, type: non-empty-string, listeningUrl: non-empty-string, priority: Priority::*} $dbWebhook */
             $dbWebhook = $connection->selectOne('select * from Webhook where listeningUrl = ?', [$url]);
             return new Webhook(
                 (string) $dbWebhook->id,

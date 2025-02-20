@@ -14,7 +14,7 @@ final class Nullable
      */
     public static function toApi(mixed $transformed, Transformer $transformer): \stdClass|\JsonSerializable|null
     {
-        if($transformed === null) {
+        if ($transformed === null) {
             return null;
         }
 

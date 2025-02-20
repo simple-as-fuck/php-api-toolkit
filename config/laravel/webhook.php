@@ -5,9 +5,8 @@ declare(strict_types=1);
 return [
     /* configuration for webhook dispatcher */
     'dispatch' => [
-        // authentication token for https://swagger.io/docs/specification/authentication/bearer-authentication/
-        // if not null token is in every webhook call for authentication of application that serving event
-        'token' => null,
+        // http request headers send in every webhook call
+        'default_headers' => [],
         // connection name where are asynchronous webhook calls dispatched, if null default laravel queue connection is used
         'queue-connection' => null,
         // if connection support named queue, specific name for webhooks can be defined here, if null default queue name is used

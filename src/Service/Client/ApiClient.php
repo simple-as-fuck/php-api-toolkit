@@ -148,17 +148,19 @@ class ApiClient
             $request = $request->withBaseUrl($this->config->getBaseUrl($apiName));
         }
 
-        $psrRequest = $request->createPsr($this->requestFactory);
-
-        $token = $this->config->getBearerToken($apiName);
-        if (! $psrRequest->hasHeader('Authorization') && $token !== null) {
-            $psrRequest = $psrRequest->withHeader('Authorization', 'Bearer '.$token);
+        $defaultHeaders = $this->config->getDefaultHeaders($apiName);
+        foreach ($defaultHeaders as $defaultHeader => $value) {
+            $defaultHeader = (string) $defaultHeader;
+            if (! $request->hasHeader($defaultHeader)) {
+                $request = $request->withHeader($defaultHeader, $value);
+            }
         }
+
+        $psrRequest = $request->createPsr($this->requestFactory);
 
         $defaultOptions = [
             RequestOptions::VERIFY => $this->config->getVerifyCerts($apiName),
         ];
-
         foreach ($defaultOptions as $key => $defaultOption) {
             if (! array_key_exists($key, $options)) {
                 $options[$key] = $defaultOption;

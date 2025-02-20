@@ -55,6 +55,19 @@ final class Request
     }
 
     /**
+     * @param string $name
+     * @param string|array<string> $value
+     */
+    public function withHeader(string $name, string|array $value): self
+    {
+        $headers = $this->headers;
+        $headers[$name] = $value;
+        $request = new self($this->method, $this->url, [], $this->body, $headers);
+        $request->baseUrl = $this->baseUrl;
+        return $request;
+    }
+
+    /**
      * @template TData
      * @param TData $jsonData
      * @param Transformer<TData>|null $transformer
@@ -77,6 +90,11 @@ final class Request
     public function hasBaseUrl(): bool
     {
         return $this->baseUrl !== null;
+    }
+
+    public function hasHeader(string $name): bool
+    {
+        return array_key_exists($name, $this->headers);
     }
 
     public function createPsr(RequestFactoryInterface $factory): RequestInterface

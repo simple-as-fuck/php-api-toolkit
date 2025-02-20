@@ -7,9 +7,24 @@ namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 abstract class Config
 {
     /**
+     * @deprecated in 0.6 will be removed use $this->getDefaultHeaders
      * @return non-empty-string|null
      */
     abstract public function getBearerToken(): ?string;
+
+    /**
+     * @return array<string>
+     */
+    public function getDefaultHeaders(): array
+    {
+        /** @phpstan-ignore-next-line */
+        $token = $this->getBearerToken();
+        if ($token !== null) {
+            return ['Authorization' => 'Bearer '.$token];
+        }
+
+        return [];
+    }
 
     /**
      * @return positive-int

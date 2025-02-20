@@ -13,9 +13,9 @@ use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 abstract class Client
 {
     public function __construct(
-        private Config $config,
-        private \GuzzleHttp\Client $client,
-        private ?LoggerInterface $logger,
+        private readonly Config $config,
+        private readonly \GuzzleHttp\Client $client,
+        private readonly ?LoggerInterface $logger,
     ) {
     }
 
@@ -29,9 +29,12 @@ abstract class Client
         $requestHeaders = $headers;
         $requestOptions = $options;
 
-        $token = $this->config->getBearerToken();
-        if (! array_key_exists('Authorization', $requestHeaders) && $token !== null) {
-            $requestHeaders['Authorization'] = 'Bearer '.$token;
+        $defaultHeaders = $this->config->getDefaultHeaders();
+        foreach ($defaultHeaders as $defaultHeader => $value) {
+            $defaultHeader = (string) $defaultHeader;
+            if (! array_key_exists($defaultHeader, $requestHeaders)) {
+                $requestHeaders[$defaultHeader] = $value;
+            }
         }
 
         $requestOptions[RequestOptions::HEADERS] = $requestHeaders;

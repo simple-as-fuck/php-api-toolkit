@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Client;
 
-use Illuminate\Contracts\Config\Repository;
-use SimpleAsFuck\Validator\Factory\Validator;
-use SimpleAsFuck\Validator\Rule\General\Rules;
+use SimpleAsFuck\ApiToolkit\Service\Config\LaravelAdapter;
 
 final class LaravelConfig extends Config
 {
     public function __construct(
-        private Repository $repository
+        private readonly LaravelAdapter $laravelAdapter
     ) {
     }
 
@@ -21,16 +19,29 @@ final class LaravelConfig extends Config
      */
     public function getBaseUrl(string $apiName): string
     {
-        return $this->getValue('services.'.$apiName.'.base_url')->string()->notEmpty()->notNull();
+        return $this->laravelAdapter->get('services.'.$apiName.'.base_url')->string()->notEmpty()->notNull();
     }
 
     /**
+     * @deprecated in 0.6 will be removed use $this->getDefaultHeaders
      * @param non-empty-string $apiName
      * @return non-empty-string|null
      */
     public function getBearerToken(string $apiName): ?string
     {
-        return $this->getValue('services.'.$apiName.'.token')->string()->notEmpty()->nullable();
+        return $this->laravelAdapter->get('services.'.$apiName.'.token')->string()->notEmpty()->nullable();
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     * @return array<string>
+     */
+    public function getDefaultHeaders(string $apiName): array
+    {
+        return [
+            ...parent::getDefaultHeaders($apiName),
+            ...$this->laravelAdapter->get('services.'.$apiName.'.default_headers')->array()->ofString()->nullable() ?? [],
+        ];
     }
 
     /**
@@ -38,7 +49,7 @@ final class LaravelConfig extends Config
      */
     public function getVerifyCerts(string $apiName): bool
     {
-        return $this->getValue('services.'.$apiName.'.verify')->bool()->nullable() ?? parent::getVerifyCerts($apiName);
+        return $this->laravelAdapter->get('services.'.$apiName.'.verify')->bool()->nullable() ?? parent::getVerifyCerts($apiName);
     }
 
     /**
@@ -47,14 +58,6 @@ final class LaravelConfig extends Config
      */
     public function getDeprecatedHeader(string $apiName): string
     {
-        return $this->getValue('services.'.$apiName.'deprecated_header')->string()->notEmpty()->nullable() ?? parent::getDeprecatedHeader($apiName);
-    }
-
-    /**
-     * @param non-empty-string $key
-     */
-    private function getValue(string $key): Rules
-    {
-        return Validator::make($this->repository->get($key), 'Config key '.$key);
+        return $this->laravelAdapter->get('services.'.$apiName.'deprecated_header')->string()->notEmpty()->nullable() ?? parent::getDeprecatedHeader($apiName);
     }
 }

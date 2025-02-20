@@ -33,7 +33,9 @@ Laravel config load automatically configuration from `services.php` config, with
 ```php
     'some_api_name' => [ // this key is value of first parameter ApiClient::request method
         'base_url' => 'https://some-host/some-base-url',
-        'token' => 'tokenexample', // optional default null, authentication token for https://swagger.io/docs/specification/authentication/bearer-authentication/
+        'default_headers' => [ // optional default [], http headers send in every request
+            'Authorization' => 'Bearer tokenexample', // https://swagger.io/docs/specification/authentication/bearer-authentication/
+        ],
         'verify' => true, // optional default true, turn on/off certificates verification
         'deprecated_header' => 'Deprecated', // optional default 'Deprecated', define name of deprecated response header logged into deprecation log
     ],

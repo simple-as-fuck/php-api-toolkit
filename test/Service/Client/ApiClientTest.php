@@ -63,7 +63,7 @@ final class ApiClientTest extends TestCase
             [400, 'Exception message', '', new RequestException('Exception message', $request, $response)],
             [
                 400,
-                'Json message',
+                'Json message status (400) instance: "/"',
                 '{"message":"Json message"}',
                 new RequestException(
                     'Exception message',
@@ -73,7 +73,7 @@ final class ApiClientTest extends TestCase
             ],
             [
                 400,
-                'Json title',
+                'Error title: "Json title" status (400) instance: "/"',
                 '{"title":"Json title"}',
                 new RequestException(
                     'Exception message',
@@ -83,12 +83,32 @@ final class ApiClientTest extends TestCase
             ],
             [
                 400,
-                'Error type: "/test/error" Json title status (401) instance: "/test/url"',
+                'Json message status (400) instance: "/"',
+                '{"title":"Json title","message":"Json message"}',
+                new RequestException(
+                    'Exception message',
+                    $request,
+                    $response->withBody($httpFactory->createStream('{"title":"Json title","message":"Json message"}'))
+                ),
+            ],
+            [
+                401,
+                'Error type: "/test/error" status (401) instance: "/test/url"',
                 '{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}',
                 new RequestException(
                     'Exception message',
                     $request,
                     $response->withBody($httpFactory->createStream('{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}'))
+                ),
+            ],
+            [
+                403,
+                'Error type: "/test/error" Json message status (403) instance: "/"',
+                '{"type":"/test/error","message":"Json message"}',
+                new RequestException(
+                    'Exception message',
+                    $request,
+                    $response->withStatus(403)->withBody($httpFactory->createStream('{"type":"/test/error","message":"Json message"}'))
                 ),
             ],
         ];

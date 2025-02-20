@@ -87,6 +87,22 @@ final class Request
         return $request;
     }
 
+    /**
+     * @return non-empty-string
+     */
+    public function method(): string
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    public function url(): string
+    {
+        return $this->url;
+    }
+
     public function hasBaseUrl(): bool
     {
         return $this->baseUrl !== null;

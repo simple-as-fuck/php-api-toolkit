@@ -190,62 +190,62 @@ class ApiClient
 
                 $responseContent = $response->getBody()->getContents();
                 $errorObject = Validator::make(\json_decode($responseContent))->object();
-                $errorParts = [];
+                $messageParts = [];
 
-                // https://datatracker.ietf.org/doc/html/rfc7807
+                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 type
                 $errorType = $errorObject->property('type')->string()->notEmpty()->nullable(true);
                 if ($errorType !== null) {
-                    $errorParts[] = 'Error type: "'.$errorType.'"';
+                    $messageParts[] = 'Error type: "'.$errorType.'"';
                 }
 
-                $errorMessage =
-                    $errorObject
-                        ->property('title')
-                        ->string()
-                        ->notEmpty()
-                        ->nullable(true)
-                    ??
-                    $errorObject
-                        ->property('message')
-                        ->string()
-                        ->notEmpty()
-                        ->nullable(true)
-                ;
+                $errorMessage = $errorObject->property('message')->string()->notEmpty()->nullable(true);
                 if ($errorMessage !== null) {
-                    $errorParts[] = $errorMessage;
+                    $messageParts[] = $errorMessage;
                 }
 
-                if (count($errorParts) !== 0) {
-                    $errorStatus = $errorObject->property('status')->int()->nullable(true);
-                    if ($errorStatus !== null) {
-                        $errorParts[] = 'status ('.$errorStatus.')';
-                    }
-                    $errorInstance = $errorObject->property('instance')->string()->notEmpty()->nullable(true);
-                    if ($errorInstance !== null) {
-                        $errorParts[] = 'instance: "'.$errorInstance.'"';
-                    }
+                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 status
+                $errorStatus = $errorObject->property('status')->int()->nullable(true) ?? $response->getStatusCode();
+                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 instance
+                $errorInstance = $errorObject->property('instance')->string()->notEmpty()->nullable(true) ?? $promise->request->url();
+                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 title
+                $errorTitle = $errorObject->property('title')->string()->notEmpty()->nullable(true);
+                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 detail
+                $errorDetail = $errorObject->property('detail')->string()->notEmpty()->nullable(true);
 
-                    $message = implode(' ', $errorParts);
+                if (count($messageParts) === 0) {
+                    if ($errorTitle !== null) {
+                        $messageParts[] = 'Error title: "'.$errorTitle.'"';
+                    }
+                    if ($errorDetail !== null) {
+                        $messageParts[] = 'Error detail: "'.$errorDetail.'"';
+                    }
+                }
+
+                if (count($messageParts) !== 0) {
+                    $messageParts[] = 'status (' . $errorStatus . ')';
+                    $messageParts[] = 'instance: "' . $errorInstance . '"';
+
+                    $message = implode(' ', $messageParts);
                 }
 
                 $response = $response->withBody((new HttpFactory())->createStream($responseContent));
                 $response = new Response($promise->request, $response);
 
                 match ($response->getStatusCode()) {
-                    HttpCodes::HTTP_BAD_REQUEST => throw new BadRequestApiException($message, $promise->request, $response, $exception),
-                    HttpCodes::HTTP_UNAUTHORIZED => throw new UnauthorizedApiException($message, $promise->request, $response, $exception),
-                    HttpCodes::HTTP_FORBIDDEN => throw new ForbiddenApiException($message, $promise->request, $response, $exception),
-                    HttpCodes::HTTP_NOT_FOUND => throw new NotFoundApiException($message, $promise->request, $response, $exception),
-                    HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($message, $promise->request, $response, $exception),
-                    HttpCodes::HTTP_GONE => throw new GoneApiException($message, $promise->request, $response, $exception),
-                    HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($message, $promise->request, $response, $exception),
-                    default => throw new ResponseApiException($message, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_BAD_REQUEST => throw new BadRequestApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_UNAUTHORIZED => throw new UnauthorizedApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_FORBIDDEN => throw new ForbiddenApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_NOT_FOUND => throw new NotFoundApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_GONE => throw new GoneApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    default => throw new ResponseApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
                 };
             }
 
-            throw new ApiException($message, $promise->request, null, $exception);
+            throw new ApiException($message, 0, $promise->request->url(), null, null, null, $promise->request, $response, $exception);
         } catch (TransferException $exception) {
-            throw new ApiException($exception->getMessage(), $promise->request, null, $exception);
+            throw new ApiException($exception->getMessage(), 0, $promise->request->url(), null, null, null, $promise->request, null, $exception);
         }
 
         $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);

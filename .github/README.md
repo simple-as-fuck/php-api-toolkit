@@ -54,7 +54,6 @@ Deprecated or Sunset headers will be logged into defined log channel.
 $deprecationsLogger = new \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger(
     $config,
     $logger,
-    new \GuzzleHttp\Psr7\HttpFactory()
 );
 
 $client = new \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient(
@@ -103,8 +102,19 @@ catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
      * \SimpleAsFuck\ApiToolkit\Model\Client\ApiException is thrown,
      * and you can handle any error from communication
      */
-    $exception->getCode(); // if exception contains http response, http status is here, otherwise zero is returned
-    $exception->getMessage(); // if http response contains json object with message string property, json message overwrite exception message
+    // if exception contains http response, rfc7807 status or http status is here, otherwise zero is returned
+    $exception->getCode();
+    // exception message for logging or debugging is build from https://datatracker.ietf.org/doc/html/rfc7807
+    // extended with optional message property, you SHOULD log this, so you know WTF is going wrong
+    $logger->error($exception->getMessage()); 
+    // short information for end user WTF just happened, if is not null you CAN show the tittle on your front end
+    $exception->getTitle();
+    // information for end user with more detail, if is not null you SHOULD show the detail on your front end,
+    // because detail can contain clue or information how user can solve error, mainly if error is his false :D
+    $exception->getDetail();
+    // parse from error response some extensions, is RECOMMENDED ignoring all errors from error response parsing
+    // because you can lose another useful data from error response or if response si corrupted you can lose previous exception
+    $exception->response()?->getJson(allowInvalidJson: true)->object()->property('some_error_property')->string()->nullable(failAsNull: true);
 }
 
 ```

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -34,10 +33,8 @@ final class DeprecationsLoggerTest extends TestCase
         $config = $this->createMock(Config::class);
         $config->method('getDeprecatedHeader')->willReturn('Deprecated');
 
-        $httpFactory = new HttpFactory();
-
-        $logger = new DeprecationsLogger($config, $psrLogger, $httpFactory);
-        $logger->logDeprecation('test', (new Request('GET', '/'))->withBaseUrl('https://test'), $response);
+        $logger = new DeprecationsLogger($config, $psrLogger);
+        $logger->logDeprecation('test', (new Request('GET', '/')), $response);
     }
 
     /**
@@ -48,7 +45,7 @@ final class DeprecationsLoggerTest extends TestCase
         return [
             [null, [], new Response()],
             [
-                'Api: test method: GET uri: "https://test/" call is deprecated',
+                'Api: test method: GET url: "/" call is deprecated',
                 [
                     'Sunset' => '2022-12-15T21:46:37+00:00',
                     'Link' => 'https://example.net/sunset',
@@ -63,7 +60,7 @@ final class DeprecationsLoggerTest extends TestCase
                 ),
             ],
             [
-                'Api: test method: GET uri: "https://test/" call is deprecated',
+                'Api: test method: GET url: "/" call is deprecated',
                 [
                     'Sunset' => 'Some sunset header with incorrect format',
                     'Link' => 'Some sunset link with incorrect format',

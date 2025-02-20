@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Client;
 
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
@@ -16,7 +15,6 @@ class DeprecationsLogger
     public function __construct(
         private readonly Config $config,
         private readonly LoggerInterface $logger,
-        private readonly RequestFactoryInterface $requestFactory
     ) {
     }
 
@@ -59,8 +57,7 @@ class DeprecationsLogger
         }
 
         if (count($deprecatedContext) !== 0) {
-            $request = $request->createPsr($this->requestFactory);
-            $this->logger->warning('Api: '.$apiName.' method: '.$request->getMethod().' uri: "'.$request->getUri()->__toString().'" call is deprecated', $deprecatedContext);
+            $this->logger->warning('Api: '.$apiName.' method: '.$request->method().' url: "'.$request->url().'" call is deprecated', $deprecatedContext);
         }
     }
 }

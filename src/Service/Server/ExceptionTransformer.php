@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Server;
 
+use Kayex\HttpCodes;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 
@@ -26,6 +27,7 @@ class ExceptionTransformer implements Transformer
     {
         $responseData = new \stdClass();
         $responseData->message = 'Internal server error';
+        $responseData->status = HttpCodes::HTTP_INTERNAL_SERVER_ERROR;
         if ($this->configRepository->getServerConfig()->debug()) {
             $responseData->message = 'Exception ('.\get_class($transformed).') message: \''.$transformed->getMessage().'\' from: '.$transformed->getFile().':'.$transformed->getLine();
             $responseData->trace = array_map(fn (array $item): string => ($item['file'] ?? '-').':'.($item['line'] ?? '-'), $transformed->getTrace());

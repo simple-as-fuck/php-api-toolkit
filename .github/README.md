@@ -286,11 +286,7 @@ try {
 }
 catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
     // exception message for logging or debugging, you SHOULD log this, so you know WTF is going wrong
-    $message = $exception->getMessage();
-    if ($exception->getInternalMessage() !== null) {
-        $message .= ', '.$exception->getInternalMessage();
-    }
-    $logger->error($message, [
+    $logger->error(implode(', ', [$exception->getMessage(), (string) $exception->getInternalMessage()]), [
         'type' => $exception->getType(),
         'status' => $exception->getCode(),
         'instance' => $exception->getInstance(),

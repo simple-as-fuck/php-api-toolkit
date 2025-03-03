@@ -17,7 +17,10 @@ class ApiExceptionTransformer implements Transformer
      */
     public function toApi($transformed): \stdClass
     {
-        $responseData = ['message' => $transformed->getMessage()];
+        $responseData = [];
+        if ($transformed->getMessage() !== '') {
+            $responseData['message'] = $transformed->getMessage();
+        }
         if ($transformed->getType() !== null) {
             $responseData['type'] = $transformed->getType();
         }

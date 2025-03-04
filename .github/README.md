@@ -102,12 +102,12 @@ catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
      * \SimpleAsFuck\ApiToolkit\Model\Client\ApiException is thrown,
      * and you can handle any error from communication
      */
-    // if exception contains http response, rfc7807 status or http status is here, otherwise zero is returned
+    // if exception contains http response, rfc9457 status or http status is here, otherwise zero is returned
     $exception->getCode();
-    // exception message for logging or debugging is build from https://datatracker.ietf.org/doc/html/rfc7807
+    // exception message for logging or debugging is build from https://datatracker.ietf.org/doc/html/rfc9457
     // extended with optional message property, you SHOULD log this, so you know WTF is going wrong
     $logger->error($exception->getMessage()); 
-    // short information for end user WTF just happened, if is not null you CAN show the tittle on your front end
+    // short information for end user WTF just happened, if is not null you SHOULD show the tittle on your front end
     $exception->getTitle();
     // information for end user with more detail, if is not null you SHOULD show the detail on your front end,
     // because detail can contain clue or information how user can solve error, mainly if error is his false :D
@@ -296,7 +296,7 @@ catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
     $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson(
     //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson(
         $exception,
-        // transformer will convert exception in to https://datatracker.ietf.org/doc/html/rfc7807 json object with message and all another extensions
+        // transformer will convert exception in to https://datatracker.ietf.org/doc/html/rfc9457 json object with message and all another extensions
         new \SimpleAsFuck\ApiToolkit\Service\Server\ApiExceptionTransformer(),
         $exception->getStatusCode()
     );
@@ -309,7 +309,7 @@ catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception
         $exception,
         // transformer will convert exception into json object
         // with message property contains message from http exception
-        // and https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 status property
+        // and https://datatracker.ietf.org/doc/html/rfc9457#name-status property
         new \SimpleAsFuck\ApiToolkit\Service\Symfony\HttpExceptionTransformer(),
         $exception->getStatusCode()
     );
@@ -324,7 +324,7 @@ catch (\Throwable $exception) {
         // if application has turned off debug, message property contain only "Internal server error"
         // but with enabled debug message contains exception type, message, file and line where was exception thrown
         // with enabled debug json object also contains trace property with exception stacktrace
-        // and json object contains https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 status property always with 500 http code
+        // and json object contains https://datatracker.ietf.org/doc/html/rfc9457#name-status property always with 500 http code
         new \SimpleAsFuck\ApiToolkit\Service\Server\ExceptionTransformer($configRepository),
         \Kayex\HttpCodes::HTTP_INTERNAL_SERVER_ERROR
     );

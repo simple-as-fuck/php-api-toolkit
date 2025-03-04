@@ -12,6 +12,7 @@ use GuzzleHttp\RequestOptions;
 use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use SimpleAsFuck\ApiToolkit\DataObject\Client\ServiceUnavailableApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ConflictApiException;
@@ -192,7 +193,7 @@ class ApiClient
                 $errorObject = Validator::make(\json_decode($responseContent))->object();
                 $messageParts = [];
 
-                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 type
+                // https://datatracker.ietf.org/doc/html/rfc9457#name-type
                 $errorType = $errorObject->property('type')->string()->notEmpty()->nullable(true);
                 if ($errorType !== null) {
                     $messageParts[] = 'Error type: "'.$errorType.'"';
@@ -203,13 +204,13 @@ class ApiClient
                     $messageParts[] = $errorMessage;
                 }
 
-                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 status
+                // https://datatracker.ietf.org/doc/html/rfc9457#name-status
                 $errorStatus = $errorObject->property('status')->int()->nullable(true) ?? $response->getStatusCode();
-                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 instance
-                $errorInstance = $errorObject->property('instance')->string()->notEmpty()->nullable(true) ?? $promise->request->url();
-                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 title
+                // https://datatracker.ietf.org/doc/html/rfc9457#name-instance
+                $errorInstance = $errorObject->property('instance')->string()->notEmpty()->nullable(true);
+                // https://datatracker.ietf.org/doc/html/rfc9457#name-title
                 $errorTitle = $errorObject->property('title')->string()->notEmpty()->nullable(true);
-                // https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 detail
+                // https://datatracker.ietf.org/doc/html/rfc9457#name-detail
                 $errorDetail = $errorObject->property('detail')->string()->notEmpty()->nullable(true);
 
                 if (count($messageParts) === 0) {
@@ -223,7 +224,9 @@ class ApiClient
 
                 if (count($messageParts) !== 0) {
                     $messageParts[] = 'status (' . $errorStatus . ')';
-                    $messageParts[] = 'instance: "' . $errorInstance . '"';
+                    if ($errorInstance !== null) {
+                        $messageParts[] = 'error instance: "' . $errorInstance . '"';
+                    }
 
                     $message = implode(' ', $messageParts);
                 }
@@ -239,6 +242,7 @@ class ApiClient
                     HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
                     HttpCodes::HTTP_GONE => throw new GoneApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
                     HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_SERVICE_UNAVAILABLE => throw new ServiceUnavailableApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
                     default => throw new ResponseApiException($message, $errorStatus, $errorInstance, $errorType, $errorTitle, $errorDetail, $promise->request, $response, $exception),
                 };
             }

@@ -9,13 +9,13 @@ use Kayex\HttpCodes;
 class ApiException extends \RuntimeException
 {
     /**
-     * @param non-empty-string|null $message https://datatracker.ietf.org/doc/html/rfc7807 extension available to server and client for logging or debugging purposes MUST contain only English message
+     * @param non-empty-string|null $message https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members available to server and client for logging or debugging purposes MUST contain only English message
      * @param int<100,505> $code HTTP status
-     * @param non-empty-string|null $type https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 type
-     * @param non-empty-string|null $title https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 title message for end user
-     * @param non-empty-string|null $detail https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 detail for end user
-     * @param non-empty-string|null $instance https://datatracker.ietf.org/doc/html/rfc7807#section-3.1 instance
-     * @param array<literal-string, mixed> $extensions https://datatracker.ietf.org/doc/html/rfc7807 extensions all values MUST be json serializable
+     * @param non-empty-string|null $type https://datatracker.ietf.org/doc/html/rfc9457#name-type
+     * @param non-empty-string|null $title https://datatracker.ietf.org/doc/html/rfc9457#name-title message for end user
+     * @param non-empty-string|null $detail https://datatracker.ietf.org/doc/html/rfc9457#name-detail detail for end user
+     * @param non-empty-string|null $instance https://datatracker.ietf.org/doc/html/rfc9457#name-instance
+     * @param array<literal-string, mixed> $extensions https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members all values MUST be json serializable
      * @param non-empty-string|null $internalMessage available only to server for logging or debugging purposes MUST NOT leave server environment
      */
     public function __construct(

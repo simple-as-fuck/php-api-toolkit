@@ -63,7 +63,7 @@ final class ApiClientTest extends TestCase
             [400, 'Exception message', '', new RequestException('Exception message', $request, $response)],
             [
                 400,
-                'Json message status (400) instance: "/"',
+                'Json message status (400)',
                 '{"message":"Json message"}',
                 new RequestException(
                     'Exception message',
@@ -73,7 +73,7 @@ final class ApiClientTest extends TestCase
             ],
             [
                 400,
-                'Error title: "Json title" status (400) instance: "/"',
+                'Error title: "Json title" status (400)',
                 '{"title":"Json title"}',
                 new RequestException(
                     'Exception message',
@@ -83,7 +83,7 @@ final class ApiClientTest extends TestCase
             ],
             [
                 400,
-                'Json message status (400) instance: "/"',
+                'Json message status (400)',
                 '{"title":"Json title","message":"Json message"}',
                 new RequestException(
                     'Exception message',
@@ -93,7 +93,7 @@ final class ApiClientTest extends TestCase
             ],
             [
                 401,
-                'Error type: "/test/error" status (401) instance: "/test/url"',
+                'Error type: "/test/error" status (401) error instance: "/test/url"',
                 '{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}',
                 new RequestException(
                     'Exception message',
@@ -103,7 +103,7 @@ final class ApiClientTest extends TestCase
             ],
             [
                 403,
-                'Error type: "/test/error" Json message status (403) instance: "/"',
+                'Error type: "/test/error" Json message status (403)',
                 '{"type":"/test/error","message":"Json message"}',
                 new RequestException(
                     'Exception message',

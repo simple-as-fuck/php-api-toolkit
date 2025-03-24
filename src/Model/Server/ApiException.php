@@ -27,7 +27,7 @@ class ApiException extends \RuntimeException
         private readonly ?string $instance = null,
         private readonly array $extensions = [],
         private readonly ?string $internalMessage = null,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message ?? '', $code, $previous);
     }

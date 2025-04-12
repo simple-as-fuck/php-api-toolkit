@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
+/**
+ * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\...
+ * @phpstan-ignore-next-line class.extendsDeprecatedClass
+ */
 class ResponseApiException extends ApiException
 {
     /**
+     * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\...
      * @param string $message for logging or debugging purposes MUST contain only English message
      * @param int $code https://datatracker.ietf.org/doc/html/rfc9457#name-status or HTTP status
      * @param non-empty-string|null $instance https://datatracker.ietf.org/doc/html/rfc9457#name-instance
@@ -14,7 +19,7 @@ class ResponseApiException extends ApiException
      * @param non-empty-string|null $title https://datatracker.ietf.org/doc/html/rfc9457#name-title message for end user
      * @param non-empty-string|null $detail https://datatracker.ietf.org/doc/html/rfc9457#name-detail detail for end user
      */
-    final public function __construct(
+    public function __construct(
         string $message,
         int $code,
         ?string $instance,
@@ -28,7 +33,10 @@ class ResponseApiException extends ApiException
         parent::__construct($message, $code, $instance, $type, $title, $detail, $request, $response, $previous);
     }
 
-    final public function response(): Response
+    /**
+     * @deprecated will be removed
+     */
+    public function response(): Response
     {
         return $this->response;
     }

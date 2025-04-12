@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
-final class InternalServerErrorApiException extends ResponseApiException
+/**
+ * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\InternalServerErrorApiException
+ * @phpstan-ignore-next-line class.extendsDeprecatedClass
+ */
+class InternalServerErrorApiException extends ResponseApiException
 {
 }

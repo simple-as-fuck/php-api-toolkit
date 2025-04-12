@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
-final class ForbiddenApiException extends ResponseApiException
+/**
+ * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\ForbiddenApiException
+ * @phpstan-ignore-next-line class.extendsDeprecatedClass
+ */
+class ForbiddenApiException extends ResponseApiException
 {
 }

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
-final class GoneApiException extends ResponseApiException
+/**
+ * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\GoneApiException
+ * @phpstan-ignore-next-line class.extendsDeprecatedClass
+ */
+class GoneApiException extends ResponseApiException
 {
 }

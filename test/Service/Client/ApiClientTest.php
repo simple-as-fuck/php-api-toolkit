@@ -7,7 +7,11 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use SimpleAsFuck\ApiToolkit\DataObject\Client\BadRequestApiException;
+use SimpleAsFuck\ApiToolkit\DataObject\Client\ForbiddenApiException;
+use SimpleAsFuck\ApiToolkit\DataObject\Client\UnauthorizedApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
@@ -29,9 +33,10 @@ final class ApiClientTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderWaitRawFail
+     * @param class-string $expectedClass
      */
-    public function testWaitRawFail(int $expectedStatusCode, string $expectedMessage, string $expectedContent, \Throwable $exception): void
+    #[DataProvider('dataProviderWaitRawFail')]
+    public function testWaitRawFail(string $expectedClass, int $expectedStatusCode, string $expectedMessage, string $expectedContent, \Throwable $exception): void
     {
         $promise = $this->createMock(PromiseInterface::class);
         $promise->method('wait')->willThrowException($exception);
@@ -40,8 +45,10 @@ final class ApiClientTest extends TestCase
         try {
             $this->apiClient->waitRaw($promise);
         } catch (ApiException $apiException) {
+            self::assertInstanceOf($expectedClass, $apiException);
             self::assertSame($expectedStatusCode, $apiException->getCode());
             self::assertSame($expectedMessage, $apiException->getMessage());
+            /** @phpstan-ignore-next-line */
             $response = $apiException->response();
             if ($response !== null) {
                 self::assertSame($expectedContent, $response->getBody()->getContents());
@@ -50,7 +57,7 @@ final class ApiClientTest extends TestCase
     }
 
     /**
-     * @return array<array<mixed>>
+     * @return non-empty-array<non-empty-array<mixed>>
      */
     public static function dataProviderWaitRawFail(): array
     {
@@ -59,11 +66,13 @@ final class ApiClientTest extends TestCase
         $response = new Response(new Request('GET', '/'), $httpFactory->createResponse(400));
 
         return [
-            [0, 'Exception message', '', new TransferException('Exception message')],
-            [400, 'Exception message', '', new RequestException('Exception message', $request, $response)],
+            /** @phpstan-ignore-next-line */
+            [ApiException::class, 0, 'Exception message', '', new TransferException('Exception message')],
+            [BadRequestApiException::class, 400, 'Exception message', '', new RequestException('Exception message', $request, $response)],
             [
+                BadRequestApiException::class,
                 400,
-                'Json message status (400)',
+                'Json message',
                 '{"message":"Json message"}',
                 new RequestException(
                     'Exception message',
@@ -72,8 +81,9 @@ final class ApiClientTest extends TestCase
                 ),
             ],
             [
+                BadRequestApiException::class,
                 400,
-                'Error title: "Json title" status (400)',
+                'Error title: "Json title"',
                 '{"title":"Json title"}',
                 new RequestException(
                     'Exception message',
@@ -82,8 +92,9 @@ final class ApiClientTest extends TestCase
                 ),
             ],
             [
+                BadRequestApiException::class,
                 400,
-                'Json message status (400)',
+                'Json message',
                 '{"title":"Json title","message":"Json message"}',
                 new RequestException(
                     'Exception message',
@@ -92,18 +103,20 @@ final class ApiClientTest extends TestCase
                 ),
             ],
             [
+                UnauthorizedApiException::class,
                 401,
-                'Error type: "/test/error" status (401) error instance: "/test/url"',
+                'Error type: "/test/error" error instance: "/test/url"',
                 '{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}',
                 new RequestException(
                     'Exception message',
                     $request,
-                    $response->withBody($httpFactory->createStream('{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}'))
+                    $response->withStatus(401)->withBody($httpFactory->createStream('{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}'))
                 ),
             ],
             [
+                ForbiddenApiException::class,
                 403,
-                'Error type: "/test/error" Json message status (403)',
+                'Error type: "/test/error" Json message',
                 '{"type":"/test/error","message":"Json message"}',
                 new RequestException(
                     'Exception message',

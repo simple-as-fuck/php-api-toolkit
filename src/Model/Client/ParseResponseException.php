@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
-final class ParseResponseException extends ResponseApiException
+/**
+ * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\ParseResponseException
+ * @phpstan-ignore-next-line class.extendsDeprecatedClass
+ */
+class ParseResponseException extends ResponseApiException
 {
 }

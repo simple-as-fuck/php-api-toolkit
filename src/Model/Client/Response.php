@@ -13,8 +13,8 @@ use SimpleAsFuck\Validator\Rule\General\Rules;
 final class Response implements ResponseInterface
 {
     public function __construct(
-        private Request $request,
-        private ResponseInterface $response
+        private readonly Request $request,
+        private readonly ResponseInterface $response
     ) {
     }
 

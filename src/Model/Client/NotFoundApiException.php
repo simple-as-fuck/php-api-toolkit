@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
-final class NotFoundApiException extends ResponseApiException
+/**
+ * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\NotFoundApiException
+ * @phpstan-ignore-next-line class.extendsDeprecatedClass
+ */
+class NotFoundApiException extends ResponseApiException
 {
 }

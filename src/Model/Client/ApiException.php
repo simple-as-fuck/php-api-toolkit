@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
+/**
+ * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\...
+ */
 class ApiException extends \RuntimeException
 {
     /**
+     * @deprecated use SimpleAsFuck\ApiToolkit\DataObject\Client\...
      * @param string $message for logging or debugging purposes MUST contain only English message
      * @param int $code https://datatracker.ietf.org/doc/html/rfc9457#name-status or HTTP status or 0 if nothing is available
      * @param non-empty-string|null $instance https://datatracker.ietf.org/doc/html/rfc9457#name-instance
@@ -29,6 +33,7 @@ class ApiException extends \RuntimeException
     }
 
     /**
+     * @deprecated will be removed
      * @return non-empty-string|null
      */
     public function getInstance(): ?string
@@ -37,6 +42,7 @@ class ApiException extends \RuntimeException
     }
 
     /**
+     * @deprecated will be removed
      * @return non-empty-string|null
      */
     public function getType(): ?string
@@ -45,6 +51,7 @@ class ApiException extends \RuntimeException
     }
 
     /**
+     * @deprecated will be removed
      * @return non-empty-string|null
      */
     public function getTitle(): ?string
@@ -53,6 +60,7 @@ class ApiException extends \RuntimeException
     }
 
     /**
+     * @deprecated will be removed
      * @return non-empty-string|null
      */
     public function getDetail(): ?string
@@ -60,11 +68,17 @@ class ApiException extends \RuntimeException
         return $this->detail;
     }
 
+    /**
+     * @deprecated will be removed
+     */
     public function request(): Request
     {
         return $this->request;
     }
 
+    /**
+     * @deprecated will be removed
+     */
     public function response(): ?Response
     {
         return $this->response;

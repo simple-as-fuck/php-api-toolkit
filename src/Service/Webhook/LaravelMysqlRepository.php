@@ -60,9 +60,9 @@ final class LaravelMysqlRepository extends Repository
         }
 
         usort($webhooks, static function (Webhook $a, Webhook $b) use ($webhookMatches): int {
-            $diff = $b->params()->priority() - $a->params()->priority();
+            $diff = $b->params->priority - $a->params->priority;
             if ($diff === 0) {
-                $diff = $webhookMatches[$b->id()] - $webhookMatches[$a->id()];
+                $diff = $webhookMatches[$b->id] - $webhookMatches[$a->id];
             }
             return $diff;
         });
@@ -79,7 +79,7 @@ final class LaravelMysqlRepository extends Repository
         $connection = $this->getLaravelConnection();
 
         $webhookAttributeIds = [];
-        foreach ($params->attributes() as $key => $value) {
+        foreach ($params->attributes as $key => $value) {
             $webhookAttributeId = $connection->table('WebhookAttribute')
                 ->where('key', '=', $key)
                 ->where('value', '=', $value)
@@ -100,8 +100,8 @@ final class LaravelMysqlRepository extends Repository
         try {
             $webhookId = $connection->table('Webhook')->insertGetId([
                 'type' => $type,
-                'listeningUrl' => $params->listeningUrl(),
-                'priority' => $params->priority(),
+                'listeningUrl' => $params->listeningUrl,
+                'priority' => $params->priority,
             ]);
 
             if (count($webhookAttributeIds) === 0) {

@@ -11,13 +11,14 @@ final class Webhook
      * @param non-empty-string $type
      */
     public function __construct(
-        private string $id,
-        private string $type,
-        private Params $params
+        public readonly string $id,
+        public readonly string $type,
+        public readonly Params $params
     ) {
     }
 
     /**
+     * @deprecated use $this->id
      * @return non-empty-string
      */
     public function id(): string
@@ -26,6 +27,7 @@ final class Webhook
     }
 
     /**
+     * @deprecated use $this->type
      * @return non-empty-string
      */
     public function type(): string
@@ -33,6 +35,9 @@ final class Webhook
         return $this->type;
     }
 
+    /**
+     * @deprecated use $this->params
+     */
     public function params(): Params
     {
         return $this->params;

@@ -35,7 +35,7 @@ final class ParamsTransformer implements Transformer, UserClassRule
     public function toApi($transformed): \stdClass
     {
         $attributes = [];
-        foreach ($transformed->attributes() as $key => $value) {
+        foreach ($transformed->attributes as $key => $value) {
             $attributes[] = (object) [
                 'key' => $key,
                 'value' => $value,
@@ -43,8 +43,8 @@ final class ParamsTransformer implements Transformer, UserClassRule
         }
 
         return (object) [
-            'listeningUrl' => $transformed->listeningUrl(),
-            'priority' => $transformed->priority(),
+            'listeningUrl' => $transformed->listeningUrl,
+            'priority' => $transformed->priority,
             'attributes' => $attributes,
         ];
     }

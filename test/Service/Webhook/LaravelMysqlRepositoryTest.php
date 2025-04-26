@@ -172,34 +172,34 @@ final class LaravelMysqlRepositoryTest extends TestCase
 
         $webhook = $repository->save($type, $params);
         self::assertNotNull($webhook);
-        self::assertSame($type, $webhook->type());
-        self::assertEquals($params, $webhook->params());
+        self::assertSame($type, $webhook->type);
+        self::assertEquals($params, $webhook->params);
 
         $connection = self::$connectionResolver->connection('default');
 
         /** @var object{id: int, type: string, listeningUrl: string, priority: int} $dbWebhook */
-        $dbWebhook = $connection->selectOne('select * from Webhook where id = ?', [$webhook->id()]);
-        self::assertSame($webhook->id(), (string) $dbWebhook->id);
+        $dbWebhook = $connection->selectOne('select * from Webhook where id = ?', [$webhook->id]);
+        self::assertSame($webhook->id, (string) $dbWebhook->id);
         self::assertSame($type, $dbWebhook->type);
-        self::assertSame($params->listeningUrl(), $dbWebhook->listeningUrl);
-        self::assertSame($params->priority(), $dbWebhook->priority);
+        self::assertSame($params->listeningUrl, $dbWebhook->listeningUrl);
+        self::assertSame($params->priority, $dbWebhook->priority);
 
         /** @var array<object{webhookId: int, webhookAttributeId: int}> $dbRequiredAttributeMaps */
-        $dbRequiredAttributeMaps = $connection->select('select * from WebhookRequiredAttribute where webhookId = ?', [$webhook->id()]);
+        $dbRequiredAttributeMaps = $connection->select('select * from WebhookRequiredAttribute where webhookId = ?', [$webhook->id]);
         /** @var object{webhookId: int} $dbWithoutAttribute */
-        $dbWithoutAttribute = $connection->selectOne('select * from WebhookWithoutAttribute where webhookId = ?', [$webhook->id()]);
+        $dbWithoutAttribute = $connection->selectOne('select * from WebhookWithoutAttribute where webhookId = ?', [$webhook->id]);
 
-        if (count($params->attributes()) === 0) {
+        if (count($params->attributes) === 0) {
             self::assertCount(0, $dbRequiredAttributeMaps);
-            self::assertSame($webhook->id(), (string) $dbWithoutAttribute->webhookId);
+            self::assertSame($webhook->id, (string) $dbWithoutAttribute->webhookId);
         } else {
-            self::assertCount(count($params->attributes()), $dbRequiredAttributeMaps);
+            self::assertCount(count($params->attributes), $dbRequiredAttributeMaps);
             foreach ($dbRequiredAttributeMaps as $dbRequiredAttributeMap) {
-                self::assertSame($webhook->id(), (string) $dbRequiredAttributeMap->webhookId);
+                self::assertSame($webhook->id, (string) $dbRequiredAttributeMap->webhookId);
 
                 /** @var \stdClass $dbRequiredAttribute */
                 $dbRequiredAttribute = $connection->selectOne('select * from WebhookAttribute where id = ?', [$dbRequiredAttributeMap->webhookAttributeId]);
-                self::assertSame($params->attributes()[$dbRequiredAttribute->key], $dbRequiredAttribute->value);
+                self::assertSame($params->attributes[$dbRequiredAttribute->key], $dbRequiredAttribute->value);
             }
         }
 
@@ -223,11 +223,11 @@ final class LaravelMysqlRepositoryTest extends TestCase
 
         /** @var Webhook $webhook */
         $webhook = $repository->save($type, $params);
-        $repository->delete($webhook->id());
+        $repository->delete($webhook->id);
 
-        self::assertNull($connection->selectOne('select * from Webhook where id = ?', [$webhook->id()]));
-        self::assertNull($connection->selectOne('select * from WebhookRequiredAttribute where webhookId = ?', [$webhook->id()]));
-        self::assertNull($connection->selectOne('select * from WebhookWithoutAttribute where webhookId = ?', [$webhook->id()]));
+        self::assertNull($connection->selectOne('select * from Webhook where id = ?', [$webhook->id]));
+        self::assertNull($connection->selectOne('select * from WebhookRequiredAttribute where webhookId = ?', [$webhook->id]));
+        self::assertNull($connection->selectOne('select * from WebhookWithoutAttribute where webhookId = ?', [$webhook->id]));
     }
 
     /**

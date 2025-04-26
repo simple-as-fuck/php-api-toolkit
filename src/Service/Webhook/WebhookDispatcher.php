@@ -9,8 +9,8 @@ use GuzzleHttp\RequestOptions;
 class WebhookDispatcher
 {
     public function __construct(
-        private Repository $repository,
-        private Client $client,
+        private readonly Repository $repository,
+        private readonly Client $client,
     ) {
     }
 

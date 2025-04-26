@@ -12,13 +12,14 @@ final class Params
      * @param array<non-empty-string, non-empty-string> $attributes
      */
     public function __construct(
-        private string $listeningUrl,
-        private int $priority,
-        private array $attributes
+        public readonly string $listeningUrl,
+        public readonly int $priority,
+        public readonly array $attributes
     ) {
     }
 
     /**
+     * @deprecated use $this->listeningUrl
      * @return non-empty-string
      */
     public function listeningUrl(): string
@@ -27,6 +28,7 @@ final class Params
     }
 
     /**
+     * @deprecated use $this->priority
      * @return Priority::*
      */
     public function priority(): int
@@ -35,6 +37,7 @@ final class Params
     }
 
     /**
+     * @deprecated use $this->attributes
      * @return array<non-empty-string, non-empty-string>
      */
     public function attributes(): array

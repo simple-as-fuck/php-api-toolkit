@@ -30,9 +30,9 @@ final class WebhookTransformer implements UserClassRule, Transformer
     public function toApi($transformed): \stdClass
     {
         return (object) [
-            'webhookId' => $transformed->id(),
-            'type' => $transformed->type(),
-            'params' => (new ParamsTransformer())->toApi($transformed->params())
+            'webhookId' => $transformed->id,
+            'type' => $transformed->type,
+            'params' => (new ParamsTransformer())->toApi($transformed->params)
         ];
     }
 }

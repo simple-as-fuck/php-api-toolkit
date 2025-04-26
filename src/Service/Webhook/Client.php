@@ -49,19 +49,19 @@ abstract class Client
             try {
                 $requestOptions[RequestOptions::JSON] = (new WebhookTransformer())->toApi($webhook);
 
-                $response = $this->client->request('POST', $webhook->params()->listeningUrl(), $requestOptions);
+                $response = $this->client->request('POST', $webhook->params->listeningUrl, $requestOptions);
 
                 $callResult = MessageService::parseJsonFromBody(new UnexpectedValueException(), $response, 'Webhook response body', false)
                     ->object()->class(new ResultTransformer())
                     ->notNull()
                 ;
 
-                if ($callResult->stopDispatching()) {
+                if ($callResult->stopDispatching) {
                     break;
                 }
             } catch (\Throwable $exception) {
-                $this->logger?->warning('Call webhook: "'.$webhook->id().'" fail message: "'.$exception->getMessage().'", webhook url: "'.$webhook->params()->listeningUrl().'"', [
-                    'webhookId' => $webhook->id(),
+                $this->logger?->warning('Call webhook: "'.$webhook->id.'" fail message: "'.$exception->getMessage().'", webhook url: "'.$webhook->params->listeningUrl.'"', [
+                    'webhookId' => $webhook->id,
                     'exception' => $exception
                 ]);
                 $nextTryWebhooks[] = $webhook;
@@ -72,7 +72,7 @@ abstract class Client
             ++$tries;
             $maximumTries = $this->config->getMaxTries();
             if ($tries >= $maximumTries) {
-                $webhookIdsWithoutRetry = implode(', ', array_map(static fn (Webhook $webhook): string => '"'.$webhook->id().'"', $nextTryWebhooks));
+                $webhookIdsWithoutRetry = implode(', ', array_map(static fn (Webhook $webhook): string => '"'.$webhook->id.'"', $nextTryWebhooks));
                 $this->logger?->error('Call webhooks: '.$webhookIdsWithoutRetry.' fail without any retry, maximum tries: '.$maximumTries);
                 return;
             }

@@ -7,10 +7,13 @@ namespace SimpleAsFuck\ApiToolkit\Model\Webhook;
 final class Result
 {
     public function __construct(
-        private bool $stopDispatching = false,
+        public readonly bool $stopDispatching = false,
     ) {
     }
 
+    /**
+     * @deprecated use $this->stopDispatching
+     */
     public function stopDispatching(): bool
     {
         return $this->stopDispatching;

@@ -79,14 +79,4 @@ class ApiException extends \RuntimeException
     {
         return $this->internalMessage;
     }
-
-    /**
-     * @deprecated use $this->getCode()
-     * @return int<100,505>
-     */
-    public function getStatusCode(): int
-    {
-        /** @var int<100,505> */
-        return $this->getCode();
-    }
 }

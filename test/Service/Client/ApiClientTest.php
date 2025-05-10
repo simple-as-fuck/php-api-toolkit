@@ -9,10 +9,10 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use SimpleAsFuck\ApiToolkit\DataObject\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\ForbiddenApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\UnauthorizedApiException;
-use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
@@ -36,7 +36,7 @@ final class ApiClientTest extends TestCase
      * @param class-string $expectedClass
      */
     #[DataProvider('dataProviderWaitRawFail')]
-    public function testWaitRawFail(string $expectedClass, int $expectedStatusCode, string $expectedMessage, string $expectedContent, \Throwable $exception): void
+    public function testWaitRawFail(string $expectedClass, int $expectedStatusCode, string $expectedMessage, ?string $expectedContent, \Throwable $exception): void
     {
         $promise = $this->createMock(PromiseInterface::class);
         $promise->method('wait')->willThrowException($exception);
@@ -48,11 +48,7 @@ final class ApiClientTest extends TestCase
             self::assertInstanceOf($expectedClass, $apiException);
             self::assertSame($expectedStatusCode, $apiException->getCode());
             self::assertSame($expectedMessage, $apiException->getMessage());
-            /** @phpstan-ignore-next-line */
-            $response = $apiException->response();
-            if ($response !== null) {
-                self::assertSame($expectedContent, $response->getBody()->getContents());
-            }
+            self::assertSame($expectedContent, $apiException->getResponse()?->getBody()->getContents());
         }
     }
 
@@ -66,8 +62,7 @@ final class ApiClientTest extends TestCase
         $response = new Response(new Request('GET', '/'), $httpFactory->createResponse(400));
 
         return [
-            /** @phpstan-ignore-next-line */
-            [ApiException::class, 0, 'Exception message', '', new TransferException('Exception message')],
+            [ApiException::class, 0, 'Exception message', null, new TransferException('Exception message')],
             [BadRequestApiException::class, 400, 'Exception message', '', new RequestException('Exception message', $request, $response)],
             [
                 BadRequestApiException::class,

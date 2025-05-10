@@ -14,22 +14,11 @@ final class LaravelConfig extends Config
     }
 
     /**
-     * @return non-empty-string|null
-     */
-    public function getBearerToken(): ?string
-    {
-        return $this->laravelAdapter->get('webhook.dispatch.token')->string()->notEmpty()->nullable();
-    }
-
-    /**
      * @return array<string>
      */
     public function getDefaultHeaders(): array
     {
-        return [
-            ...parent::getDefaultHeaders(),
-            ...$this->laravelAdapter->get('webhook.dispatch.default_headers')->array()->ofString()->nullable() ?? [],
-        ];
+        return $this->laravelAdapter->get('webhook.dispatch.default_headers')->array()->ofString()->nullable() ?? [];
     }
 
     /**

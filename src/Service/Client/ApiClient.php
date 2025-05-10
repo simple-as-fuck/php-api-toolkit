@@ -12,19 +12,20 @@ use GuzzleHttp\RequestOptions;
 use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use SimpleAsFuck\ApiToolkit\DataObject\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\ConflictApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\ForbiddenApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\GoneApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\InternalServerErrorApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\NotFoundApiException;
+use SimpleAsFuck\ApiToolkit\DataObject\Client\ResponseApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\ServiceUnavailableApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\UnauthorizedApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail;
-use SimpleAsFuck\ApiToolkit\Model\Client\ApiException;
+use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
-use SimpleAsFuck\ApiToolkit\Model\Client\ResponseApiException;
 use SimpleAsFuck\ApiToolkit\Model\Client\ResponsePromise;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
@@ -191,13 +192,20 @@ class ApiClient
                 $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);
 
                 $responseContent = $response->getBody()->getContents();
-                $errorObject = Validator::make(\json_decode($responseContent))->object();
+                $response = $response->withBody((new HttpFactory())->createStream($responseContent));
+                $response = new Response($promise->request, $response);
+
+                $errorObject = Validator::make(
+                    \json_decode($responseContent),
+                    'Response problem detail: json',
+                    new ParseResponseException($promise->request, $response),
+                )
+                    ->object()
+                ;
+
                 $problemDetail = $errorObject->class(new ProblemDetailTransformer())->nullable(true);
                 // https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members
                 $extensionMessage = $errorObject->property('message')->string()->notEmpty()->nullable(true);
-
-                $response = $response->withBody((new HttpFactory())->createStream($responseContent));
-                $response = new Response($promise->request, $response);
 
                 $statusCode = $problemDetail->status ?? $response->getStatusCode();
 
@@ -209,17 +217,14 @@ class ApiClient
                     HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
                     HttpCodes::HTTP_GONE => throw new GoneApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
                     HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_SERVICE_UNAVAILABLE => throw new ServiceUnavailableApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $problemDetail?->instance, $problemDetail?->type, $problemDetail?->title, $problemDetail?->detail, $promise->request, $response, $exception),
-                    /** @phpstan-ignore-next-line */
-                    default => throw new ResponseApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception, $response->getStatusCode()), $statusCode, $problemDetail?->instance, $problemDetail?->type, $problemDetail?->title, $problemDetail?->detail, $promise->request, $response, $exception),
+                    HttpCodes::HTTP_SERVICE_UNAVAILABLE => throw new ServiceUnavailableApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
+                    default => throw new ResponseApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception, $response->getStatusCode()), $statusCode, $promise->request, $response, $problemDetail, $exception),
                 };
             }
 
-            /** @phpstan-ignore-next-line */
-            throw new ApiException($exception->getMessage(), 0, $promise->request->url(), null, null, null, $promise->request, $response, $exception);
+            throw new ApiException($exception->getMessage(), 0, $promise->request, null, null, $exception);
         } catch (TransferException $exception) {
-            /** @phpstan-ignore-next-line */
-            throw new ApiException($exception->getMessage(), 0, $promise->request->url(), null, null, null, $promise->request, null, $exception);
+            throw new ApiException($exception->getMessage(), 0, $promise->request, null, null, $exception);
         }
 
         $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);

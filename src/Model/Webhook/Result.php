@@ -10,12 +10,4 @@ final class Result
         public readonly bool $stopDispatching = false,
     ) {
     }
-
-    /**
-     * @deprecated use $this->stopDispatching
-     */
-    public function stopDispatching(): bool
-    {
-        return $this->stopDispatching;
-    }
 }

@@ -23,25 +23,12 @@ final class LaravelConfig extends Config
     }
 
     /**
-     * @deprecated in 0.6 will be removed use $this->getDefaultHeaders
-     * @param non-empty-string $apiName
-     * @return non-empty-string|null
-     */
-    public function getBearerToken(string $apiName): ?string
-    {
-        return $this->laravelAdapter->get('services.'.$apiName.'.token')->string()->notEmpty()->nullable();
-    }
-
-    /**
      * @param non-empty-string $apiName
      * @return array<string>
      */
     public function getDefaultHeaders(string $apiName): array
     {
-        return [
-            ...parent::getDefaultHeaders($apiName),
-            ...$this->laravelAdapter->get('services.'.$apiName.'.default_headers')->array()->ofString()->nullable() ?? [],
-        ];
+        return $this->laravelAdapter->get('services.'.$apiName.'.default_headers')->array()->ofString()->nullable() ?? [];
     }
 
     /**

@@ -17,31 +17,4 @@ final class Params
         public readonly array $attributes
     ) {
     }
-
-    /**
-     * @deprecated use $this->listeningUrl
-     * @return non-empty-string
-     */
-    public function listeningUrl(): string
-    {
-        return $this->listeningUrl;
-    }
-
-    /**
-     * @deprecated use $this->priority
-     * @return Priority::*
-     */
-    public function priority(): int
-    {
-        return $this->priority;
-    }
-
-    /**
-     * @deprecated use $this->attributes
-     * @return array<non-empty-string, non-empty-string>
-     */
-    public function attributes(): array
-    {
-        return $this->attributes;
-    }
 }

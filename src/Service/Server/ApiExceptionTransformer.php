@@ -21,21 +21,23 @@ class ApiExceptionTransformer implements Transformer
         if ($transformed->getMessage() !== '') {
             $responseData['message'] = $transformed->getMessage();
         }
-        if ($transformed->getType() !== null) {
-            $responseData['type'] = $transformed->getType();
+        if ($transformed->getProblemDetail()?->type !== null) {
+            $responseData['type'] = $transformed->getProblemDetail()->type;
         }
-        if ($transformed->getTitle() !== null) {
-            $responseData['title'] = $transformed->getTitle();
+        if ($transformed->getProblemDetail()?->title !== null) {
+            $responseData['title'] = $transformed->getProblemDetail()->title;
         }
-        $responseData['status'] = $transformed->getCode();
-        if ($transformed->getDetail() !== null) {
-            $responseData['detail'] = $transformed->getDetail();
+        if ($transformed->getProblemDetail()?->status !== null) {
+            $responseData['status'] = $transformed->getProblemDetail()->status;
         }
-        if ($transformed->getInstance() !== null) {
-            $responseData['instance'] = $transformed->getInstance();
+        if ($transformed->getProblemDetail()?->detail !== null) {
+            $responseData['detail'] = $transformed->getProblemDetail()->detail;
+        }
+        if ($transformed->getProblemDetail()?->instance !== null) {
+            $responseData['instance'] = $transformed->getProblemDetail()->instance;
         }
 
-        $responseData = [...$responseData, ...$transformed->getExtensions()];
+        $responseData = [...$responseData, ...$transformed->getProblemDetailExtensions()];
 
         return (object) $responseData;
     }

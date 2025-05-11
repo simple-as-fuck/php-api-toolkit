@@ -20,8 +20,8 @@ final class ProblemDetail
         public readonly ?string $type,
         public readonly ?int $status,
         public readonly ?string $title,
-        public readonly ?string $detail,
-        public readonly ?string $instance,
+        public readonly ?string $detail = null,
+        public readonly ?string $instance = null
     ) {
     }
 }

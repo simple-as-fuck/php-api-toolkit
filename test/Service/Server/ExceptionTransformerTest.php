@@ -16,7 +16,7 @@ final class ExceptionTransformerTest extends TestCase
     public function testToApi(string $expectedMessage, bool $debug): void
     {
         $config = $this->createMock(SimpleAsFuck\ApiToolkit\Service\Config\Repository::class);
-        $config->method('getServerConfig')->willReturn(new \SimpleAsFuck\ApiToolkit\Model\Server\Config($debug));
+        $config->method('isDebug')->willReturn($debug);
 
         $transformer = new ExceptionTransformer($config);
 

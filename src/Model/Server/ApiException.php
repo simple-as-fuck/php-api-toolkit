@@ -27,7 +27,7 @@ class ApiException extends \RuntimeException
         } else {
             $code = $problemDetail->status ?? HttpCodes::HTTP_INTERNAL_SERVER_ERROR;
         }
-        parent::__construct($message ?? '', $code , $previous);
+        parent::__construct($message ?? '', $code, $previous);
     }
 
     public function getProblemDetail(): ?ProblemDetail

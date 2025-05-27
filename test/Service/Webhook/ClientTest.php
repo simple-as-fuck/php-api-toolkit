@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
@@ -12,22 +14,20 @@ use SimpleAsFuck\ApiToolkit\Service\Webhook\Client;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Config;
 use SimpleAsFuck\Validator\Factory\Validator;
 
-/**
- * @covers \SimpleAsFuck\ApiToolkit\Service\Webhook\Client
- */
+#[CoversClass(Client::class)]
 final class ClientTest extends TestCase
 {
     /**
-     * @dataProvider dataCallWebhooks
-     *
      * @param array<Webhook> $expectedRetryWebhooks
      * @param array<Webhook> $webhooks
      */
+    #[DataProvider('dataCallWebhooks')]
     public function testCallWebhooks(array $expectedRetryWebhooks, int $expectedCalls, array $webhooks, int $tries): void
     {
         $config = $this->createMock(Config::class);
         $config->method('getDelayBetweenTries')->willReturn(5);
         $config->method('getMaxTries')->willReturn(6);
+        $config->method('getDefaultOptions')->willReturn(Validator::make([RequestOptions::TIMEOUT => 20])->array());
 
         $httpCalls = 0;
         $httpClient = $this->createMock(\GuzzleHttp\Client::class);

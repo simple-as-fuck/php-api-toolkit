@@ -32,8 +32,16 @@ abstract class Client
         $defaultHeaders = $this->config->getDefaultHeaders();
         foreach ($defaultHeaders as $defaultHeader => $value) {
             $defaultHeader = (string) $defaultHeader;
-            if (! array_key_exists($defaultHeader, $requestHeaders)) {
+            if (! array_key_exists($defaultHeader, $headers)) {
                 $requestHeaders[$defaultHeader] = $value;
+            }
+        }
+
+        $defaultOptions = $this->config->getDefaultOptions();
+        $defaultOptions->key(RequestOptions::TIMEOUT)->float()->min(0)->notNull(if: ($options[RequestOptions::TIMEOUT] ?? null) === null);
+        foreach ($defaultOptions->notNull() as $key => $defaultOption) {
+            if (! array_key_exists($key, $options)) {
+                $requestOptions[$key] = $defaultOption;
             }
         }
 

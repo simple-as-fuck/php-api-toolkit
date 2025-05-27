@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Service\Client;
 
 use SimpleAsFuck\ApiToolkit\Service\Config\LaravelAdapter;
+use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 
 final class LaravelConfig extends Config
 {
@@ -24,19 +25,19 @@ final class LaravelConfig extends Config
 
     /**
      * @param non-empty-string $apiName
+     */
+    public function getDefaultOptions($apiName): ArrayRule
+    {
+        return $this->laravelAdapter->get('services.'.$apiName.'.default_options')->array();
+    }
+
+    /**
+     * @param non-empty-string $apiName
      * @return array<string>
      */
     public function getDefaultHeaders(string $apiName): array
     {
         return $this->laravelAdapter->get('services.'.$apiName.'.default_headers')->array()->ofString()->nullable() ?? [];
-    }
-
-    /**
-     * @param non-empty-string $apiName
-     */
-    public function getVerifyCerts(string $apiName): bool
-    {
-        return $this->laravelAdapter->get('services.'.$apiName.'.verify')->bool()->nullable() ?? parent::getVerifyCerts($apiName);
     }
 
     /**

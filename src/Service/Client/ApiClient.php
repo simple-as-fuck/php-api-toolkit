@@ -162,10 +162,9 @@ class ApiClient
 
         $psrRequest = $request->createPsr($this->requestFactory);
 
-        $defaultOptions = [
-            RequestOptions::VERIFY => $this->config->getVerifyCerts($apiName),
-        ];
-        foreach ($defaultOptions as $key => $defaultOption) {
+        $defaultOptions = $this->config->getDefaultOptions($apiName);
+        $defaultOptions->key(RequestOptions::TIMEOUT)->float()->min(0)->notNull(if: ($options[RequestOptions::TIMEOUT] ?? null) === null);
+        foreach ($defaultOptions->notNull() as $key => $defaultOption) {
             if (! array_key_exists($key, $options)) {
                 $options[$key] = $defaultOption;
             }

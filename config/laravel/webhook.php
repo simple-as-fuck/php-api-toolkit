@@ -3,8 +3,15 @@
 declare(strict_types=1);
 
 return [
-    /* configuration for webhook dispatcher */
+    /*
+     * configuration for webhook dispatcher
+     */
     'dispatch' => [
+        // required, guzzle options array https://docs.guzzlephp.org/en/stable/request-options.html
+        'default_options' => [
+            // required, you must always configure some timeout https://docs.guzzlephp.org/en/stable/request-options.html#timeout
+            'timeout' => null,
+        ],
         // http request headers send in every webhook call
         'default_headers' => [],
         // connection name where are asynchronous webhook calls dispatched, if null default laravel queue connection is used
@@ -19,7 +26,9 @@ return [
         'tries-delay' => 3600,
     ],
 
-    /* configuration for webhook repository */
+    /*
+     *  configuration for webhook repository
+     */
     // config keys in the 'repository' array can be different and depends on the used repository, registered in service provider
     'repository' => [
         /*

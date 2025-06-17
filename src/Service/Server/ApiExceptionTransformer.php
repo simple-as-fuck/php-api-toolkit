@@ -37,7 +37,7 @@ class ApiExceptionTransformer implements Transformer
             $responseData['instance'] = $transformed->getProblemDetail()->instance;
         }
 
-        $responseData = [...$responseData, ...$transformed->getProblemDetailExtensions()];
+        $responseData = [...$responseData, ...((array) $transformed->getProblemDetailExtensions())];
 
         return (object) $responseData;
     }

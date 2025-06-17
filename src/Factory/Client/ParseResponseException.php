@@ -25,7 +25,9 @@ final class ParseResponseException extends Exception
             $message,
             $this->response->getStatusCode(),
             $this->request,
-            $this->response
+            $this->response,
+            null,
+            null,
         );
     }
 }

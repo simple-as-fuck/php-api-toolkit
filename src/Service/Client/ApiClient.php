@@ -201,29 +201,26 @@ class ApiClient
                 )
                     ->object()
                 ;
-
                 $problemDetail = $errorObject->class(new ProblemDetailTransformer())->nullable(true);
-                // https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members
-                $extensionMessage = $errorObject->property('message')->string()->notEmpty()->nullable(true);
 
                 $statusCode = $problemDetail->status ?? $response->getStatusCode();
 
                 match ($response->getStatusCode()) {
-                    HttpCodes::HTTP_BAD_REQUEST => throw new BadRequestApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_UNAUTHORIZED => throw new UnauthorizedApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_FORBIDDEN => throw new ForbiddenApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_NOT_FOUND => throw new NotFoundApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_GONE => throw new GoneApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    HttpCodes::HTTP_SERVICE_UNAVAILABLE => throw new ServiceUnavailableApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception), $statusCode, $promise->request, $response, $problemDetail, $exception),
-                    default => throw new ResponseApiException($this->buildExceptionMessage($problemDetail, $extensionMessage, $exception, $response->getStatusCode()), $statusCode, $promise->request, $response, $problemDetail, $exception),
+                    HttpCodes::HTTP_BAD_REQUEST => throw new BadRequestApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_UNAUTHORIZED => throw new UnauthorizedApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_FORBIDDEN => throw new ForbiddenApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_NOT_FOUND => throw new NotFoundApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_GONE => throw new GoneApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_SERVICE_UNAVAILABLE => throw new ServiceUnavailableApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    default => throw new ResponseApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception, $response->getStatusCode()), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
                 };
             }
 
-            throw new ApiException($exception->getMessage(), 0, $promise->request, null, null, $exception);
+            throw new ApiException($exception->getMessage(), 0, $promise->request, null, null, null, $exception);
         } catch (TransferException $exception) {
-            throw new ApiException($exception->getMessage(), 0, $promise->request, null, null, $exception);
+            throw new ApiException($exception->getMessage(), 0, $promise->request, null, null, null, $exception);
         }
 
         $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);
@@ -302,12 +299,9 @@ class ApiClient
         $this->request($apiName, 'DELETE', '/webhook?webhookId='.$webhookId, headers: $requestHeaders, options: $requestOptions);
     }
 
-    /**
-     * @param non-empty-string|null $extensionMessage
-     */
     private function buildExceptionMessage(
         ?ProblemDetail $problemDetail,
-        ?string $extensionMessage,
+        ObjectRule $problemDetailExtensions,
         \Throwable $previous,
         ?int $statusCode = null,
     ): string {
@@ -316,6 +310,8 @@ class ApiClient
         if ($problemDetail?->type !== null) {
             $messageParts[] = 'Error type: "'.$problemDetail->type.'"';
         }
+        // https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members
+        $extensionMessage = $problemDetailExtensions->property('message')->string()->notEmpty()->nullable(true);
         if ($extensionMessage !== null) {
             $messageParts[] = $extensionMessage;
         }

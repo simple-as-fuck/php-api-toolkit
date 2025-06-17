@@ -12,13 +12,13 @@ class ApiException extends \RuntimeException
     /**
      * @param non-empty-string|null $message https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members available to server and client for logging or debugging purposes MUST contain only English message
      * @param ProblemDetail|int<100, 505> $problemDetail ProblemDetail | HTTP status
-     * @param array<literal-string, mixed> $problemDetailExtensions https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members all values MUST be json serializable
+     * @param object{message?: non-empty-string|null, type?: non-empty-string|null, title?: non-empty-string|null, status?: int|null, detail?: non-empty-string|null, instance?: non-empty-string|null}|null $problemDetailExtensions https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members all properties MUST be json serializable
      * @param non-empty-string|null $internalMessage available only to server for logging or debugging purposes MUST NOT leave server environment
      */
     public function __construct(
         ?string $message = null,
         private readonly ProblemDetail|int $problemDetail = HttpCodes::HTTP_INTERNAL_SERVER_ERROR,
-        private readonly array $problemDetailExtensions = [],
+        private readonly ?object $problemDetailExtensions = null,
         private readonly ?string $internalMessage = null,
         ?\Throwable $previous = null
     ) {
@@ -39,10 +39,7 @@ class ApiException extends \RuntimeException
         return $this->problemDetail;
     }
 
-    /**
-     * @return array<literal-string, mixed>
-     */
-    public function getProblemDetailExtensions(): array
+    public function getProblemDetailExtensions(): ?object
     {
         return $this->problemDetailExtensions;
     }

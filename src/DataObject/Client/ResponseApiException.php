@@ -7,19 +7,22 @@ namespace SimpleAsFuck\ApiToolkit\DataObject\Client;
 use SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
+use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 
 class ResponseApiException extends ApiException
 {
     /**
      * @param string $message for logging or debugging purposes MUST contain only English message
      * @param int $code https://datatracker.ietf.org/doc/html/rfc9457#name-status or HTTP status
+     * @param ObjectRule|null $problemDetailExtensions https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members
      */
     public function __construct(
         string $message,
         int $code,
         Request $request,
         Response $response,
-        ?ProblemDetail $problemDetail = null,
+        ?ProblemDetail $problemDetail,
+        ?ObjectRule $problemDetailExtensions,
         ?\Throwable $previous = null
     ) {
         parent::__construct(
@@ -28,6 +31,7 @@ class ResponseApiException extends ApiException
             $request,
             $response,
             $problemDetail,
+            $problemDetailExtensions,
             $previous
         );
     }

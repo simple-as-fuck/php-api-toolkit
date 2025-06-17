@@ -11,7 +11,7 @@ interface Transformer
 {
     /**
      * @param Transformed $transformed
-     * @return \stdClass|\JsonSerializable
+     * @return object MUST contain public json serializable properties
      */
-    public function toApi($transformed);
+    public function toApi($transformed): object;
 }

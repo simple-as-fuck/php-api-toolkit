@@ -10,9 +10,8 @@ final class Nullable
      * @template Transformed
      * @param Transformed|null $transformed
      * @param Transformer<Transformed> $transformer
-     * @return \stdClass|\JsonSerializable|null
      */
-    public static function toApi(mixed $transformed, Transformer $transformer): \stdClass|\JsonSerializable|null
+    public static function toApi(mixed $transformed, Transformer $transformer): ?object
     {
         if ($transformed === null) {
             return null;

@@ -10,7 +10,7 @@ final class Collection
      * @template TValue
      * @param iterable<TValue> $transformed
      * @param Transformer<TValue> $transformer
-     * @return array<int, \stdClass|\JsonSerializable>
+     * @return array<int, object>
      */
     public static function toApi(iterable $transformed, Transformer $transformer): array
     {

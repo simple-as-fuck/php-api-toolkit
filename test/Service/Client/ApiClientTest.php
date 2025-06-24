@@ -9,7 +9,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\ApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\BadRequestApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\ForbiddenApiException;
 use SimpleAsFuck\ApiToolkit\DataObject\Client\UnauthorizedApiException;

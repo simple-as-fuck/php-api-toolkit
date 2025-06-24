@@ -6,7 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\ApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
 use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
 use SimpleAsFuck\Validator\Rule\General\Rules;

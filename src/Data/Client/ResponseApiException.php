@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SimpleAsFuck\ApiToolkit\DataObject\Client;
+namespace SimpleAsFuck\ApiToolkit\Data\Client;
 
 use SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;

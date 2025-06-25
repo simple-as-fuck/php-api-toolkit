@@ -7,7 +7,7 @@ namespace SimpleAsFuck\ApiToolkit\Model\Webhook;
 final class Result
 {
     public function __construct(
-        public readonly bool $stopDispatching = false,
+        public readonly bool $stopDispatching,
     ) {
     }
 }

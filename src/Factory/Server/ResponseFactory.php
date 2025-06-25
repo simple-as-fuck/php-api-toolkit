@@ -10,9 +10,11 @@ use GuzzleHttp\Utils;
 use Kayex\HttpCodes;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use SimpleAsFuck\ApiToolkit\Model\Webhook\Result;
 use SimpleAsFuck\ApiToolkit\Service\Server\SpeedLimitService;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Nullable;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
+use SimpleAsFuck\ApiToolkit\Service\Webhook\ResultTransformer;
 
 final class ResponseFactory
 {
@@ -83,6 +85,14 @@ final class ResponseFactory
             $previousItemTime = \microtime(true);
             return $item;
         }));
+    }
+
+    /**
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeWebhookResult(bool $stopDispatching = false, array $headers = []): ResponseInterface
+    {
+        return self::makeJson(new Result($stopDispatching), new ResultTransformer(), HttpCodes::HTTP_OK, $headers);
     }
 
     /**

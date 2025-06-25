@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Model\Server;
 
 use Psr\Http\Message\ServerRequestInterface;
+use SimpleAsFuck\ApiToolkit\Data\Webhook\WebhookRules;
 use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
+use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\General\Rules;
@@ -61,5 +63,13 @@ final class RequestRules
         }
 
         return new Rules($this->exceptionFactory, 'Request query: json', new Validated($query));
+    }
+
+    public function webhook(): WebhookRules
+    {
+        return new WebhookRules(
+            $this->exceptionFactory,
+            $this->json()->object()->class(new WebhookTransformer())->notNull(),
+        );
     }
 }

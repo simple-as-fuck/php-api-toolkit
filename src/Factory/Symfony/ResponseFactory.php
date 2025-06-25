@@ -9,6 +9,7 @@ use Kayex\HttpCodes;
 use SimpleAsFuck\ApiToolkit\Service\Server\SpeedLimitService;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ResponseFactory
@@ -20,7 +21,7 @@ final class ResponseFactory
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): \Symfony\Component\HttpFoundation\Response
+    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
     {
         $factory = new HttpFoundationFactory();
         return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson($body, $transformer, $code, $headers));
@@ -64,5 +65,17 @@ final class ResponseFactory
             $code,
             $headers
         );
+    }
+
+    /**
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public function makeWebhookResult(bool $stopDispatching = false, array $headers = []): Response
+    {
+        $factory = new HttpFoundationFactory();
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeWebhookResult(
+            $stopDispatching,
+            $headers,
+        ));
     }
 }

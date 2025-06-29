@@ -10,12 +10,12 @@ use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
-use SimpleAsFuck\ApiToolkit\Service\Webhook\Client;
+use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookClient;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Config;
 use SimpleAsFuck\Validator\Factory\Validator;
 
-#[CoversClass(Client::class)]
-final class ClientTest extends TestCase
+#[CoversClass(WebhookClient::class)]
+final class WebhookClientTest extends TestCase
 {
     /**
      * @param array<Webhook> $expectedRetryWebhooks
@@ -47,7 +47,7 @@ final class ClientTest extends TestCase
             return new Response(200, body: '{}');
         });
 
-        $client = $this->getMockBuilder(Client::class)
+        $client = $this->getMockBuilder(WebhookClient::class)
             ->onlyMethods(['dispatchWebhooks'])
             ->setConstructorArgs([$config, $httpClient, null])
             ->getMock()
@@ -56,10 +56,10 @@ final class ClientTest extends TestCase
         if (count($expectedRetryWebhooks) === 0) {
             $client->expects(self::never())->method('dispatchWebhooks');
         } else {
-            $client->expects(self::once())->method('dispatchWebhooks')->with($expectedRetryWebhooks, 5, $tries + 1, [], []);
+            $client->expects(self::once())->method('dispatchWebhooks')->with($expectedRetryWebhooks, [], [], 5, $tries + 1);
         }
 
-        $client->callWebhooks($webhooks, $tries, [], []);
+        $client->callWebhooks($webhooks, [], [], $tries);
 
         self::assertSame($expectedCalls, $httpCalls);
     }

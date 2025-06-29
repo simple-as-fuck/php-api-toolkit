@@ -10,7 +10,7 @@ use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
 use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
 use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 
-abstract class Client
+abstract class WebhookClient
 {
     public function __construct(
         private readonly Config $config,
@@ -24,7 +24,7 @@ abstract class Client
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
      */
-    final public function callWebhooks(iterable $webhooks, int $tries, array $headers, array $options): void
+    final public function callWebhooks(iterable $webhooks, array $headers = [], array $options = [], int $tries = 0): void
     {
         $requestHeaders = $headers;
         $requestOptions = $options;
@@ -84,7 +84,7 @@ abstract class Client
                 $this->logger?->error('Call webhooks: '.$webhookIdsWithoutRetry.' fail without any retry, maximum tries: '.$maximumTries);
                 return;
             }
-            $this->dispatchWebhooks($nextTryWebhooks, $this->config->getDelayBetweenTries(), $tries, $headers, $options);
+            $this->dispatchWebhooks($nextTryWebhooks, $headers, $options, $this->config->getDelayBetweenTries(), $tries);
         }
     }
 
@@ -94,9 +94,9 @@ abstract class Client
      * while webhook iterable is ready for calls from queue, queue worker MUST call static::callWebhooks method
      *
      * @param iterable<Webhook> $webhooks
-     * @param int<0, max> $delayInSeconds
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
+     * @param int<0, max> $delayInSeconds
      */
-    abstract public function dispatchWebhooks(iterable $webhooks, int $delayInSeconds, int $tries, array $headers, array $options): void;
+    abstract public function dispatchWebhooks(iterable $webhooks, array $headers = [], array $options = [], int $delayInSeconds = 0, int $tries = 0): void;
 }

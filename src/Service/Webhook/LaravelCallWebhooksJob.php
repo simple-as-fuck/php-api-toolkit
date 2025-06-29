@@ -30,8 +30,8 @@ final class LaravelCallWebhooksJob implements ShouldQueue
     ) {
     }
 
-    public function handle(Client $client): void
+    public function handle(WebhookClient $client): void
     {
-        $client->callWebhooks($this->webhooks, $this->webhooksTries, $this->callHeaders, $this->callOptions);
+        $client->callWebhooks($this->webhooks, $this->callHeaders, $this->callOptions, $this->webhooksTries);
     }
 }

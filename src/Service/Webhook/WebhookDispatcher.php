@@ -10,7 +10,7 @@ class WebhookDispatcher
 {
     public function __construct(
         private readonly Repository $repository,
-        private readonly Client $client,
+        private readonly WebhookClient $client,
     ) {
     }
 
@@ -20,19 +20,30 @@ class WebhookDispatcher
      * @param array<non-empty-string, string|array<string>> $headers to apply for http request
      * @param array<RequestOptions::*, mixed> $options to apply for http request
      */
-    public function dispatch(string $type, array $attributes = [], bool $synchronouslyFirstTry = false, array $headers = [], array $options = []): void
+    public function dispatch(string $type, array $attributes = [], array $headers = [], array $options = []): void
     {
         $webhooks = $this->repository->loadForDispatching($type, $attributes);
         if (count($webhooks) === 0) {
             return;
         }
 
-        if ($synchronouslyFirstTry) {
-            $this->client->callWebhooks($webhooks, 0, $headers, $options);
+        $this->client->dispatchWebhooks($webhooks, $headers, $options);
+    }
+
+    /**
+     * @param non-empty-string $type
+     * @param array<non-empty-string, non-empty-string> $attributes
+     * @param array<non-empty-string, string|array<string>> $headers to apply for http request
+     * @param array<RequestOptions::*, mixed> $options to apply for http request
+     */
+    public function call(string $type, array $attributes = [], array $headers = [], array $options = []): void
+    {
+        $webhooks = $this->repository->loadForDispatching($type, $attributes);
+        if (count($webhooks) === 0) {
             return;
         }
 
-        $this->client->dispatchWebhooks($webhooks, 0, 0, $headers, $options);
+        $this->client->callWebhooks($webhooks, $headers, $options);
     }
 
     /**
@@ -49,6 +60,6 @@ class WebhookDispatcher
             return;
         }
 
-        $this->client->dispatchWebhooks($webhooks, $delayInSeconds, 0, $headers, $options);
+        $this->client->dispatchWebhooks($webhooks, $headers, $options, $delayInSeconds);
     }
 }

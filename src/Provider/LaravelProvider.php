@@ -16,7 +16,7 @@ use SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger;
 use SimpleAsFuck\ApiToolkit\Service\Client\LaravelConfig;
 use SimpleAsFuck\ApiToolkit\Service\Config\LaravelAdapter;
 use SimpleAsFuck\ApiToolkit\Service\Config\Repository;
-use SimpleAsFuck\ApiToolkit\Service\Webhook\Client as WebhookClient;
+use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookClient;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Config as WebhookConfig;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\LaravelClient;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\LaravelMysqlRepository;

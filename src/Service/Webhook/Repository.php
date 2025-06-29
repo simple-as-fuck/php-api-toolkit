@@ -31,7 +31,8 @@ abstract class Repository
     abstract public function loadForDispatching(string $type, array $attributes): iterable;
 
     /**
-     * the method saves one unique webhook if the duplicate webhook exists method MUST return null
+     * the method saves one unique webhook with required attributes,
+     * if the duplicate webhook exists method MUST return null
      *
      * unique webhook means that a combination of webhook $type and $params->listeningUrl
      * can be saved only once

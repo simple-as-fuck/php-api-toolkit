@@ -25,18 +25,19 @@ consider package version as unsupported except last version.
 
 Api client requires guzzle client, psr client interface is not good enough because absence of async request.
 Second main dependency is some config, you can implement yours configuration loading.
-Optionally, you can add deprecations logger for automated logging of `Deprecated`
-or [Sunset](https://datatracker.ietf.org/doc/html/rfc8594) response header.
+Optionally, you can add deprecations logger for automated logging of `Deprecated` or [Sunset](https://datatracker.ietf.org/doc/html/rfc8594) response header.
 
 Laravel config load automatically configuration from `services.php` config, with structure:
 
 ```php
     'some_api_name' => [ // this key is value of first parameter ApiClient::request method
-        'base_url' => 'https://some-host/some-base-url',
+        'base_url' => 'https://some-host/some-base-url', // required
+        'default_options' => [ // required, guzzle options array https://docs.guzzlephp.org/en/stable/request-options.html
+            'timeout' => null, // required, you MUST always configure some timeout https://docs.guzzlephp.org/en/stable/request-options.html#timeout
+        ],
         'default_headers' => [ // optional default [], http headers send in every request
             'Authorization' => 'Bearer tokenexample', // https://swagger.io/docs/specification/authentication/bearer-authentication/
         ],
-        'verify' => true, // optional default true, turn on/off certificates verification
         'deprecated_header' => 'Deprecated', // optional default 'Deprecated', define name of deprecated response header logged into deprecation log
     ],
 ```
@@ -64,39 +65,29 @@ $client = new \SimpleAsFuck\ApiToolkit\Service\Client\ApiClient(
 );
 
 /**
- * with transformer, YourClass can be converted into different api structure
- *
- * @implements \SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer<YourClass>
- */
-final class YourTransformer implements \SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer
-{
-    /**
-     * @param YourClass $transformed
-     */
-    public function toApi($transformed): \stdClass
-    {
-        $apiData = new \stdClass();
-        $apiData->some_property = $transformed->someProperty;
-        return $apiData;
-    }
-}
-
-/**
- * @var YourClass $yourModelForRequestBody
- * @var \SimpleAsFuck\Validator\Rule\Custom\UserClassRule<YourOtherClass> $classRuleForResponseModel
+ * @var RequestDataClass $dataForRequestBody
+ * @var \SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer<RequestDataClass> $transformerForRequestBody
+ * @var \SimpleAsFuck\Validator\Rule\Custom\UserClassRule<ResponseDataClass> $classRuleForResponseBody
  */
 
 try {
-    $responseObject = $client->requestObject('some_api_name', 'POST', '/to-some-action', $yourModelForRequestBody, new YourTransformer());
+    $responseObject = $client->requestObject(
+        'some_api_name',
+        'POST',
+        '/to-some-action',
+        $dataForRequestBody,
+        $transformerForRequestBody,
+        options: [\GuzzleHttp\RequestOptions::TIMEOUT => 3600],
+    );
     /*
      * response has getter for json decoded body which is validated after decoding by rule chain
      * request method return object rule, so you can easily validate response json structure
      * is recommended use some you class rule documented here: https://github.com/simple-as-fuck/php-validator#user-class-rule
-     * and convert api data structure into some your concrete object instance
+     * and convert api data structure into some your specific object instance
      */
-    $yourModelFromResponseBody = $responseObject->class($classRuleForResponseModel)->notNull();
+    $dataFromResponseBody = $responseObject->class($classRuleForResponseBody)->notNull();
 }
-catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
+catch (\SimpleAsFuck\ApiToolkit\Data\Client\ApiException $exception) {
     /*
      * if anything go wrong in request/response processing or response json parsing
      * \SimpleAsFuck\ApiToolkit\Model\Client\ApiException is thrown,
@@ -108,13 +99,13 @@ catch (\SimpleAsFuck\ApiToolkit\Model\Client\ApiException $exception) {
     // extended with optional message property, you SHOULD log this, so you know WTF is going wrong
     $logger->error($exception->getMessage()); 
     // short information for end user WTF just happened, if is not null you SHOULD show the tittle on your front end
-    $exception->getTitle();
+    $exception->getProblemDetail()?->title;
     // information for end user with more detail, if is not null you SHOULD show the detail on your front end,
     // because detail can contain clue or information how user can solve error, mainly if error is his false :D
-    $exception->getDetail();
+    $exception->getProblemDetail()?->detail;
     // parse from error response some extensions, is RECOMMENDED ignoring all errors from error response parsing
     // because you can lose another useful data from error response or if response si corrupted you can lose previous exception
-    $exception->response()?->getJson(allowInvalidJson: true)->object()->property('some_error_property')->string()->nullable(failAsNull: true);
+    $exception->getProblemDetailExtensions()?->property('some_error_property')->string()->nullable(failAsNull: true);
 }
 
 ```
@@ -153,7 +144,7 @@ $webhook = $client->addWebhookListener(
 
 // you can save webhook identifier for future use
 // deletion while listening is no longer needed, or some data loading in listening url
-$webhook->id();
+$webhook->id;
 
 ```
 
@@ -185,39 +176,26 @@ class YourListeningController
         //\Symfony\Component\HttpFoundation\Request $request
     ): \Psr\Http\Message\ResponseInterface {
     //): \Symfony\Component\HttpFoundation\Response {
-        $webhook = \SimpleAsFuck\ApiToolkit\Factory\Server\Validator::make($request)
-        //$webhook = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Validator::make($request)
-            ->json()
-            ->object()
-            ->class(new \SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer())
-            ->notNull()
-        ;
+        $rules = \SimpleAsFuck\ApiToolkit\Factory\Server\Validator::make($request)->webhook();
+        //$rules = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Validator::make($request)->webhook();
+        $webhook = $rules->notNull();
+        $attribute = $rules->attributes()->key('some_attribute')->parseInt()->positive()->nullable();
+        $attribute = $webhook->params->attributes['some_attribute'] ?? null;
 
         // run some you logic
         // you should expect than listening action can be called multiple times
         // because of some network error or another failure
 
-        $result = new \SimpleAsFuck\ApiToolkit\Model\Webhook\Result();
-        $result = new \SimpleAsFuck\ApiToolkit\Model\Webhook\Result(
+        $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeWebhookResult();
+        //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeWebhookResult();
+        $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeWebhookResult(
             // you can inform server site application to stop
             // dispatching webhook for another listener after current listener
             // which has less priority
             // server services in this package support this functionality
             stopDispatching: true
-        )
-        // you SHOULD return valid json object,
-        // server services in this package expect to receive result object,
-        // otherwise dispatch can be detected as failed because of some syntax error
-        // and server can dispatch webhook agan
-        return \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson(
-        //return \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson(
-            $result,
-            new \SimpleAsFuck\ApiToolkit\Service\Webhook\ResultTransformer(),
-            // you MUST return successful response, otherwise
-            // server site application can send webhook agan
-            // because error response will look like failed dispatch
-            \Kayex\HttpCodes::HTTP_OK
         );
+        return $response;
     }
 }
 ```
@@ -238,16 +216,34 @@ $rules = \SimpleAsFuck\ApiToolkit\Factory\Server\Validator::make($request);
 //$rules = \SimpleAsFuck\ApiToolkit\Factory\Symfony\Validator::make($request);
 
 // validate some query parameter
-$someQueryValidValue = $rules->query()->key('someKey')->string()->parseInt()->min(1)->notNull();
+$someQueryValidValue = $rules->query()->key('someKey')->string()->parseInt()->positive()->notNull();
 
 /** @var \SimpleAsFuck\ApiToolkit\Service\Server\UserQueryRule<YourClass> $yourQueryRule */
 $yourObjectFromRequestQuery = $rules->query()->class($yourQueryRule)->notNull();
 
 // validate something from request body with json format
-$someJsonValidValue = $rules->json()->object()->property('someProperty')->string()->notEmpty()->max(255)->notNull();
+$someJsonValidValue = $rules->json()->object()->property('someProperty')->string()->notEmpty()->maxChar(255)->notNull();
 
 /** @var \SimpleAsFuck\Validator\Rule\Custom\UserClassRule<YourClass> $yourClassRule */
 $yourObjectFromRequestBody = $rules->json()->object()->class($yourClassRule)->notNull();
+
+// http error in your action
+/** @var bool $shitHappens */
+if ($shitHappens) {
+    throw new \SimpleAsFuck\ApiToolkit\Model\Server\ApiException(
+        'Shit Happens',
+        new \SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail(
+            'https://shit-happens.wtf/error',
+            418,
+            'Shit happens',
+            'Developers are looking for some shit in their code.',
+            '/error/418',
+        ),
+        (object) ['wtf' => 418],
+        internalMessage: 'Shit Happens, enjoy looking for what happens in the code.'
+    );
+    //throw new \Symfony\Component\HttpKernel\Exception\HttpException(418, 'Shit Happens'),
+}
 
 // end of your action
 
@@ -287,10 +283,10 @@ try {
 catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
     // exception message for logging or debugging, you SHOULD log this, so you know WTF is going wrong
     $logger->error(implode(', ', [$exception->getMessage(), (string) $exception->getInternalMessage()]), [
-        'type' => $exception->getType(),
+        'type' => $exception->getProblemDetail()?->type,
         'status' => $exception->getCode(),
-        'instance' => $exception->getInstance(),
-        ...$exception->getExtensions(),
+        'instance' => $exception->getProblemDetail()?->instance,
+        'extensions' => $exception->getProblemDetailExtensions(),
     ]);
 
     $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson(
@@ -298,7 +294,7 @@ catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
         $exception,
         // transformer will convert exception in to https://datatracker.ietf.org/doc/html/rfc9457 json object with message and all another extensions
         new \SimpleAsFuck\ApiToolkit\Service\Server\ApiExceptionTransformer(),
-        $exception->getStatusCode()
+        $exception->getCode()
     );
 }
 // if you use Symfony Http Exceptions you can use HttpExceptionTransformer
@@ -336,9 +332,9 @@ catch (\Throwable $exception) {
 
 For webhook dispatching from server site to a client is here prepared WebhookDispatcher.
 WebhookDispatcher will find necessary webhooks for calling by using abstract webhook [Repository](../src/Service/Webhook/Repository.php)
-and after then call them by abstract webhook [Client](../src/Service/Webhook/Client.php).
+and after then call them by abstract [WebhookClient](../src/Service/Webhook/WebhookClient.php).
 
-You need to implement webhook Repository, webhook Client and have prepared
+You can implement webhook Repository, webhook Client and have prepared
 some storage for persisting webhooks, also you need to prepare some queue
 for webhook call retries.
 
@@ -346,13 +342,13 @@ For Laravel are prepared [LaravelMysqlRepository](../src/Service/Webhook/Laravel
 [LaravelClient](../src/Service/Webhook/LaravelClient.php) using Laravel [queues](https://laravel.com/docs/queues).
 
 Laravel webhook implementation load automatically configuration from [webhook.php](../config/laravel/webhook.php) config,
-which can be published from this package.
+you should publish configuration from this package and change for your needs.
 
 ```console
 php artisan vendor:publish --tag=api-toolkit-config
 ```
 
-Webhooks are stored in MySql database tables, they are defined in Laravel migration publishable from this package.
+You can store webhooks in MySql database tables, they are defined in Laravel migration publishable from this package.
 
 ```console
 php artisan vendor:publish --tag=api-toolkit-migration
@@ -362,32 +358,38 @@ php artisan vendor:publish --tag=api-toolkit-migration
 
 /**
  * @var \SimpleAsFuck\ApiToolkit\Service\Webhook\Repository $webhookRepository
- * @var \SimpleAsFuck\ApiToolkit\Service\Webhook\Client $webhookClient
+ * @var \SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookClient $webhookClient
  */
 
 $dispatcher = new \SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookDispatcher($webhookRepository, $webhookClient);
 
 // simplest dispatch, when something happened on the server side,
 // webhooks calls are added into a queue
-$dispatcher->dispatch('some_webhook_event_type');
+$dispatcher->dispatch('some_webhook_event_type', options: [\GuzzleHttp\RequestOptions::TIMEOUT => 20]);
 
 // webhook call with some attribute,
-// for example, you can dispatch an event type with some concrete entity id
-$dispatcher->dispatch('some_webhook_event_type', ['some_attribute' => '1256']);
+// for example, you can dispatch an event type with some specific entity id
+$dispatcher->dispatch('some_webhook_event_type', attributes: ['some_attribute' => '1256'], options: [\GuzzleHttp\RequestOptions::TIMEOUT => 20]);
 
-// webhook dispatch with third parameter $synchronouslyFirstTry as true
-// will first webhook call try immediately without adding call into queue
+// webhook call try immediately without adding call into queue
 // only if the first call fails, webhook call is added into queue for retry
-$dispatcher->dispatch('some_webhook_event_type', [], synchronouslyFirstTry: true);
+$dispatcher->call('some_webhook_event_type', options: [\GuzzleHttp\RequestOptions::TIMEOUT => 20]);
 
 // simple dispatch when the first call will try after 1 minute
-$dispatcher->dispatchWithDelay('some_webhook_event_type', [], 60);
+$dispatcher->dispatchWithDelay(60, 'some_webhook_event_type', options: [\GuzzleHttp\RequestOptions::TIMEOUT => 20]);
+
+// you can build webhook sequence by your custom logic without using $webhookRepository
+// beware you still need some queue for webhook retries if calls failed
+/** @var iterable<\SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook> $webhooks */
+$webhookClient->dispatchWebhooks($webhooks, options: [\GuzzleHttp\RequestOptions::TIMEOUT => 20]);
+// first try without queue
+$webhookClient->callWebhooks($webhooks, options: [\GuzzleHttp\RequestOptions::TIMEOUT => 20]);
 
 ```
 
 For webhook listener registration on server site, you can use controllers [AddListener](../src/Controller/Webhook/AddListener.php),
 [RemoveListener](../src/Controller/Webhook/RemoveListener.php), [Symfony](../src/Controller/Webhook/Symfony.php) equivalent
-or just use webhook [Repository](../src/Service/Webhook/Repository.php) in any action and persist webhook with a processed model
+or just use webhook [Repository](../src/Service/Webhook/Repository.php) in any action and persist webhook with a processed data
 and controllers from here use only as inspiration.
 
 Controllers from this package do not have any publish functionality or not provide any auto-registration in your router,

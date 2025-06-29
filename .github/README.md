@@ -248,18 +248,18 @@ if ($shitHappens) {
 // end of your action
 
 /**
- * @var YourClass $yourModelForResponseBody
+ * @var YourClass $yourDataForResponseBody
  * @var \SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer<YourClass> $transformer 
  */
 
 // response with one object
-$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson($yourModelForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
-//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson($yourModelForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
+$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson($yourDataForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson($yourDataForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
 
 // response with some array or collection (avoiding out of memory problem recommended some lazy loading iterator)
-$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourModelForResponseBody]), $transformer);
-//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourModelForResponseBody]), $transformer);
-//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream([$yourModelForResponseBody], $transformer);
+$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourDataForResponseBody]), $transformer);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourDataForResponseBody]), $transformer);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream([$yourDataForResponseBody], $transformer);
 
 ```
 

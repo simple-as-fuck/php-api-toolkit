@@ -24,6 +24,9 @@ jobs:
       - name: Install tools
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
 
+      - name: Chesk code style
+        run: tools/php-cs-fixer fix --dry-run --no-interaction
+
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with psr/http-message:^2.0 --with simple-as-fuck/php-validator:^0.7.0 --with illuminate/support:^12.0 --with psr/log:^3.0 --with symfony/http-foundation:^7.0 --with symfony/http-kernel:^7.0 --with symfony/psr-http-message-bridge:^7.0
 
@@ -31,7 +34,7 @@ jobs:
         run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php83:
     name: "php 8.3"
@@ -47,20 +50,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install tools
-        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
-
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest
-
-      - name: Chesk code style
-        run: tools/php-cs-fixer fix --dry-run --no-interaction
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php83a:
     name: "php 8.3, laravel 10, PSR message 1"
@@ -76,9 +73,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install tools
-        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
-
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^10.0 --with psr/http-message:^1.1
 
@@ -86,7 +80,7 @@ jobs:
         run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php83b:
     name: "php 8.3, laravel 11"
@@ -102,9 +96,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install tools
-        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
-
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^11.0
 
@@ -112,7 +103,7 @@ jobs:
         run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php82:
     name: "php 8.2"
@@ -128,9 +119,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install tools
-        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
-
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest
 
@@ -138,7 +126,7 @@ jobs:
         run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php82a:
     name: "php 8.2, laravel 9, PSR log 2, symfony 6"
@@ -154,9 +142,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install tools
-        run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
-
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^9.0 --with psr/log:^2.0 --with symfony/http-foundation:^6.0 --with symfony/http-kernel:^6.0 --with symfony/psr-http-message-bridge:^6.0
 
@@ -164,7 +149,7 @@ jobs:
         run: vendor/bin/phpstan analyse --memory-limit=-1
 
       - name: Run tests
-        run: tools/phpunit test/ --bootstrap vendor/autoload.php
+        run: vendor/bin/phpunit test/
 
   php81:
     name: "php 8.1"

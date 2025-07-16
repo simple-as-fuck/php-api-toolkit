@@ -47,7 +47,7 @@ final class LaravelConfig extends Config
      */
     public function getDeprecatedHeader(string $apiName): string
     {
-        return $this->getValue('services.'.$apiName.'deprecated_header')->string()->notEmpty()->nullable() ?? parent::getDeprecatedHeader($apiName);
+        return $this->getValue('services.'.$apiName.'.deprecated_header')->string()->notEmpty()->nullable() ?? parent::getDeprecatedHeader($apiName);
     }
 
     /**

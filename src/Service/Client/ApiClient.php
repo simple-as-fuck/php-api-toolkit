@@ -164,7 +164,7 @@ class ApiClient
 
         $defaultOptions = $this->config->getDefaultOptions($apiName);
         $defaultOptions->key(RequestOptions::TIMEOUT)->float()->min(0)->notNull(if: ($options[RequestOptions::TIMEOUT] ?? null) === null);
-        foreach ($defaultOptions->notNull() as $key => $defaultOption) {
+        foreach ($defaultOptions->nullable() ?? [] as $key => $defaultOption) {
             if (! array_key_exists($key, $options)) {
                 $options[$key] = $defaultOption;
             }

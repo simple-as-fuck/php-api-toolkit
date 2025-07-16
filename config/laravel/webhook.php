@@ -20,9 +20,9 @@ return [
         'queue-name' => null,
         // channel name where failed webhook calls are logged, if null default laravel channel is used
         'log-channel' => null,
-        // define how many times will webhook call retry if failed
+        // required define how many times will webhook call retry if failed
         'max-tries' => 24,
-        // define delay between retries in seconds
+        // required define delay between retries in seconds
         'tries-delay' => 3600,
     ],
 

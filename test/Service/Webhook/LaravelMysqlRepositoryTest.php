@@ -197,7 +197,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
             foreach ($dbRequiredAttributeMaps as $dbRequiredAttributeMap) {
                 self::assertSame($webhook->id, (string) $dbRequiredAttributeMap->webhookId);
 
-                /** @var \stdClass $dbRequiredAttribute */
+                /** @var object{key: string, value: string} $dbRequiredAttribute */
                 $dbRequiredAttribute = $connection->selectOne('select * from WebhookAttribute where id = ?', [$dbRequiredAttributeMap->webhookAttributeId]);
                 self::assertSame($params->attributes[$dbRequiredAttribute->key], $dbRequiredAttribute->value);
             }

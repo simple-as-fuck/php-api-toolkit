@@ -40,7 +40,7 @@ final class LaravelMysqlRepository extends Repository
         }
 
         foreach ($connection->table('WebhookWithoutAttribute')->pluck('webhookId') as $webhookId) {
-            /** @phpstan-ignore-next-line */
+            /** @var int $webhookId */
             if (array_key_exists($webhookId, $webhookMatches)) {
                 continue;
             }
@@ -187,7 +187,7 @@ final class LaravelMysqlRepository extends Repository
         $attributes = [];
         foreach ($connection->table('WebhookRequiredAttribute')->where('webhookId', '=', $webhookId)->get() as $requiredAttribute) {
             /** @var \stdClass $requiredAttribute */
-            /** @var \stdClass|null $storedAttribute */
+            /** @var object{key: string, value: string}|null $storedAttribute */
             $storedAttribute = $connection->table('WebhookAttribute')->where('id', '=', $requiredAttribute->webhookAttributeId)->first();
             if ($storedAttribute !== null) {
                 $attributes[$storedAttribute->key] = $storedAttribute->value;

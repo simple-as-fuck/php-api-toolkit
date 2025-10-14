@@ -64,7 +64,7 @@ abstract class WebhookClient
                     ->notNull()
                 ;
 
-                if ($callResult->stopDispatching) {
+                if ($callResult->isPropagationStopped()) {
                     break;
                 }
             } catch (\Throwable $exception) {

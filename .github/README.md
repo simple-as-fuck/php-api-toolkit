@@ -189,9 +189,9 @@ class YourListeningController
         $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeWebhookResult();
         //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeWebhookResult();
         $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeWebhookResult(
+            // https://www.php-fig.org/psr/psr-14/#stoppable-events
             // you can inform server site application to stop
-            // dispatching webhook for another listener after current listener
-            // which has less priority
+            // dispatching webhook for another listener with less priority
             // server services in this package support this functionality
             stopDispatching: true
         );

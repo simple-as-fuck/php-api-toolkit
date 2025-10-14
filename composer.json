@@ -1,7 +1,7 @@
 {
     "name": "simple-as-fuck/php-api-toolkit",
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "psr/http-message": "^1.1|^2.0",
         "psr/http-factory": "^1.1",

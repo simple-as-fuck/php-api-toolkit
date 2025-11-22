@@ -20,12 +20,12 @@ final class ResponseFactory
 {
     /**
      * @template TBody
-     * @param TBody|null $body will be encoded as json
+     * @param TBody|null $body will be encoded as application/json object
      * @param Transformer<TBody>|null $transformer
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
+    public static function makeObject(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
     {
         $headers['Content-Type'] = 'application/json';
         $factory = new HttpFactory();
@@ -39,6 +39,32 @@ final class ResponseFactory
     }
 
     /**
+     * @deprecated use ResponseFactory::makeObject
+     * @template TBody
+     * @param TBody|null $body will be encoded as json
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
+    {
+        return self::makeObject($body, $transformer, $code, $headers);
+    }
+
+    /**
+     * @template TBody
+     * @param \Iterator<TBody> $body will be encoded as application/json array
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeArray(\Iterator $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
+    {
+        return self::makeJsonStream($body, $transformer, $code, $headers);
+    }
+
+    /**
+     * @deprecated use ResponseFactory::makeArray
      * @template TBody
      * @param \Iterator<TBody> $body will be encoded as json
      * @param Transformer<TBody>|null $transformer
@@ -88,11 +114,39 @@ final class ResponseFactory
     }
 
     /**
+     * @template TBody
+     * @param \Iterator<TBody> $body will be encoded as application/jsonl https://jsonlines.org/
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeStream(\Iterator $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
+    {
+        $headers['Content-Type'] = 'application/jsonl';
+        $factory = new HttpFactory();
+        $response = self::makeResponse($factory, $code, $headers);
+
+        return $response->withBody(new PumpStream(static function () use ($body, $transformer): ?string {
+            if (! $body->valid()) {
+                return null;
+            }
+
+            $responseData = $body->current();
+            $body->next();
+            if ($transformer !== null) {
+                $responseData = $transformer->toApi($responseData);
+            }
+
+            return Utils::jsonEncode($responseData) . "\n";
+        }));
+    }
+
+    /**
      * @param array<non-empty-string, string|array<string>> $headers
      */
     public static function makeWebhookResult(bool $stopDispatching = false, array $headers = []): ResponseInterface
     {
-        return self::makeJson(new Result($stopDispatching), new ResultTransformer(), HttpCodes::HTTP_OK, $headers);
+        return self::makeObject(new Result($stopDispatching), new ResultTransformer(), HttpCodes::HTTP_OK, $headers);
     }
 
     /**

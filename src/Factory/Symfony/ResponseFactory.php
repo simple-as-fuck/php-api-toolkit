@@ -16,6 +16,20 @@ final class ResponseFactory
 {
     /**
      * @template TBody
+     * @param TBody|null $body will be encoded as application/json object
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeObject(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
+    {
+        $factory = new HttpFoundationFactory();
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeObject($body, $transformer, $code, $headers));
+    }
+
+    /**
+     * @deprecated use ResponseFactory::makeObject
+     * @template TBody
      * @param TBody|null $body will be encoded as json
      * @param Transformer<TBody>|null $transformer
      * @param int<100,505> $code
@@ -24,10 +38,23 @@ final class ResponseFactory
     public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
     {
         $factory = new HttpFoundationFactory();
-        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson($body, $transformer, $code, $headers));
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeObject($body, $transformer, $code, $headers));
     }
 
     /**
+     * @template TBody
+     * @param iterable<TBody> $body will be encoded as application/json array
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeArray(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
+    {
+        return self::makeJsonStream($body, $transformer, $code, $headers);
+    }
+
+    /**
+     * @deprecated use ResponseFactory::makeArray
      * @template TBody
      * @param iterable<TBody> $body will be encoded as json
      * @param Transformer<TBody>|null $transformer
@@ -68,6 +95,32 @@ final class ResponseFactory
     }
 
     /**
+     * @template TBody
+     * @param iterable<TBody> $body will be encoded as application/jsonl https://jsonlines.org/
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
+    {
+        $headers['Content-Type'] = 'application/jsonl';
+        return new StreamedResponse(
+            static function () use ($body, $transformer): void {
+                foreach ($body as $responseData) {
+                    if ($transformer !== null) {
+                        $responseData = $transformer->toApi($responseData);
+                    }
+
+                    echo Utils::jsonEncode($responseData) . "\n";
+                }
+            },
+            $code,
+            $headers,
+        );
+    }
+
+    /**
+     * @deprecated will be static
      * @param array<non-empty-string, string|array<string>> $headers
      */
     public function makeWebhookResult(bool $stopDispatching = false, array $headers = []): Response

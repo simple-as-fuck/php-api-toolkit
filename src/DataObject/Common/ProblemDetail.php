@@ -7,7 +7,7 @@ namespace SimpleAsFuck\ApiToolkit\DataObject\Common;
 /**
  * https://datatracker.ietf.org/doc/html/rfc9457#name-the-problem-details-json-ob
  */
-final class ProblemDetail
+final readonly class ProblemDetail
 {
     /**
      * @param non-empty-string|null $type https://datatracker.ietf.org/doc/html/rfc9457#name-type
@@ -17,11 +17,11 @@ final class ProblemDetail
      * @param non-empty-string|null $instance https://datatracker.ietf.org/doc/html/rfc9457#name-instance
      */
     public function __construct(
-        public readonly ?string $type,
-        public readonly ?int $status,
-        public readonly ?string $title,
-        public readonly ?string $detail = null,
-        public readonly ?string $instance = null
+        public ?string $type,
+        public ?int $status,
+        public ?string $title,
+        public ?string $detail = null,
+        public ?string $instance = null
     ) {
     }
 }

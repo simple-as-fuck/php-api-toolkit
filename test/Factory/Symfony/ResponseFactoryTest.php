@@ -10,13 +10,13 @@ use SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory;
 final class ResponseFactoryTest extends TestCase
 {
     /**
-     * @dataProvider dataProviderMakeJsonStream
+     * @dataProvider dataProviderMakeArray
      *
      * @param iterable<mixed> $streamedData
      */
-    public function testMakeJsonStream(string $expectedBody, iterable $streamedData): void
+    public function testMakeArray(string $expectedBody, iterable $streamedData): void
     {
-        $response = ResponseFactory::makeJsonStream($streamedData);
+        $response = ResponseFactory::makeArray($streamedData);
 
         ob_start();
         $response->sendContent();
@@ -28,7 +28,7 @@ final class ResponseFactoryTest extends TestCase
     /**
      * @return array<array<mixed>>
      */
-    public static function dataProviderMakeJsonStream(): array
+    public static function dataProviderMakeArray(): array
     {
         return [
             ['[548846,"sadasjkfghjsg"]', [548846, 'sadasjkfghjsg']],

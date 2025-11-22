@@ -8,13 +8,13 @@ use SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory;
 final class ResponseFactoryTest extends TestCase
 {
     /**
-     * @dataProvider dataProviderMakeJsonStream
+     * @dataProvider dataProviderMakeArray
      *
      * @param array<mixed> $streamedData
      */
-    public function testMakeJsonStream(string $expectedBody, array $streamedData): void
+    public function testMakeArray(string $expectedBody, array $streamedData): void
     {
-        $response = ResponseFactory::makeJsonStream(new \ArrayIterator($streamedData));
+        $response = ResponseFactory::makeArray(new \ArrayIterator($streamedData));
 
         self::assertSame($expectedBody, $response->getBody()->getContents());
     }
@@ -22,7 +22,7 @@ final class ResponseFactoryTest extends TestCase
     /**
      * @return array<array<mixed>>
      */
-    public static function dataProviderMakeJsonStream(): array
+    public static function dataProviderMakeArray(): array
     {
         return [
             ['[548846,"sadasjkfghjsg"]', [548846, 'sadasjkfghjsg']],

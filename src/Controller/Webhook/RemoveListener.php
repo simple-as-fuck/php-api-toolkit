@@ -24,6 +24,6 @@ final class RemoveListener implements RequestHandlerInterface
 
         $this->repository->delete($webhookId);
 
-        return ResponseFactory::makeJson(null);
+        return ResponseFactory::makeObject(null);
     }
 }

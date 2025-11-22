@@ -30,7 +30,7 @@ final class Symfony
             throw new ConflictHttpException('Webhook: \''.$params->listeningUrl.'\' with type: \''.$type.'\' already exist');
         }
 
-        return ResponseFactory::makeJson($webhook, new WebhookTransformer());
+        return ResponseFactory::makeObject($webhook, new WebhookTransformer());
     }
 
     public function removeListener(Request $request): Response
@@ -39,6 +39,6 @@ final class Symfony
 
         $this->repository->delete($webhookId);
 
-        return ResponseFactory::makeJson(null);
+        return ResponseFactory::makeObject(null);
     }
 }

@@ -60,6 +60,7 @@ final class ResponseFactory
      */
     public static function makeArray(\Iterator $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
     {
+        /** @phpstan-ignore-next-line */
         return self::makeJsonStream($body, $transformer, $code, $headers);
     }
 

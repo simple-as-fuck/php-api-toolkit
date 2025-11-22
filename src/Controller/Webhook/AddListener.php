@@ -32,6 +32,6 @@ final class AddListener implements RequestHandlerInterface
             throw new ApiException('Webhook: \''.$params->listeningUrl.'\' with type: \''.$type.'\' already exist', HttpCodes::HTTP_CONFLICT);
         }
 
-        return ResponseFactory::makeJson($webhook, new WebhookTransformer());
+        return ResponseFactory::makeObject($webhook, new WebhookTransformer());
     }
 }

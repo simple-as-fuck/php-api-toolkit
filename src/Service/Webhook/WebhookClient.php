@@ -7,7 +7,7 @@ namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
-use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
+use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
 use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 
 abstract class WebhookClient
@@ -59,8 +59,9 @@ abstract class WebhookClient
 
                 $response = $this->client->request('POST', $webhook->params->listeningUrl, $requestOptions);
 
-                $callResult = MessageService::parseJsonFromBody(new UnexpectedValueException(), $response, 'Webhook response body', false)
-                    ->object()->class(new ResultTransformer())
+                $callResult = JsonService::jsonDecode($response->getBody()->getContents(), 'Webhook response body', new UnexpectedValueException())
+                    ->object()
+                    ->class(new ResultTransformer())
                     ->notNull()
                 ;
 

@@ -7,8 +7,9 @@ namespace SimpleAsFuck\ApiToolkit\Model\Client;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\StreamRules;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
-use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
+use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
 final class Response implements ResponseInterface
@@ -117,7 +118,30 @@ final class Response implements ResponseInterface
      */
     public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
     {
-        return MessageService::parseJsonFromBody(new ParseResponseException($this->request, $this), $this->response, 'Response body', $allowInvalidJson, $jsonDecodeFlags);
+        return JsonService::jsonDecode(
+            $this->response->getBody()->getContents(),
+            'Response body',
+            new ParseResponseException($this->request, $this),
+            $allowInvalidJson,
+            $jsonDecodeFlags
+        );
+    }
+
+    /**
+     * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     * @throws ApiException
+     */
+    public function getJsonl(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): StreamRules
+    {
+        return new StreamRules(
+            JsonService::jsonlDecode(
+                $this->response->getBody(),
+                'Response body',
+                new ParseResponseException($this->request, $this),
+                $allowInvalidJson,
+                $jsonDecodeFlags,
+            ),
+        );
     }
 
     public function getStatusCode(): int

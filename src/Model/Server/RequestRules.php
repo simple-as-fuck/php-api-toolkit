@@ -6,7 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\Model\Server;
 
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleAsFuck\ApiToolkit\Data\Webhook\WebhookRules;
-use SimpleAsFuck\ApiToolkit\Service\Http\MessageService;
+use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\Validated;
@@ -40,7 +40,7 @@ final class RequestRules
      */
     public function json(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
     {
-        return MessageService::parseJsonFromBody($this->exceptionFactory, $this->request, 'Request body', $allowInvalidJson, $jsonDecodeFlags);
+        return JsonService::jsonDecode($this->request->getBody()->getContents(), 'Request body', $this->exceptionFactory, $allowInvalidJson, $jsonDecodeFlags);
     }
 
     /**

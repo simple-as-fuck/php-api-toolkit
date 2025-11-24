@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use SimpleAsFuck\ApiToolkit\Model\Server\QueryRule;
+use SimpleAsFuck\ApiToolkit\Data\Server\QueryRule;
 use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 use SimpleAsFuck\Validator\Model\Validated;
 

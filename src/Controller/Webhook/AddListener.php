@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory;
 use SimpleAsFuck\ApiToolkit\Factory\Server\Validator;
-use SimpleAsFuck\ApiToolkit\Model\Server\ApiException;
+use SimpleAsFuck\ApiToolkit\Data\Server\ApiException;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\ParamsTransformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Repository;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;

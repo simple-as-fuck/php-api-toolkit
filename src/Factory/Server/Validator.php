@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Factory\Server;
 
 use Psr\Http\Message\ServerRequestInterface;
-use SimpleAsFuck\ApiToolkit\Model\Server\RequestRules;
+use SimpleAsFuck\ApiToolkit\Data\Server\RequestRules;
 use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\RuleChain;
 use SimpleAsFuck\Validator\Model\Validated;

@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Server;
 
-use SimpleAsFuck\ApiToolkit\Model\Server\ApiException;
+use SimpleAsFuck\ApiToolkit\Data\Server\ApiException;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 
 /**
- * @implements Transformer<ApiException>
+ * @implements Transformer<ApiException|\SimpleAsFuck\ApiToolkit\Model\Server\ApiException>
  */
 class ApiExceptionTransformer implements Transformer
 {
     /**
-     * @param ApiException $transformed
+     * @param ApiException|\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $transformed
+     * @phpstan-ignore-next-line
      */
     public function toApi($transformed): \stdClass
     {
@@ -47,6 +48,7 @@ class ApiExceptionTransformer implements Transformer
             $responseData['instance'] = $transformed->getProblemDetail()->instance;
         }
 
+        /** @phpstan-ignore-next-line */
         $responseData = [...$responseData, ...((array) $transformed->getProblemDetailExtensions())];
 
         return (object) $responseData;

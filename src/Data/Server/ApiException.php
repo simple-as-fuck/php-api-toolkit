@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace SimpleAsFuck\ApiToolkit\Model\Server;
+namespace SimpleAsFuck\ApiToolkit\Data\Server;
 
 use Kayex\HttpCodes;
 use SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail;
 
-/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Server\ApiException */
-class ApiException extends \RuntimeException
+/** @phpstan-ignore-next-line */
+class ApiException extends \SimpleAsFuck\ApiToolkit\Model\Server\ApiException
 {
-    private readonly ProblemDetail|int $problemDetail;
-
     /**
      * @param non-empty-string|null $message https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members available to server and client for logging or debugging purposes MUST contain only English message
      * @param ProblemDetail|int<100, 505> $problemDetail ProblemDetail | HTTP status
@@ -20,28 +18,19 @@ class ApiException extends \RuntimeException
      */
     public function __construct(
         ?string $message = null,
-        ProblemDetail|\SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail|int $problemDetail = HttpCodes::HTTP_INTERNAL_SERVER_ERROR,
+        private readonly ProblemDetail|int $problemDetail = HttpCodes::HTTP_INTERNAL_SERVER_ERROR,
         private readonly ?object $problemDetailExtensions = null,
         private readonly ?string $internalMessage = null,
         ?\Throwable $previous = null
     ) {
-        if ($problemDetail instanceof \SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail) {
-            $problemDetail = new ProblemDetail(
-                $problemDetail->type,
-                $problemDetail->status,
-                $problemDetail->title,
-                $problemDetail->detail,
-                $problemDetail->instance,
-            );
-        }
-
-        if (is_int($problemDetail)) {
-            $code = $problemDetail;
-        } else {
-            $code = $problemDetail->status ?? HttpCodes::HTTP_INTERNAL_SERVER_ERROR;
-        }
-        $this->problemDetail = $problemDetail;
-        parent::__construct($message ?? '', $code, $previous);
+        /** @phpstan-ignore-next-line */
+        parent::__construct(
+            $message,
+            $problemDetail,
+            $problemDetailExtensions,
+            $internalMessage,
+            $previous,
+        );
     }
 
     public function getProblemDetail(): ?ProblemDetail

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SimpleAsFuck\ApiToolkit\Model\Server;
+namespace SimpleAsFuck\ApiToolkit\Data\Server;
 
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleAsFuck\ApiToolkit\Data\Webhook\WebhookRules;
@@ -12,16 +12,15 @@ use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
-/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Server\RequestRules */
-readonly class RequestRules
+/** @phpstan-ignore-next-line */
+final readonly class RequestRules extends \SimpleAsFuck\ApiToolkit\Model\Server\RequestRules
 {
-    private Exception $exceptionFactory;
-    private ServerRequestInterface $request;
-
-    public function __construct(Exception $exceptionFactory, ServerRequestInterface $request)
-    {
-        $this->exceptionFactory = $exceptionFactory;
-        $this->request = $request;
+    public function __construct(
+        private Exception $exceptionFactory,
+        private ServerRequestInterface $request
+    ) {
+        /** @phpstan-ignore-next-line */
+        parent::__construct($exceptionFactory, $request);
     }
 
     public function header(): HeaderRule

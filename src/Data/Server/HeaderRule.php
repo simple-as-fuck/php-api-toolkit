@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SimpleAsFuck\ApiToolkit\Model\Server;
+namespace SimpleAsFuck\ApiToolkit\Data\Server;
 
 use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\RuleChain;
@@ -12,8 +12,8 @@ use SimpleAsFuck\Validator\Rule\ArrayRule\TypedKey;
 use SimpleAsFuck\Validator\Rule\String\RegexMatch;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
-/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Server\HeaderRule */
-class HeaderRule
+/** @phpstan-ignore-next-line */
+final class HeaderRule extends \SimpleAsFuck\ApiToolkit\Model\Server\HeaderRule
 {
     /**
      * @param Validated<array<array<string>>> $validated
@@ -22,6 +22,8 @@ class HeaderRule
         private readonly Exception $exceptionFactory,
         private readonly Validated $validated,
     ) {
+        /** @phpstan-ignore-next-line */
+        parent::__construct($exceptionFactory, $validated);
     }
 
     /**

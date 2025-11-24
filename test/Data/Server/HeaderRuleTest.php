@@ -3,8 +3,9 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use SimpleAsFuck\ApiToolkit\Model\Server\HeaderRule;
+use SimpleAsFuck\ApiToolkit\Data\Server\HeaderRule;
 use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
@@ -25,11 +26,10 @@ final class HeaderRuleTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderKeyOf
-     *
      * @param non-empty-string $key
      * @param array<string>|null $expectedValue
      */
+    #[DataProvider('dataProviderKeyOf')]
     public function testKeyOf(?array $expectedValue, string $key, bool $caseSensitive): void
     {
         $headerValue = $this->rule->keyOf($key, fn (StringRule $rule): ?string => $rule->nullable(), $caseSensitive)->nullable();
@@ -54,10 +54,9 @@ final class HeaderRuleTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderKey
-     *
      * @param non-empty-string $key
      */
+    #[DataProvider('dataProviderKey')]
     public function testKey(?string $expectedValue, string $key, bool $caseSensitive): void
     {
         $headerValue = $this->rule->key($key, $caseSensitive)->nullable();

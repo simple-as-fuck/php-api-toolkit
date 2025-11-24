@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Factory\Server;
 
 use Kayex\HttpCodes;
-use SimpleAsFuck\ApiToolkit\Model\Server\ApiException;
+use SimpleAsFuck\ApiToolkit\Data\Server\ApiException;
 use SimpleAsFuck\Validator\Factory\Exception;
 
 final class ApiValidationException extends Exception

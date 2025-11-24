@@ -230,9 +230,9 @@ $yourObjectFromRequestBody = $rules->json()->object()->class($yourClassRule)->no
 // http error in your action
 /** @var bool $shitHappens */
 if ($shitHappens) {
-    throw new \SimpleAsFuck\ApiToolkit\Model\Server\ApiException(
+    throw new \SimpleAsFuck\ApiToolkit\Data\Server\ApiException(
         'Shit Happens',
-        new \SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail(
+        new \SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail(
             'https://shit-happens.wtf/error',
             418,
             'Shit happens',
@@ -253,13 +253,13 @@ if ($shitHappens) {
  */
 
 // response with one object
-$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson($yourDataForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
-//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson($yourDataForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
+$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeObject($yourDataForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeObject($yourDataForResponseBody, $transformer, \Kayex\HttpCodes::HTTP_OK);
 
 // response with some array or collection (avoiding out of memory problem recommended some lazy loading iterator)
-$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourDataForResponseBody]), $transformer);
-//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream(new \ArrayIterator([$yourDataForResponseBody]), $transformer);
-//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJsonStream([$yourDataForResponseBody], $transformer);
+$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArray(new \ArrayIterator([$yourDataForResponseBody]), $transformer);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeArray(new \ArrayIterator([$yourDataForResponseBody]), $transformer);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeArray([$yourDataForResponseBody], $transformer);
 
 ```
 
@@ -280,7 +280,7 @@ you can easily get this transformer from DI, without any new configuration (stan
 try {
     // some breakable logic
 }
-catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
+catch(\SimpleAsFuck\ApiToolkit\Data\Server\ApiException $exception) {
     // exception message for logging or debugging, you SHOULD log this, so you know WTF is going wrong
     $logger->error(implode(', ', [$exception->getMessage(), (string) $exception->getInternalMessage()]), [
         'type' => $exception->getProblemDetail()?->type,
@@ -289,8 +289,8 @@ catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
         'extensions' => $exception->getProblemDetailExtensions(),
     ]);
 
-    $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson(
-    //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson(
+    $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeObject(
+    //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeObject(
         $exception,
         // transformer will convert exception in to https://datatracker.ietf.org/doc/html/rfc9457 json object with message and all another extensions
         new \SimpleAsFuck\ApiToolkit\Service\Server\ApiExceptionTransformer(),
@@ -301,7 +301,7 @@ catch(\SimpleAsFuck\ApiToolkit\Model\Server\ApiException $exception) {
 catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception) {
     $logger->error($exception->getMessage(), ['status' => $exception->getStatusCode()]);
 
-    $response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson(
+    $response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeObject(
         $exception,
         // transformer will convert exception into json object
         // with message property contains message from http exception
@@ -313,8 +313,8 @@ catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception
 catch (\Throwable $exception) {
     $logger->error($exception->getMessage());
 
-    $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeJson(
-    //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeJson(
+    $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeObject(
+    //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeObject(
         $exception,
         // transformer will convert exception in to json object
         // if application has turned off debug, message property contain only "Internal server error"

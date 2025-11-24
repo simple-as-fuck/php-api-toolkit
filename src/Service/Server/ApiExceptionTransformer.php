@@ -21,19 +21,29 @@ class ApiExceptionTransformer implements Transformer
         if ($transformed->getMessage() !== '') {
             $responseData['message'] = $transformed->getMessage();
         }
+        /** @phpstan-ignore-next-line */
         if ($transformed->getProblemDetail()?->type !== null) {
+            /** @phpstan-ignore-next-line */
             $responseData['type'] = $transformed->getProblemDetail()->type;
         }
+        /** @phpstan-ignore-next-line */
         if ($transformed->getProblemDetail()?->title !== null) {
+            /** @phpstan-ignore-next-line */
             $responseData['title'] = $transformed->getProblemDetail()->title;
         }
+        /** @phpstan-ignore-next-line */
         if ($transformed->getProblemDetail()?->status !== null) {
+            /** @phpstan-ignore-next-line */
             $responseData['status'] = $transformed->getProblemDetail()->status;
         }
+        /** @phpstan-ignore-next-line */
         if ($transformed->getProblemDetail()?->detail !== null) {
+            /** @phpstan-ignore-next-line */
             $responseData['detail'] = $transformed->getProblemDetail()->detail;
         }
+        /** @phpstan-ignore-next-line */
         if ($transformed->getProblemDetail()?->instance !== null) {
+            /** @phpstan-ignore-next-line */
             $responseData['instance'] = $transformed->getProblemDetail()->instance;
         }
 

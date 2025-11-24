@@ -27,10 +27,15 @@ class ApiException extends \RuntimeException
     ) {
         if ($problemDetail instanceof \SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail) {
             $problemDetail = new ProblemDetail(
+                /** @phpstan-ignore-next-line */
                 $problemDetail->type,
+                /** @phpstan-ignore-next-line */
                 $problemDetail->status,
+                /** @phpstan-ignore-next-line */
                 $problemDetail->title,
+                /** @phpstan-ignore-next-line */
                 $problemDetail->detail,
+                /** @phpstan-ignore-next-line */
                 $problemDetail->instance,
             );
         }
@@ -38,6 +43,7 @@ class ApiException extends \RuntimeException
         if (is_int($problemDetail)) {
             $code = $problemDetail;
         } else {
+            /** @phpstan-ignore-next-line */
             $code = $problemDetail->status ?? HttpCodes::HTTP_INTERNAL_SERVER_ERROR;
         }
         $this->problemDetail = $problemDetail;

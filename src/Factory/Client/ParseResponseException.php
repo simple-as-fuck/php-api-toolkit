@@ -21,7 +21,7 @@ final class ParseResponseException extends Exception
      */
     public function create(string $message): \Exception
     {
-        return new \SimpleAsFuck\ApiToolkit\DataObject\Client\ParseResponseException(
+        return new \SimpleAsFuck\ApiToolkit\Data\Client\ParseResponseException(
             $message,
             $this->response->getStatusCode(),
             $this->request,

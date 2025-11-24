@@ -14,15 +14,15 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\ResponseApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\BadRequestApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\ConflictApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\ForbiddenApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\GoneApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\InternalServerErrorApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\NotFoundApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\ServiceUnavailableApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Client\UnauthorizedApiException;
-use SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail;
+use SimpleAsFuck\ApiToolkit\Data\Client\BadRequestApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\ConflictApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\ForbiddenApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\GoneApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\InternalServerErrorApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\NotFoundApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\ServiceUnavailableApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\UnauthorizedApiException;
+use SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
@@ -54,7 +54,7 @@ class ApiClient
      * @param non-empty-string $apiName
      * @param non-empty-string $method
      * @param non-empty-string $urlWithQuery
-     * @param TBody|null $body will be encoded as json
+     * @param TBody|null $body will be encoded as application/json
      * @param Transformer<TBody>|null $bodyTransformer
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
@@ -84,7 +84,7 @@ class ApiClient
      * @param non-empty-string $apiName
      * @param non-empty-string $method
      * @param non-empty-string $urlWithQuery
-     * @param TBody|null $body will be encoded as json
+     * @param TBody|null $body will be encoded as application/json
      * @param Transformer<TBody>|null $bodyTransformer
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
@@ -203,6 +203,7 @@ class ApiClient
                 ;
                 $problemDetail = $errorObject->class(new ProblemDetailTransformer())->nullable(true);
 
+                /** @phpstan-ignore-next-line */
                 $statusCode = $problemDetail->status ?? $response->getStatusCode();
 
                 match ($response->getStatusCode()) {
@@ -307,7 +308,9 @@ class ApiClient
     ): string {
         $messageParts = [];
 
+        /** @phpstan-ignore-next-line */
         if ($problemDetail?->type !== null) {
+            /** @phpstan-ignore-next-line */
             $messageParts[] = 'Error type: "'.$problemDetail->type.'"';
         }
         // https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members
@@ -317,10 +320,14 @@ class ApiClient
         }
 
         if (count($messageParts) === 0) {
+            /** @phpstan-ignore-next-line */
             if ($problemDetail?->title !== null) {
+                /** @phpstan-ignore-next-line */
                 $messageParts[] = 'Error title: "'.$problemDetail->title.'"';
             }
+            /** @phpstan-ignore-next-line */
             if ($problemDetail?->detail !== null) {
+                /** @phpstan-ignore-next-line */
                 $messageParts[] = 'Error detail: "'.$problemDetail->detail.'"';
             }
         }
@@ -332,7 +339,9 @@ class ApiClient
         if ($statusCode !== null) {
             $messageParts[] = 'status (' . $statusCode . ')';
         }
+        /** @phpstan-ignore-next-line */
         if ($problemDetail?->instance !== null) {
+            /** @phpstan-ignore-next-line */
             $messageParts[] = 'error instance: "' . $problemDetail->instance . '"';
         }
 

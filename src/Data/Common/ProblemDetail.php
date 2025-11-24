@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace SimpleAsFuck\ApiToolkit\DataObject\Common;
+namespace SimpleAsFuck\ApiToolkit\Data\Common;
 
 /**
- * @deprecated use SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail
  * https://datatracker.ietf.org/doc/html/rfc9457#name-the-problem-details-json-ob
+ * @phpstan-ignore-next-line
  */
-readonly class ProblemDetail
+final readonly class ProblemDetail extends \SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail
 {
     /**
      * @param non-empty-string|null $type https://datatracker.ietf.org/doc/html/rfc9457#name-type
@@ -18,11 +18,19 @@ readonly class ProblemDetail
      * @param non-empty-string|null $instance https://datatracker.ietf.org/doc/html/rfc9457#name-instance
      */
     public function __construct(
-        public ?string $type,
-        public ?int $status,
-        public ?string $title,
-        public ?string $detail = null,
-        public ?string $instance = null
+        ?string $type,
+        ?int $status,
+        ?string $title,
+        ?string $detail = null,
+        ?string $instance = null
     ) {
+        /** @phpstan-ignore-next-line */
+        parent::__construct(
+            $type,
+            $status,
+            $title,
+            $detail,
+            $instance,
+        );
     }
 }

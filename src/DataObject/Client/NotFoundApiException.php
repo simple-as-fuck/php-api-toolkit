@@ -6,6 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\DataObject\Client;
 
 use SimpleAsFuck\ApiToolkit\Data\Client\ResponseApiException;
 
-final class NotFoundApiException extends ResponseApiException
+/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Client\NotFoundApiException */
+class NotFoundApiException extends ResponseApiException
 {
 }

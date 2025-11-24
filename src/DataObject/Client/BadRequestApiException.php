@@ -6,6 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\DataObject\Client;
 
 use SimpleAsFuck\ApiToolkit\Data\Client\ResponseApiException;
 
-final class BadRequestApiException extends ResponseApiException
+/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Client\BadRequestApiException */
+class BadRequestApiException extends ResponseApiException
 {
 }

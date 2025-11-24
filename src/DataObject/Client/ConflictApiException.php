@@ -6,6 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\DataObject\Client;
 
 use SimpleAsFuck\ApiToolkit\Data\Client\ResponseApiException;
 
-final class ConflictApiException extends ResponseApiException
+/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Client\ConflictApiException */
+class ConflictApiException extends ResponseApiException
 {
 }

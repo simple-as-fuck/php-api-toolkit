@@ -6,6 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\DataObject\Client;
 
 use SimpleAsFuck\ApiToolkit\Data\Client\ResponseApiException;
 
-final class InternalServerErrorApiException extends ResponseApiException
+/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Client\InternalServerErrorApiException */
+class InternalServerErrorApiException extends ResponseApiException
 {
 }

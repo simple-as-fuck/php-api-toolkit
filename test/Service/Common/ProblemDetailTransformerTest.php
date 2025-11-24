@@ -5,7 +5,7 @@ declare(strict_types=1);
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider as DataProvider;
 use PHPUnit\Framework\TestCase;
-use SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail;
+use SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail;
 use SimpleAsFuck\ApiToolkit\Service\Common\ProblemDetailTransformer;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 

@@ -6,6 +6,7 @@ namespace SimpleAsFuck\ApiToolkit\DataObject\Client;
 
 use SimpleAsFuck\ApiToolkit\Data\Client\ResponseApiException;
 
-final class ServiceUnavailableApiException extends ResponseApiException
+/** @deprecated use SimpleAsFuck\ApiToolkit\Data\Client\ServiceUnavailableApiException */
+class ServiceUnavailableApiException extends ResponseApiException
 {
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Data\Client;
 
-use SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail;
+use SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail;
 use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Model\Client\Response;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
@@ -21,7 +21,8 @@ class ResponseApiException extends ApiException
         int $code,
         Request $request,
         Response $response,
-        ?ProblemDetail $problemDetail,
+        /** @phpstan-ignore-next-line */
+        ProblemDetail|\SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail|null $problemDetail,
         ?ObjectRule $problemDetailExtensions,
         ?\Throwable $previous = null
     ) {

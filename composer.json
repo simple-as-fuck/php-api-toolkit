@@ -23,11 +23,11 @@
     },
     "require-dev": {
         "ext-pdo": "*",
-        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan": "^2.1.32",
         "phpunit/phpunit": "^10.0",
-        "phpstan/phpstan-strict-rules": "^2.0",
-        "phpstan/phpstan-deprecation-rules": "^2.0",
-        "spaze/phpstan-disallowed-calls": "^4.5"
+        "phpstan/phpstan-strict-rules": "^2.0.7",
+        "phpstan/phpstan-deprecation-rules": "^2.0.3",
+        "spaze/phpstan-disallowed-calls": "^4.7"
     },
     "autoload": {
         "psr-4": {"SimpleAsFuck\\ApiToolkit\\": "src/"}

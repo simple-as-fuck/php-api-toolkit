@@ -41,7 +41,7 @@ final class ExceptionTransformerTest extends TestCase
     {
         return [
             ['Internal server error', false],
-            ['Exception (Exception) message: \'Test\' from: '.__DIR__.'/ExceptionTransformerTest.php:23', true],
+            ['Exception (Exception) message: \'Test\' from: '.__DIR__.'/ExceptionTransformerTest.php:21', true],
         ];
     }
 }

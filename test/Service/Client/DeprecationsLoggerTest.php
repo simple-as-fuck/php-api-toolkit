@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -10,17 +12,14 @@ use SimpleAsFuck\ApiToolkit\Model\Client\Request;
 use SimpleAsFuck\ApiToolkit\Service\Client\Config;
 use SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger;
 
-/**
- * @covers \SimpleAsFuck\ApiToolkit\Service\Client\DeprecationsLogger
- */
+#[CoversClass(DeprecationsLogger::class)]
 final class DeprecationsLoggerTest extends TestCase
 {
     /**
-     * @dataProvider dataProviderLogDeprecation
-     *
      * @param non-empty-string|null $expectedLogMessage
      * @param array<non-empty-string, string> $expectedContext
      */
+    #[DataProvider('dataProviderLogDeprecation')]
     public function testLogDeprecation(?string $expectedLogMessage, array $expectedContext, ResponseInterface $response): void
     {
         $psrLogger = $this->createMock(LoggerInterface::class);

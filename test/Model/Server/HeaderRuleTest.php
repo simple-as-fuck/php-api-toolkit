@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Model\Server\HeaderRule;
 use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
-/**
- * @covers \SimpleAsFuck\ApiToolkit\Model\Server\HeaderRule
- */
+#[CoversClass(HeaderRule::class)]
 final class HeaderRuleTest extends TestCase
 {
     private HeaderRule $rule;

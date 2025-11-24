@@ -11,7 +11,7 @@ final class RequestTest extends TestCase
     public function testWithJson(): void
     {
         $request = new Request('POST', '/test');
-        $request = $request->withBaseUrl('http://host');
+        $request = $request->withBaseUrl('https://host');
         $requestWithJson = $request->withJson(['test' => 'test'], null);
 
         $factory = new HttpFactory();
@@ -23,13 +23,13 @@ final class RequestTest extends TestCase
     public function testWithBaseUrl(): void
     {
         $request = new Request('GET', '/test', ['test' => 'test'], null, ['test' => 'test']);
-        $requestWithBaseUrl = $request->withBaseUrl('http://host');
+        $requestWithBaseUrl = $request->withBaseUrl('https://host');
         $psrRequest = $requestWithBaseUrl->createPsr(new HttpFactory());
 
         self::assertSame(false, $request->hasBaseUrl());
         self::assertSame(true, $requestWithBaseUrl->hasBaseUrl());
         self::assertSame('GET', $psrRequest->getMethod());
-        self::assertSame('http://host/test?test=test', (string) $psrRequest->getUri());
+        self::assertSame('https://host/test?test=test', (string) $psrRequest->getUri());
         self::assertSame('', $psrRequest->getBody()->getContents());
         self::assertSame(['test'], $psrRequest->getHeader('test'));
     }

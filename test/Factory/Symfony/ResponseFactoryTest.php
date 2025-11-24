@@ -11,10 +11,9 @@ use SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory;
 final class ResponseFactoryTest extends TestCase
 {
     /**
-     * @dataProvider dataProviderMakeArray
-     *
      * @param iterable<mixed> $streamedData
      */
+    #[DataProvider('dataProviderMakeArray')]
     public function testMakeArray(string $expectedBody, iterable $streamedData): void
     {
         $response = ResponseFactory::makeArray($streamedData);

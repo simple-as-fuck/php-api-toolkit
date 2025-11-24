@@ -6,15 +6,15 @@ use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\ConnectionResolver;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\LaravelMysqlRepository;
 
-/**
- * @covers \SimpleAsFuck\ApiToolkit\Service\Webhook\LaravelMysqlRepository
- */
+#[CoversClass(LaravelMysqlRepository::class)]
 final class LaravelMysqlRepositoryTest extends TestCase
 {
     private static ConnectionResolver $connectionResolver;
@@ -61,12 +61,11 @@ final class LaravelMysqlRepositoryTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderLoadForDispatching
-     *
      * @param array<non-empty-string> $expectedUrls
      * @param non-empty-string $type
      * @param array<non-empty-string, non-empty-string> $attributes
      */
+    #[DataProvider('dataProviderLoadForDispatching')]
     public function testLoadForDispatching(array $expectedUrls, string $type, array $attributes): void
     {
         $repository = new LaravelMysqlRepository(
@@ -159,10 +158,9 @@ final class LaravelMysqlRepositoryTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderSaveAndDelete
-     *
      * @param non-empty-string $type
      */
+    #[DataProvider('dataProviderSaveAndDelete')]
     public function testSave(string $type, Params $params): void
     {
         $repository = new LaravelMysqlRepository(
@@ -208,10 +206,9 @@ final class LaravelMysqlRepositoryTest extends TestCase
     }
 
     /**
-     * @dataProvider dataProviderSaveAndDelete
-     *
      * @param non-empty-string $type
      */
+    #[DataProvider('dataProviderSaveAndDelete')]
     public function testDelete(string $type, Params $params): void
     {
         $connection = self::$connectionResolver->connection('default');

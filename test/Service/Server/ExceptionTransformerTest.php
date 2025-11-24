@@ -2,17 +2,15 @@
 
 declare(strict_types=1);
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SimpleAsFuck\ApiToolkit\Service\Server\ExceptionTransformer;
 
-/**
- * @covers \SimpleAsFuck\ApiToolkit\Service\Server\ExceptionTransformer
- */
+#[CoversClass(ExceptionTransformer::class)]
 final class ExceptionTransformerTest extends TestCase
 {
-    /**
-     * @dataProvider dataProviderToApi
-     */
+    #[DataProvider('dataProviderToApi')]
     public function testToApi(string $expectedMessage, bool $debug): void
     {
         $config = $this->createMock(SimpleAsFuck\ApiToolkit\Service\Config\Repository::class);

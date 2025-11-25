@@ -11,7 +11,6 @@ use Kayex\HttpCodes;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Result;
-use SimpleAsFuck\ApiToolkit\Service\Server\SpeedLimitService;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Nullable;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\ResultTransformer;
@@ -39,19 +38,6 @@ final class ResponseFactory
     }
 
     /**
-     * @deprecated use ResponseFactory::makeObject
-     * @template TBody
-     * @param TBody|null $body will be encoded as json
-     * @param Transformer<TBody>|null $transformer
-     * @param int<100,505> $code
-     * @param array<non-empty-string, string|array<string>> $headers
-     */
-    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
-    {
-        return self::makeObject($body, $transformer, $code, $headers);
-    }
-
-    /**
      * @template TBody
      * @param \Iterator<TBody> $body will be encoded as application/json array
      * @param Transformer<TBody>|null $transformer
@@ -60,28 +46,12 @@ final class ResponseFactory
      */
     public static function makeArray(\Iterator $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
     {
-        /** @phpstan-ignore-next-line */
-        return self::makeJsonStream($body, $transformer, $code, $headers);
-    }
-
-    /**
-     * @deprecated use ResponseFactory::makeArray
-     * @template TBody
-     * @param \Iterator<TBody> $body will be encoded as json
-     * @param Transformer<TBody>|null $transformer
-     * @param int<100,505> $code
-     * @param array<non-empty-string, string|array<string>> $headers
-     * @param float $speedLimit speed limit in KB/s for sending response slow down, zero means no slow down (this is not precise but is something)
-     */
-    public static function makeJsonStream(\Iterator $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = [], float $speedLimit = 0): ResponseInterface
-    {
         $headers['Content-Type'] = 'application/json';
         $factory = new HttpFactory();
         $response = self::makeResponse($factory, $code, $headers);
 
         $start = true;
-        $previousItemTime = \microtime(true);
-        return $response->withBody(new PumpStream(function (int $size) use ($body, $transformer, $speedLimit, &$start, &$previousItemTime): ?string {
+        return $response->withBody(new PumpStream(function (int $size) use ($body, $transformer, &$start): ?string {
             $item = '';
             if ($start) {
                 $start = false;
@@ -104,12 +74,10 @@ final class ResponseFactory
             $body->next();
             if ($body->valid()) {
                 $item .= ',';
-                SpeedLimitService::slowdownDataSending($speedLimit, strlen($item), $previousItemTime);
             } else {
                 $item .= ']';
             }
 
-            $previousItemTime = \microtime(true);
             return $item;
         }));
     }

@@ -6,7 +6,6 @@ namespace SimpleAsFuck\ApiToolkit\Factory\Symfony;
 
 use GuzzleHttp\Utils;
 use Kayex\HttpCodes;
-use SimpleAsFuck\ApiToolkit\Service\Server\SpeedLimitService;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,20 +27,6 @@ final class ResponseFactory
     }
 
     /**
-     * @deprecated use ResponseFactory::makeObject
-     * @template TBody
-     * @param TBody|null $body will be encoded as json
-     * @param Transformer<TBody>|null $transformer
-     * @param int<100,505> $code
-     * @param array<non-empty-string, string|array<string>> $headers
-     */
-    public static function makeJson(mixed $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
-    {
-        $factory = new HttpFoundationFactory();
-        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeObject($body, $transformer, $code, $headers));
-    }
-
-    /**
      * @template TBody
      * @param iterable<TBody> $body will be encoded as application/json array
      * @param Transformer<TBody>|null $transformer
@@ -50,30 +35,14 @@ final class ResponseFactory
      */
     public static function makeArray(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
     {
-        /** @phpstan-ignore-next-line */
-        return self::makeJsonStream($body, $transformer, $code, $headers);
-    }
-
-    /**
-     * @deprecated use ResponseFactory::makeArray
-     * @template TBody
-     * @param iterable<TBody> $body will be encoded as json
-     * @param Transformer<TBody>|null $transformer
-     * @param int<100,505> $code
-     * @param array<non-empty-string, string|array<string>> $headers
-     * @param float $speedLimit speed limit in KB/s for sending response slow down, zero means no slow down (this is not precise but is something)
-     */
-    public static function makeJsonStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = [], float $speedLimit = 0): StreamedResponse
-    {
         $headers['Content-Type'] = 'application/json';
         return new StreamedResponse(
-            static function () use ($body, $transformer, $speedLimit) {
+            static function () use ($body, $transformer) {
                 $dataSeparator = '';
 
                 echo '[';
 
                 foreach ($body as $responseData) {
-                    $batchSendingStartAt = \microtime(true);
                     echo $dataSeparator;
 
                     if ($transformer !== null) {
@@ -84,14 +53,13 @@ final class ResponseFactory
                     $responseData = Utils::jsonEncode($responseData);
                     echo $responseData;
 
-                    SpeedLimitService::slowdownDataSending($speedLimit, strlen($dataSeparator) + strlen($responseData), $batchSendingStartAt);
                     $dataSeparator = ',';
                 }
 
                 echo ']';
             },
             $code,
-            $headers
+            $headers,
         );
     }
 
@@ -121,10 +89,9 @@ final class ResponseFactory
     }
 
     /**
-     * @deprecated will be static
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public function makeWebhookResult(bool $stopDispatching = false, array $headers = []): Response
+    public static function makeWebhookResult(bool $stopDispatching = false, array $headers = []): Response
     {
         $factory = new HttpFoundationFactory();
         return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeWebhookResult(

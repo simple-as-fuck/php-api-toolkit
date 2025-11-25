@@ -21,6 +21,7 @@ use SimpleAsFuck\ApiToolkit\Data\Client\GoneApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\InternalServerErrorApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\NotFoundApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\ServiceUnavailableApiException;
+use SimpleAsFuck\ApiToolkit\Data\Client\StreamRules;
 use SimpleAsFuck\ApiToolkit\Data\Client\UnauthorizedApiException;
 use SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
@@ -45,7 +46,7 @@ class ApiClient
         private readonly Config $config,
         private readonly Client $client,
         private readonly RequestFactoryInterface $requestFactory,
-        private readonly ?DeprecationsLogger $deprecationsLogger = null
+        private readonly ?DeprecationsLogger $deprecationsLogger = null,
     ) {
     }
 
@@ -69,7 +70,7 @@ class ApiClient
         ?Transformer $bodyTransformer = null,
         array $headers = [],
         array $options = [],
-        int $requestJsonFlags = 0
+        int $requestJsonFlags = 0,
     ): Response {
         $request = new Request($method, $urlWithQuery, [], null, $headers);
         if ($body !== null) {
@@ -101,7 +102,7 @@ class ApiClient
         array $headers = [],
         array $options = [],
         int $requestJsonFlags = 0,
-        int $responseJsonFlags = 0
+        int $responseJsonFlags = 0,
     ): ObjectRule {
         return $this
             ->request($apiName, $method, $urlWithQuery, $body, $bodyTransformer, $headers, $options, $requestJsonFlags)
@@ -129,7 +130,44 @@ class ApiClient
         array $options = [],
         int $responseJsonFlags = 0
     ): ArrayRule {
-        return $this->waitArray($this->requestAsync($apiName, new Request($method, $url, $query, null, $headers), $options), responseJsonFlags: $responseJsonFlags);
+        return $this->waitArray(
+            $this->requestAsync(
+                $apiName,
+                new Request($method, $url, $query, null, $headers),
+                $options,
+            ),
+            responseJsonFlags: $responseJsonFlags,
+        );
+    }
+
+    /**
+     * @param non-empty-string $apiName
+     * @param non-empty-string $method
+     * @param non-empty-string $url
+     * @param array<mixed> $query
+     * @param array<non-empty-string, string|array<string>> $headers
+     * @param array<RequestOptions::*, mixed> $options
+     * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     * @throws ApiException
+     */
+    public function requestStream(
+        string $apiName,
+        string $method,
+        string $url,
+        array $query = [],
+        array $headers = [],
+        array $options = [],
+        int $responseJsonFlags = 0,
+    ): StreamRules {
+        $options[RequestOptions::STREAM] = true;
+        return $this->waitStream(
+            $this->requestAsync(
+                $apiName,
+                new Request($method, $url, $query, null, $headers),
+                $options,
+            ),
+            responseJsonFlags: $responseJsonFlags,
+        );
     }
 
     /**
@@ -244,6 +282,15 @@ class ApiClient
     public function waitArray(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): ArrayRule
     {
         return $this->waitRaw($promise)->getJson($allowInvalidJson, $responseJsonFlags)->array();
+    }
+
+    /**
+     * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     * @throws ApiException
+     */
+    public function waitStream(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): StreamRules
+    {
+        return $this->waitRaw($promise)->getJsonl($allowInvalidJson, $responseJsonFlags);
     }
 
     /**

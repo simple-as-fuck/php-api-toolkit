@@ -12,15 +12,12 @@ use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
-/** @phpstan-ignore-next-line */
-final readonly class RequestRules extends \SimpleAsFuck\ApiToolkit\Model\Server\RequestRules
+final readonly class RequestRules
 {
     public function __construct(
         private Exception $exceptionFactory,
         private ServerRequestInterface $request
     ) {
-        /** @phpstan-ignore-next-line */
-        parent::__construct($exceptionFactory, $request);
     }
 
     public function header(): HeaderRule
@@ -30,9 +27,7 @@ final readonly class RequestRules extends \SimpleAsFuck\ApiToolkit\Model\Server\
 
     public function query(): QueryRule
     {
-        /** @var Validated<array<mixed>> $validate */
-        $validate = new Validated($this->request->getQueryParams());
-        return new QueryRule($this->exceptionFactory, $validate);
+        return new QueryRule($this->exceptionFactory, new Validated($this->request->getQueryParams()));
     }
 
     /**

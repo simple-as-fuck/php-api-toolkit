@@ -9,15 +9,15 @@ namespace SimpleAsFuck\ApiToolkit\Data\Transformation;
  * @template Tout
  * @implements \Iterator<array-key, Tout>
  */
-final class Iterator implements \Iterator
+final readonly class Iterator implements \Iterator
 {
     /**
      * @param \Iterator<array-key, Tin> $iterator
      * @param callable(Tin): Tout $callable
      */
     public function __construct(
-        private readonly \Iterator $iterator,
-        private readonly mixed $callable,
+        private \Iterator $iterator,
+        private mixed $callable,
     ) {
     }
 

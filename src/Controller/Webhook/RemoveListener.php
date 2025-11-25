@@ -11,10 +11,10 @@ use SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory;
 use SimpleAsFuck\ApiToolkit\Factory\Server\Validator;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Repository;
 
-final class RemoveListener implements RequestHandlerInterface
+final readonly class RemoveListener implements RequestHandlerInterface
 {
     public function __construct(
-        private readonly Repository $repository,
+        private Repository $repository,
     ) {
     }
 

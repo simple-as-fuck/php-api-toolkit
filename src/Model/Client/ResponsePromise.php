@@ -6,15 +6,15 @@ namespace SimpleAsFuck\ApiToolkit\Model\Client;
 
 use GuzzleHttp\Promise\PromiseInterface;
 
-final class ResponsePromise
+final readonly class ResponsePromise
 {
     /**
      * @param non-empty-string $apiName
      */
     public function __construct(
-        public readonly string $apiName,
-        public readonly Request $request,
-        public readonly PromiseInterface $promise,
+        public string $apiName,
+        public Request $request,
+        public PromiseInterface $promise,
     ) {
     }
 }

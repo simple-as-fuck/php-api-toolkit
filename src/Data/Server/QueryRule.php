@@ -12,18 +12,15 @@ use SimpleAsFuck\Validator\Rule\ArrayRule\Key;
 use SimpleAsFuck\Validator\Rule\ArrayRule\StringTypedKey;
 use SimpleAsFuck\Validator\Rule\Object\ClassFromArray;
 
-/** @phpstan-ignore-next-line */
-final readonly class QueryRule extends \SimpleAsFuck\ApiToolkit\Model\Server\QueryRule
+final readonly class QueryRule
 {
     /**
-     * @param Validated<array<mixed>> $queryParams
+     * @param Validated<covariant array<mixed>> $queryParams
      */
     public function __construct(
         private Exception $exceptionFactory,
         private Validated $queryParams
     ) {
-        /** @phpstan-ignore-next-line */
-        parent::__construct($exceptionFactory, $queryParams);
     }
 
     /**
@@ -54,11 +51,9 @@ final readonly class QueryRule extends \SimpleAsFuck\ApiToolkit\Model\Server\Que
      * @template TClass of object
      * @param UserQueryRule<TClass> $userQueryRule
      * @return ClassFromArray<QueryRule, TClass>
-     * @phpstan-ignore-next-line
      */
     public function class(UserQueryRule $userQueryRule): ClassFromArray
     {
-        /** @phpstan-ignore-next-line */
         return new ClassFromArray(
             $this->exceptionFactory,
             /** @phpstan-ignore-next-line */

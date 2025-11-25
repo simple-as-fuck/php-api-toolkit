@@ -11,18 +11,18 @@ use SimpleAsFuck\Validator\Rule\Custom\UserClassRule;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 
 /**
- * @implements UserClassRule<Result&StoppableEventInterface>
- * @implements Transformer<Result&StoppableEventInterface>
+ * @implements UserClassRule<StoppableEventInterface>
+ * @implements Transformer<StoppableEventInterface>
  */
 final class ResultTransformer implements UserClassRule, Transformer
 {
-    public function validate(ObjectRule $rule): Result&StoppableEventInterface
+    public function validate(ObjectRule $rule): StoppableEventInterface
     {
         return new Result($rule->property('stopDispatching')->bool()->nullable() ?? false);
     }
 
     /**
-     * @param Result&StoppableEventInterface $transformed
+     * @param StoppableEventInterface $transformed
      */
     public function toApi($transformed): \stdClass
     {

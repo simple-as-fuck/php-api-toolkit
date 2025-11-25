@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Data\Client;
 
-/** @phpstan-ignore-next-line */
-final class UnauthorizedApiException extends \SimpleAsFuck\ApiToolkit\DataObject\Client\UnauthorizedApiException
+final class UnauthorizedApiException extends ResponseApiException
 {
 }

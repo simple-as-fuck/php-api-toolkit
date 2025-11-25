@@ -7,11 +7,11 @@ namespace SimpleAsFuck\ApiToolkit\Data\Webhook;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
 use SimpleAsFuck\Validator\Factory\Exception;
 
-final class WebhookRules
+final readonly class WebhookRules
 {
     public function __construct(
-        private readonly Exception $exception,
-        private readonly Webhook $webhook,
+        private Exception $exception,
+        private Webhook $webhook,
     ) {
     }
 

@@ -13,10 +13,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
-final class Symfony
+final readonly class Symfony
 {
     public function __construct(
-        private readonly Repository $repository,
+        private Repository $repository,
     ) {
     }
 

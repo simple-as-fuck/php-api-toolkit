@@ -12,18 +12,15 @@ use SimpleAsFuck\Validator\Rule\ArrayRule\TypedKey;
 use SimpleAsFuck\Validator\Rule\String\RegexMatch;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
-/** @phpstan-ignore-next-line */
-final class HeaderRule extends \SimpleAsFuck\ApiToolkit\Model\Server\HeaderRule
+final readonly class HeaderRule
 {
     /**
-     * @param Validated<array<array<string>>> $validated
+     * @param Validated<covariant array<array<string>>> $validated
      */
     public function __construct(
-        private readonly Exception $exceptionFactory,
-        private readonly Validated $validated,
+        private Exception $exceptionFactory,
+        private Validated $validated,
     ) {
-        /** @phpstan-ignore-next-line */
-        parent::__construct($exceptionFactory, $validated);
     }
 
     /**

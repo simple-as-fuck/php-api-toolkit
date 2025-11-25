@@ -9,14 +9,14 @@ use SimpleAsFuck\Validator\Model\RuleChain;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
-final class AttributesRule
+final readonly class AttributesRule
 {
     /**
      * @param array<non-empty-string, non-empty-string> $attributes
      */
     public function __construct(
-        private readonly Exception $exception,
-        private readonly array $attributes,
+        private Exception $exception,
+        private array $attributes,
     ) {
     }
 

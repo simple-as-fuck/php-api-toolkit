@@ -241,7 +241,6 @@ class ApiClient
                 ;
                 $problemDetail = $errorObject->class(new ProblemDetailTransformer())->nullable(true);
 
-                /** @phpstan-ignore-next-line */
                 $statusCode = $problemDetail->status ?? $response->getStatusCode();
 
                 match ($response->getStatusCode()) {
@@ -355,9 +354,7 @@ class ApiClient
     ): string {
         $messageParts = [];
 
-        /** @phpstan-ignore-next-line */
         if ($problemDetail?->type !== null) {
-            /** @phpstan-ignore-next-line */
             $messageParts[] = 'Error type: "'.$problemDetail->type.'"';
         }
         // https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members
@@ -367,14 +364,10 @@ class ApiClient
         }
 
         if (count($messageParts) === 0) {
-            /** @phpstan-ignore-next-line */
             if ($problemDetail?->title !== null) {
-                /** @phpstan-ignore-next-line */
                 $messageParts[] = 'Error title: "'.$problemDetail->title.'"';
             }
-            /** @phpstan-ignore-next-line */
             if ($problemDetail?->detail !== null) {
-                /** @phpstan-ignore-next-line */
                 $messageParts[] = 'Error detail: "'.$problemDetail->detail.'"';
             }
         }
@@ -386,9 +379,7 @@ class ApiClient
         if ($statusCode !== null) {
             $messageParts[] = 'status (' . $statusCode . ')';
         }
-        /** @phpstan-ignore-next-line */
         if ($problemDetail?->instance !== null) {
-            /** @phpstan-ignore-next-line */
             $messageParts[] = 'error instance: "' . $problemDetail->instance . '"';
         }
 

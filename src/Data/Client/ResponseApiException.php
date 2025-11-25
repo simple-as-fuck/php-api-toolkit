@@ -21,8 +21,7 @@ class ResponseApiException extends ApiException
         int $code,
         Request $request,
         Response $response,
-        /** @phpstan-ignore-next-line */
-        ProblemDetail|\SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail|null $problemDetail,
+        ?ProblemDetail $problemDetail,
         ?ObjectRule $problemDetailExtensions,
         ?\Throwable $previous = null
     ) {

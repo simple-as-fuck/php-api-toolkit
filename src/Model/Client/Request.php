@@ -14,14 +14,9 @@ use SimpleAsFuck\Validator\Rule\String\StringRule;
 final class Request
 {
     /** @var non-empty-string */
-    private string $url;
-    /** @var non-empty-string */
-    private string $method;
-    /** @var array<string, string|array<string>> */
-    private array $headers;
-    private ?StreamInterface $body;
+    private readonly string $url;
     /** @var non-empty-string|null */
-    private ?string $baseUrl;
+    private ?string $baseUrl = null;
 
     /**
      * @param non-empty-string $method
@@ -29,19 +24,20 @@ final class Request
      * @param array<mixed> $query
      * @param array<string, string|array<string>> $headers
      */
-    public function __construct(string $method, string $url, array $query = [], ?StreamInterface $body = null, array $headers = [])
-    {
+    public function __construct(
+        private readonly string $method,
+        string $url,
+        array $query = [],
+        private readonly ?StreamInterface $body = null,
+        private readonly array $headers = [],
+    ) {
         if (count($query) !== 0) {
             StringRule::make($url, 'Parameter $url')->url([], [PHP_URL_QUERY, PHP_URL_FRAGMENT])->notNull();
             $url .= '?'.\http_build_query($query, '', '&', PHP_QUERY_RFC3986);
         }
 
         StringRule::make($url, 'Parameter $url')->url([], [PHP_URL_SCHEME, PHP_URL_USER, PHP_URL_PASS, PHP_URL_HOST, PHP_URL_PORT])->notNull();
-        $this->method = $method;
         $this->url = $url;
-        $this->headers = $headers;
-        $this->body = $body;
-        $this->baseUrl = null;
     }
 
     /**

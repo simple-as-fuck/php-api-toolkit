@@ -6,10 +6,10 @@ namespace SimpleAsFuck\ApiToolkit\Model\Webhook;
 
 use Psr\EventDispatcher\StoppableEventInterface;
 
-final class Result implements StoppableEventInterface
+final readonly class Result implements StoppableEventInterface
 {
     public function __construct(
-        private readonly bool $stopDispatching,
+        private bool $stopDispatching,
     ) {
     }
 

@@ -21,7 +21,7 @@ final class HeaderRuleTest extends TestCase
             'header' => ['test'],
             'Header1' => ['test1'],
         ];
-        /** @phpstan-ignore-next-line */
+
         $this->rule = new HeaderRule(new UnexpectedValueException(), new Validated($testData));
     }
 

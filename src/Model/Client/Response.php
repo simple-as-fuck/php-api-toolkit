@@ -12,11 +12,11 @@ use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
 use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
-final class Response implements ResponseInterface
+final readonly class Response implements ResponseInterface
 {
     public function __construct(
-        private readonly Request $request,
-        private readonly ResponseInterface $response
+        private Request $request,
+        private ResponseInterface $response
     ) {
     }
 

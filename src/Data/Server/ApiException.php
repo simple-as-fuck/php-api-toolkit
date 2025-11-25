@@ -7,8 +7,7 @@ namespace SimpleAsFuck\ApiToolkit\Data\Server;
 use Kayex\HttpCodes;
 use SimpleAsFuck\ApiToolkit\Data\Common\ProblemDetail;
 
-/** @phpstan-ignore-next-line */
-class ApiException extends \SimpleAsFuck\ApiToolkit\Model\Server\ApiException
+class ApiException extends \RuntimeException
 {
     /**
      * @param non-empty-string|null $message https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members available to server and client for logging or debugging purposes MUST contain only English message
@@ -23,14 +22,13 @@ class ApiException extends \SimpleAsFuck\ApiToolkit\Model\Server\ApiException
         private readonly ?string $internalMessage = null,
         ?\Throwable $previous = null
     ) {
-        /** @phpstan-ignore-next-line */
-        parent::__construct(
-            $message,
-            $problemDetail,
-            $problemDetailExtensions,
-            $internalMessage,
-            $previous,
-        );
+        if (is_int($problemDetail)) {
+            $code = $problemDetail;
+        } else {
+            $code = $problemDetail->status ?? HttpCodes::HTTP_INTERNAL_SERVER_ERROR;
+        }
+
+        parent::__construct($message ?? '', $code, $previous);
     }
 
     public function getProblemDetail(): ?ProblemDetail

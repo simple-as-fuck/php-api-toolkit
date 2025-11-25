@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Model\Webhook;
 
-final class Params
+final readonly class Params
 {
     /**
      * @param non-empty-string $listeningUrl
@@ -12,9 +12,9 @@ final class Params
      * @param array<non-empty-string, non-empty-string> $attributes
      */
     public function __construct(
-        public readonly string $listeningUrl,
-        public readonly int $priority,
-        public readonly array $attributes
+        public string $listeningUrl,
+        public int $priority,
+        public array $attributes
     ) {
     }
 }

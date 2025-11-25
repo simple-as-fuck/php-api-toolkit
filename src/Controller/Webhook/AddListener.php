@@ -15,10 +15,10 @@ use SimpleAsFuck\ApiToolkit\Service\Webhook\ParamsTransformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Repository;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 
-final class AddListener implements RequestHandlerInterface
+final readonly class AddListener implements RequestHandlerInterface
 {
     public function __construct(
-        private readonly Repository $repository,
+        private Repository $repository,
     ) {
     }
 

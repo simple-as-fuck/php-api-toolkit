@@ -11,7 +11,7 @@ use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 
 /**
  * @implements UserClassRule<ProblemDetail>
- * @implements Transformer<ProblemDetail|\SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail>
+ * @implements Transformer<ProblemDetail>
  */
 class ProblemDetailTransformer implements UserClassRule, Transformer
 {
@@ -27,35 +27,24 @@ class ProblemDetailTransformer implements UserClassRule, Transformer
     }
 
     /**
-     * @param ProblemDetail|\SimpleAsFuck\ApiToolkit\DataObject\Common\ProblemDetail $transformed
-     * @phpstan-ignore-next-line
+     * @param ProblemDetail $transformed
      */
     public function toApi($transformed): \stdClass
     {
         $responseData = [];
-        /** @phpstan-ignore-next-line */
         if ($transformed->type !== null) {
-            /** @phpstan-ignore-next-line */
             $responseData['type'] = $transformed->type;
         }
-        /** @phpstan-ignore-next-line */
         if ($transformed->status !== null) {
-            /** @phpstan-ignore-next-line */
             $responseData['status'] = $transformed->status;
         }
-        /** @phpstan-ignore-next-line */
         if ($transformed->title !== null) {
-            /** @phpstan-ignore-next-line */
             $responseData['title'] = $transformed->title;
         }
-        /** @phpstan-ignore-next-line */
         if ($transformed->detail !== null) {
-            /** @phpstan-ignore-next-line */
             $responseData['detail'] = $transformed->detail;
         }
-        /** @phpstan-ignore-next-line */
         if ($transformed->instance !== null) {
-            /** @phpstan-ignore-next-line */
             $responseData['instance'] = $transformed->instance;
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Server;
 
-use SimpleAsFuck\ApiToolkit\Model\Server\QueryRule;
+use SimpleAsFuck\ApiToolkit\Data\Server\QueryRule;
 use SimpleAsFuck\Validator\Rule\Custom\UserArrayRule;
 
 /**

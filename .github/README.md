@@ -81,11 +81,46 @@ try {
     );
     /*
      * response has getter for json decoded body which is validated after decoding by rule chain
-     * request method return object rule, so you can easily validate response json structure
+     * request method return ObjectRule, so you can easily validate response json structure
      * is recommended use some you class rule documented here: https://github.com/simple-as-fuck/php-validator#user-class-rule
      * and convert api data structure into some your specific object instance
      */
-    $dataFromResponseBody = $responseObject->class($classRuleForResponseBody)->notNull();
+    $objectFromResponseBody = $responseObject->class($classRuleForResponseBody)->notNull();
+
+    $responseArray = $client->requestArray(
+        'some_api_name',
+        'GET',
+        '/some-list-action',
+        ['some-filter-parameter' => 15],
+        options: [\GuzzleHttp\RequestOptions::TIMEOUT => 3600],
+    );
+    /*
+     * for responses with json encoded array, method requestArray return ArrayRule
+     * allowing validation and conversion every item of array into some your instance
+     * all items of array are loaded in to RAM before validation and whole json is decoded at once
+     */
+    $arrayFromResponseBody = $responseArray->ofClass($classRuleForResponseBody)->notNull();
+
+    $responseStream = $client->requestStream(
+        'some_api_name',
+        'GET',
+        '/some-big-response-action',
+        ['some-filter-parameter' => 15],
+        options: [\GuzzleHttp\RequestOptions::TIMEOUT => 3600],
+    );
+    /*
+     * stream is response with json encoded lines separated by \n character https://jsonlines.org/
+     * allowing validation and conversion every item of stream into some your instance
+     * requestStream method return StreamRules with object iterator inside
+     * iterator holding one decoded line with small string buffer
+     * all validation and conversion into your data instance is lazy executed while you iterating or fetching data
+     * network data should be also lazy loaded, requestStream method set guzzle option to use real stream for response body
+     * https://docs.guzzlephp.org/en/stable/request-options.html#stream
+     * but if guzzle not capable of stream resource fetching, whole stream can be loaded to RAM,
+     * depends on your PHP extensions, what guzzle can use
+     * ! also beware real network stream can be loaded only once, so multiple iteration typically throw exception !
+     */
+    $streamFromResponseBody = $responseStream->ofClass($classRuleForResponseBody)->notNull();
 }
 catch (\SimpleAsFuck\ApiToolkit\Data\Client\ApiException $exception) {
     /*
@@ -139,7 +174,7 @@ $webhook = $client->addWebhookListener(
     'some_webhook_event_type',
     'https://some-client/listening-url',
     \SimpleAsFuck\ApiToolkit\Model\Webhook\Priority::NORMAL,
-    ['some_key' => '89']
+    ['some_key' => '89'],
 );
 
 // you can save webhook identifier for future use
@@ -261,6 +296,11 @@ $response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArray(n
 //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeArray(new \ArrayIterator([$yourDataForResponseBody]), $transformer);
 //$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeArray([$yourDataForResponseBody], $transformer);
 
+// response with json encoded lines separated by \n character https://jsonlines.org/
+// avoiding out of memory problem must be used some lazy loading iterator
+/** @var \Iterator<array-key, YourClass> $yourIteratorForResponseBody some iterator with big number of items */
+$response = \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeStream($yourIteratorForResponseBody, $transformer);
+//$response = \SimpleAsFuck\ApiToolkit\Factory\Symfony\ResponseFactory::makeStream($yourIteratorForResponseBody, $transformer);
 ```
 
 ### Api server middleware tools

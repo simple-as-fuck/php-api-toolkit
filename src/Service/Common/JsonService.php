@@ -30,7 +30,7 @@ class JsonService
             } else {
                 $truncated = strlen($string) > 200;
                 $logString = $truncated ? substr($string, 0, 200) : $string;
-                throw $exceptionFactory->create($stringName.' must be valid json, invalid content: \''.$logString.'\''.($truncated ? ' (truncated)' : ''));
+                throw $exceptionFactory->create($stringName.' must be valid json (' . \json_last_error_msg() . '), invalid content: \''.$logString.'\''.($truncated ? ' (truncated)' : ''));
             }
         }
 
@@ -38,6 +38,7 @@ class JsonService
     }
 
     /**
+     * https://jsonlines.org/
      * @param non-empty-string $streamName
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @return \Iterator<int, Rules>

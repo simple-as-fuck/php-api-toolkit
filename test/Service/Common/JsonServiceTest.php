@@ -33,9 +33,9 @@ final class JsonServiceTest extends TestCase
     public static function dataJsonDecodeError(): array
     {
         return [
-            ['Test body must be valid json, invalid content: \'\'', ''],
-            ['Test body must be valid json, invalid content: \'kjdfhgroigiosdiugaeiufsabdv\'', 'kjdfhgroigiosdiugaeiufsabdv'],
-            ['Test body must be valid json, invalid content: \'kjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigi\' (truncated)', 'kjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdv'],
+            ['Test body must be valid json (Syntax error), invalid content: \'\'', ''],
+            ['Test body must be valid json (Syntax error), invalid content: \'kjdfhgroigiosdiugaeiufsabdv\'', 'kjdfhgroigiosdiugaeiufsabdv'],
+            ['Test body must be valid json (Syntax error), invalid content: \'kjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigi\' (truncated)', 'kjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdvkjdfhgroigiosdiugaeiufsabdv'],
         ];
     }
 
@@ -82,13 +82,13 @@ final class JsonServiceTest extends TestCase
             [[], ''],
             [[], '', true],
 
-            [[], ' ', false, 'Stream content value 1 must be valid json, invalid content: \' \''],
+            [[], ' ', false, 'Stream content value 1 must be valid json (Syntax error), invalid content: \' \''],
             [[1 => null], ' ', true],
-            [[], "\n", false, 'Stream content value 1 must be valid json, invalid content: \'\''],
+            [[], "\n", false, 'Stream content value 1 must be valid json (Syntax error), invalid content: \'\''],
             [[1 => null], "\n", true],
-            [[], "1\n{\"test\":5}\n fuck \n[8.9]", false, 'Stream content value 3 must be valid json, invalid content: \' fuck \''],
+            [[], "1\n{\"test\":5}\n fuck \n[8.9]", false, 'Stream content value 3 must be valid json (Syntax error), invalid content: \' fuck \''],
             [[1 => 1, (object)['test' => 5], null, [8.9]], "1\n{\"test\":5}\n fuck \n[8.9 ]", true],
-            [[], "5\n\n9", false, 'Stream content value 2 must be valid json, invalid content: \'\''],
+            [[], "5\n\n9", false, 'Stream content value 2 must be valid json (Syntax error), invalid content: \'\''],
             [[1 => 5, 2 => null, 3 => 9], "5\n\n9", true],
 
             [[1 => 1, 2 => 9], "1\n9"],

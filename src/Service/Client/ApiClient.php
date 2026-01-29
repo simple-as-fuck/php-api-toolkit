@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Client;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\HttpFactory;
@@ -44,7 +44,7 @@ class ApiClient
 {
     public function __construct(
         private readonly Config $config,
-        private readonly Client $client,
+        private readonly ClientInterface $client,
         private readonly RequestFactoryInterface $requestFactory,
         private readonly ?DeprecationsLogger $deprecationsLogger = null,
     ) {

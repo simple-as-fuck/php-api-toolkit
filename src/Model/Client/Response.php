@@ -9,7 +9,7 @@ use Psr\Http\Message\StreamInterface;
 use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\StreamRules;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
-use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
+use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
 final readonly class Response implements ResponseInterface
@@ -118,7 +118,7 @@ final readonly class Response implements ResponseInterface
      */
     public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
     {
-        return JsonService::jsonDecode(
+        return Validator::json(
             $this->response->getBody()->getContents(),
             'Response body',
             new ParseResponseException($this->request, $this),
@@ -134,7 +134,7 @@ final readonly class Response implements ResponseInterface
     public function getJsonl(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): StreamRules
     {
         return new StreamRules(
-            JsonService::jsonlDecode(
+            Validator::jsonl(
                 $this->response->getBody(),
                 'Response body',
                 new ParseResponseException($this->request, $this),

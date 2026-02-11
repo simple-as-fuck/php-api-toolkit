@@ -7,7 +7,7 @@ namespace SimpleAsFuck\ApiToolkit\Service\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
-use GuzzleHttp\Psr7\HttpFactory;
+use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\RequestOptions;
 use Kayex\HttpCodes;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -229,13 +229,14 @@ class ApiClient
                 $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);
 
                 $responseContent = $response->getBody()->getContents();
-                $response = $response->withBody((new HttpFactory())->createStream($responseContent));
+                $response = $response->withBody(Utils::streamFor($responseContent));
                 $response = new Response($promise->request, $response);
 
-                $errorObject = Validator::make(
-                    \json_decode($responseContent),
+                $errorObject = Validator::json(
+                    $responseContent,
                     'Response problem detail: json',
                     new ParseResponseException($promise->request, $response),
+                    allowInvalidJson: true,
                 )
                     ->object()
                 ;

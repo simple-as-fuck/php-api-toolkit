@@ -60,7 +60,7 @@ jobs:
         run: vendor/bin/phpunit test/
 
   php83a:
-    name: "php 8.3, laravel 10, PSR message 1"
+    name: "php 8.3, laravel 10"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.3"
     services:
@@ -74,7 +74,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with illuminate/support:^10.0 --with psr/http-message:^1.1
+        run: composer update --no-interaction --prefer-lowest --with illuminate/support:^10.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse --memory-limit=-1

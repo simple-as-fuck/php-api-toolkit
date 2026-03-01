@@ -1,5 +1,6 @@
 {
     "name": "simple-as-fuck/php-api-toolkit",
+    "license": "Unlicense",
     "require": {
         "php": "^8.2",
         "ext-json": "*",

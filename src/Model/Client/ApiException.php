@@ -10,7 +10,7 @@ class ApiException extends \RuntimeException
         string $message,
         private readonly Request $request,
         private readonly ?Response $response = null,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, $response?->getStatusCode() ?? 0, $previous);
     }

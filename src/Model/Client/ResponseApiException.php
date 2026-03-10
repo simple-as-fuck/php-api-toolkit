@@ -10,7 +10,7 @@ class ResponseApiException extends ApiException
         string $message,
         Request $request,
         private readonly Response $response,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, $request, $response, $previous);
     }

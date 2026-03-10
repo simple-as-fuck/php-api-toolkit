@@ -14,7 +14,7 @@ class ApiException extends \RuntimeException
     /**
      * @param int<100,505> $httpCode
      */
-    public function __construct(string $message, int $httpCode = HttpCodes::HTTP_INTERNAL_SERVER_ERROR, \Throwable $previous = null)
+    public function __construct(string $message, int $httpCode = HttpCodes::HTTP_INTERNAL_SERVER_ERROR, ?\Throwable $previous = null)
     {
         parent::__construct($message, $httpCode, $previous);
         $this->httpCode = $httpCode;

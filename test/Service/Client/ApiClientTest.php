@@ -67,7 +67,7 @@ final class ApiClientTest extends TestCase
             [
                 BadRequestApiException::class,
                 400,
-                'Json message',
+                'API test GET / returned error: Json message',
                 '{"message":"Json message"}',
                 new RequestException(
                     'Exception message',
@@ -78,7 +78,7 @@ final class ApiClientTest extends TestCase
             [
                 BadRequestApiException::class,
                 400,
-                'Error title: "Json title"',
+                'API test GET / returned error: Error title: "Json title"',
                 '{"title":"Json title"}',
                 new RequestException(
                     'Exception message',
@@ -89,7 +89,7 @@ final class ApiClientTest extends TestCase
             [
                 BadRequestApiException::class,
                 400,
-                'Json message',
+                'API test GET / returned error: Json message',
                 '{"title":"Json title","message":"Json message"}',
                 new RequestException(
                     'Exception message',
@@ -100,7 +100,7 @@ final class ApiClientTest extends TestCase
             [
                 UnauthorizedApiException::class,
                 401,
-                'Error type: "/test/error" error instance: "/test/url"',
+                'API test GET / returned error: Error type: "/test/error" error instance: "/test/url"',
                 '{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}',
                 new RequestException(
                     'Exception message',
@@ -111,7 +111,7 @@ final class ApiClientTest extends TestCase
             [
                 ForbiddenApiException::class,
                 403,
-                'Error type: "/test/error" Json message',
+                'API test GET / returned error: Error type: "/test/error" Json message',
                 '{"type":"/test/error","message":"Json message"}',
                 new RequestException(
                     'Exception message',

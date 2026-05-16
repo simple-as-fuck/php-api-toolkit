@@ -245,15 +245,15 @@ class ApiClient
                 $statusCode = $problemDetail->status ?? $response->getStatusCode();
 
                 match ($response->getStatusCode()) {
-                    HttpCodes::HTTP_BAD_REQUEST => throw new BadRequestApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    HttpCodes::HTTP_UNAUTHORIZED => throw new UnauthorizedApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    HttpCodes::HTTP_FORBIDDEN => throw new ForbiddenApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    HttpCodes::HTTP_NOT_FOUND => throw new NotFoundApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    HttpCodes::HTTP_GONE => throw new GoneApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    HttpCodes::HTTP_SERVICE_UNAVAILABLE => throw new ServiceUnavailableApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
-                    default => throw new ResponseApiException($this->buildExceptionMessage($problemDetail, $errorObject, $exception, $response->getStatusCode()), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_BAD_REQUEST => throw new BadRequestApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_UNAUTHORIZED => throw new UnauthorizedApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_FORBIDDEN => throw new ForbiddenApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_NOT_FOUND => throw new NotFoundApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_CONFLICT => throw new ConflictApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_GONE => throw new GoneApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_INTERNAL_SERVER_ERROR => throw new InternalServerErrorApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    HttpCodes::HTTP_SERVICE_UNAVAILABLE => throw new ServiceUnavailableApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
+                    default => throw new ResponseApiException($this->buildExceptionMessage($promise, $problemDetail, $errorObject, $exception, $response->getStatusCode()), $statusCode, $promise->request, $response, $problemDetail, $errorObject, $exception),
                 };
             }
 
@@ -348,6 +348,7 @@ class ApiClient
     }
 
     private function buildExceptionMessage(
+        ResponsePromise $promise,
         ?ProblemDetail $problemDetail,
         ObjectRule $problemDetailExtensions,
         \Throwable $previous,
@@ -384,6 +385,6 @@ class ApiClient
             $messageParts[] = 'error instance: "' . $problemDetail->instance . '"';
         }
 
-        return implode(' ', $messageParts);
+        return 'API ' . $promise->apiName . ' ' . $promise->request->method() . ' ' . $promise->request->url() . ' returned error: ' . implode(' ', $messageParts);
     }
 }

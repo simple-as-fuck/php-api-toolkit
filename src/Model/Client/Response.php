@@ -113,12 +113,11 @@ final readonly class Response implements ResponseInterface
     }
 
     /**
-     * @todo 0.8 $emptyStringAsNull move to second position
      * @todo 0.8 return ParseJson insted of Rules
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0, bool $emptyStringAsNull = false): Rules
+    public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
     {
         /** @phpstan-ignore-next-line staticMethod.deprecatedClass */
         return JsonService::jsonDecode(
@@ -126,7 +125,6 @@ final readonly class Response implements ResponseInterface
             'Response body',
             new ParseResponseException($this->request, $this),
             allowInvalidJson: $allowInvalidJson,
-            emptyStringAsNull: $emptyStringAsNull,
             jsonDecodeFlags: $jsonDecodeFlags,
         );
     }

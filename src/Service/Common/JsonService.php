@@ -27,7 +27,6 @@ class JsonService
         Exception $exceptionFactory = new UnexpectedValueException(),
         bool $allowInvalidJson = false,
         int $jsonDecodeFlags = 0,
-        bool $emptyStringAsNull = false,
     ): Rules {
         return Validator::make(
             ParseJson::make(
@@ -35,7 +34,6 @@ class JsonService
                 $stringName,
                 $exceptionFactory,
                 allowInvalidJson: $allowInvalidJson,
-                emptyStringAsNull: $emptyStringAsNull,
                 jsonDecodeFlags: $jsonDecodeFlags,
             )
                 ->nullable(),

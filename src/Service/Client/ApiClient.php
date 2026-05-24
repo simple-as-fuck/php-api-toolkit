@@ -212,6 +212,7 @@ class ApiClient
     }
 
     /**
+     * @todo use ParseJson::make instead of Validator::json
      * @throws ApiException
      */
     public function waitRaw(ResponsePromise $promise): Response
@@ -272,7 +273,7 @@ class ApiClient
      */
     public function waitObject(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): ObjectRule
     {
-        return $this->waitRaw($promise)->getJson($allowInvalidJson, $responseJsonFlags)->object();
+        return $this->waitRaw($promise)->getJson(allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $responseJsonFlags)->object();
     }
 
     /**
@@ -281,7 +282,7 @@ class ApiClient
      */
     public function waitArray(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): ArrayRule
     {
-        return $this->waitRaw($promise)->getJson($allowInvalidJson, $responseJsonFlags)->array();
+        return $this->waitRaw($promise)->getJson(allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $responseJsonFlags)->array();
     }
 
     /**
@@ -290,7 +291,7 @@ class ApiClient
      */
     public function waitStream(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): StreamRules
     {
-        return $this->waitRaw($promise)->getJsonl($allowInvalidJson, $responseJsonFlags);
+        return $this->waitRaw($promise)->getJsonl(allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $responseJsonFlags);
     }
 
     /**

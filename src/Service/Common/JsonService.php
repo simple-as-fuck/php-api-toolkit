@@ -9,6 +9,7 @@ use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
 use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Rule\General\Rules;
+use SimpleAsFuck\Validator\Rule\String\ParseJson;
 
 /**
  * @deprecated use SimpleAsFuck\Validator\Factory\Validator from simple-as-fuck/php-validator
@@ -26,8 +27,22 @@ class JsonService
         Exception $exceptionFactory = new UnexpectedValueException(),
         bool $allowInvalidJson = false,
         int $jsonDecodeFlags = 0,
+        bool $emptyStringAsNull = false,
     ): Rules {
-        return Validator::json($string, $stringName, $exceptionFactory, $allowInvalidJson, $jsonDecodeFlags);
+        return Validator::make(
+            ParseJson::make(
+                $string,
+                $stringName,
+                $exceptionFactory,
+                allowInvalidJson: $allowInvalidJson,
+                emptyStringAsNull: $emptyStringAsNull,
+                jsonDecodeFlags: $jsonDecodeFlags,
+            )
+                ->nullable()
+            ,
+            $stringName . ' json',
+            $exceptionFactory,
+        );
     }
 
     /**
@@ -44,6 +59,28 @@ class JsonService
         bool $allowInvalidJson = false,
         int $jsonDecodeFlags = 0,
     ): \Iterator {
-        return Validator::jsonl($stream, $streamName, $exceptionFactory, $allowInvalidJson, $jsonDecodeFlags);
+        return new class(
+            Validator::jsonl($stream, $streamName, $exceptionFactory, allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $jsonDecodeFlags),
+            $streamName,
+            $exceptionFactory,
+        ) extends \IteratorIterator {
+            public function __construct(
+                \Iterator $iterator,
+                private readonly string $streamName,
+                private readonly Exception $exceptionFactory,
+            ) {
+                parent::__construct($iterator);
+            }
+            public function current(): Rules
+            {
+                return Validator::make(
+                    /** @phpstan-ignore-next-line method.nonObject */
+                    $this->getInnerIterator()->current()->nullable(),
+                    /** @phpstan-ignore-next-line binaryOp.invalid */
+                    $this->streamName . ' value ' . $this->getInnerIterator()->key() . ' json',
+                    $this->exceptionFactory,
+                );
+            }
+        };
     }
 }

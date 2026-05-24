@@ -6,9 +6,9 @@ namespace SimpleAsFuck\ApiToolkit\Data\Server;
 
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleAsFuck\ApiToolkit\Data\Webhook\WebhookRules;
+use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 use SimpleAsFuck\Validator\Factory\Exception;
-use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
@@ -35,7 +35,14 @@ final readonly class RequestRules
      */
     public function json(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
     {
-        return Validator::json($this->request->getBody()->getContents(), 'Request body', $this->exceptionFactory, $allowInvalidJson, $jsonDecodeFlags);
+        /** @phpstan-ignore-next-line staticMethod.deprecatedClass */
+        return JsonService::jsonDecode(
+            $this->request->getBody()->getContents(),
+            'Request body',
+            $this->exceptionFactory,
+            allowInvalidJson: $allowInvalidJson,
+            jsonDecodeFlags: $jsonDecodeFlags,
+        );
     }
 
     /**

@@ -9,7 +9,7 @@ use Psr\Http\Message\StreamInterface;
 use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\StreamRules;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
-use SimpleAsFuck\Validator\Factory\Validator;
+use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 
 final readonly class Response implements ResponseInterface
@@ -113,33 +113,39 @@ final readonly class Response implements ResponseInterface
     }
 
     /**
+     * @todo 0.8 $emptyStringAsNull move to second position
+     * @todo 0.8 return ParseJson insted of Rules
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
+    public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0, bool $emptyStringAsNull = false): Rules
     {
-        return Validator::json(
+        /** @phpstan-ignore-next-line staticMethod.deprecatedClass */
+        return JsonService::jsonDecode(
             $this->response->getBody()->getContents(),
             'Response body',
             new ParseResponseException($this->request, $this),
-            $allowInvalidJson,
-            $jsonDecodeFlags
+            allowInvalidJson: $allowInvalidJson,
+            emptyStringAsNull: $emptyStringAsNull,
+            jsonDecodeFlags: $jsonDecodeFlags,
         );
     }
 
     /**
+     * @todo 0.8 use Validator::jsonl instead of JsonService::jsonlDecode or anothe update
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
     public function getJsonl(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): StreamRules
     {
         return new StreamRules(
-            Validator::jsonl(
+            /** @phpstan-ignore-next-line staticMethod.deprecatedClass */
+            JsonService::jsonlDecode(
                 $this->response->getBody(),
                 'Response body',
                 new ParseResponseException($this->request, $this),
-                $allowInvalidJson,
-                $jsonDecodeFlags,
+                allowInvalidJson: $allowInvalidJson,
+                jsonDecodeFlags: $jsonDecodeFlags,
             ),
         );
     }

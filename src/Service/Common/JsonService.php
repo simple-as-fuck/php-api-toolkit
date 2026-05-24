@@ -38,8 +38,7 @@ class JsonService
                 emptyStringAsNull: $emptyStringAsNull,
                 jsonDecodeFlags: $jsonDecodeFlags,
             )
-                ->nullable()
-            ,
+                ->nullable(),
             $stringName . ' json',
             $exceptionFactory,
         );
@@ -59,7 +58,7 @@ class JsonService
         bool $allowInvalidJson = false,
         int $jsonDecodeFlags = 0,
     ): \Iterator {
-        return new class(
+        return new class (
             Validator::jsonl($stream, $streamName, $exceptionFactory, allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $jsonDecodeFlags),
             $streamName,
             $exceptionFactory,

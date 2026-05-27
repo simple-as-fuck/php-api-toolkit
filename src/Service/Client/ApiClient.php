@@ -35,9 +35,9 @@ use SimpleAsFuck\ApiToolkit\Service\Common\ProblemDetailTransformer;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\ParamsTransformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
-use SimpleAsFuck\Validator\Factory\Validator;
 use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
+use SimpleAsFuck\Validator\Rule\String\ParseJson;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
 class ApiClient
@@ -103,11 +103,18 @@ class ApiClient
         array $options = [],
         int $requestJsonFlags = 0,
         int $responseJsonFlags = 0,
+        bool $responseAllowInvalidJson = false,
+        bool $responseEmptyStringAsNull = false,
     ): ObjectRule {
         return $this
             ->request($apiName, $method, $urlWithQuery, $body, $bodyTransformer, $headers, $options, $requestJsonFlags)
-            ->getJson(jsonDecodeFlags: $responseJsonFlags)
+            ->getJson(
+                allowInvalidJson: $responseAllowInvalidJson,
+                emptyStringAsNull: $responseEmptyStringAsNull,
+                jsonDecodeFlags: $responseJsonFlags,
+            )
             ->object()
+            ->cache()
         ;
     }
 
@@ -128,7 +135,9 @@ class ApiClient
         array $query = [],
         array $headers = [],
         array $options = [],
-        int $responseJsonFlags = 0
+        int $responseJsonFlags = 0,
+        bool $responseAllowInvalidJson = false,
+        bool $responseEmptyStringAsNull = false,
     ): ArrayRule {
         return $this->waitArray(
             $this->requestAsync(
@@ -137,6 +146,8 @@ class ApiClient
                 $options,
             ),
             responseJsonFlags: $responseJsonFlags,
+            responseAllowInvalidJson: $responseAllowInvalidJson,
+            responseEmptyStringAsNull: $responseEmptyStringAsNull,
         );
     }
 
@@ -148,6 +159,7 @@ class ApiClient
      * @param array<non-empty-string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
      * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     * @return StreamRules<ParseJson>
      * @throws ApiException
      */
     public function requestStream(
@@ -158,6 +170,8 @@ class ApiClient
         array $headers = [],
         array $options = [],
         int $responseJsonFlags = 0,
+        bool $responseAllowInvalidJson = false,
+        bool $responseEmptyStringAsNull = false,
     ): StreamRules {
         $options[RequestOptions::STREAM] = true;
         return $this->waitStream(
@@ -167,6 +181,8 @@ class ApiClient
                 $options,
             ),
             responseJsonFlags: $responseJsonFlags,
+            responseAllowInvalidJson: $responseAllowInvalidJson,
+            responseEmptyStringAsNull: $responseEmptyStringAsNull,
         );
     }
 
@@ -212,7 +228,6 @@ class ApiClient
     }
 
     /**
-     * @todo use ParseJson::make instead of Validator::json
      * @throws ApiException
      */
     public function waitRaw(ResponsePromise $promise): Response
@@ -233,15 +248,16 @@ class ApiClient
                 $response = $response->withBody(Utils::streamFor($responseContent));
                 $response = new Response($promise->request, $response);
 
-                $errorObject = Validator::json(
+                $errorObject = ParseJson::make(
                     $responseContent,
-                    'Response problem detail: json',
+                    'Response problem detail',
                     new ParseResponseException($promise->request, $response),
                     allowInvalidJson: true,
                 )
                     ->object()
+                    ->cache()
                 ;
-                $problemDetail = $errorObject->class(new ProblemDetailTransformer())->nullable(true);
+                $problemDetail = $errorObject->class(new ProblemDetailTransformer())->nullable(failAsNull: true);
 
                 $statusCode = $problemDetail->status ?? $response->getStatusCode();
 
@@ -271,27 +287,65 @@ class ApiClient
      * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function waitObject(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): ObjectRule
-    {
-        return $this->waitRaw($promise)->getJson(allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $responseJsonFlags)->object();
+    public function waitObject(
+        ResponsePromise $promise,
+        int $responseJsonFlags = 0,
+        bool $responseAllowInvalidJson = false,
+        bool $responseEmptyStringAsNull = false,
+    ): ObjectRule {
+        return $this
+            ->waitRaw($promise)
+            ->getJson(
+                allowInvalidJson: $responseAllowInvalidJson,
+                emptyStringAsNull: $responseEmptyStringAsNull,
+                jsonDecodeFlags: $responseJsonFlags,
+            )
+            ->object()
+            ->cache()
+        ;
     }
 
     /**
      * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function waitArray(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): ArrayRule
-    {
-        return $this->waitRaw($promise)->getJson(allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $responseJsonFlags)->array();
+    public function waitArray(
+        ResponsePromise $promise,
+        int $responseJsonFlags = 0,
+        bool $responseAllowInvalidJson = false,
+        bool $responseEmptyStringAsNull = false,
+    ): ArrayRule {
+        return $this
+            ->waitRaw($promise)
+            ->getJson(
+                allowInvalidJson: $responseAllowInvalidJson,
+                emptyStringAsNull: $responseEmptyStringAsNull,
+                jsonDecodeFlags: $responseJsonFlags,
+            )
+            ->array()
+            ->cache()
+        ;
     }
 
     /**
      * @param int $responseJsonFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     * @return StreamRules<ParseJson>
      * @throws ApiException
      */
-    public function waitStream(ResponsePromise $promise, bool $allowInvalidJson = false, int $responseJsonFlags = 0): StreamRules
-    {
-        return $this->waitRaw($promise)->getJsonl(allowInvalidJson: $allowInvalidJson, jsonDecodeFlags: $responseJsonFlags);
+    public function waitStream(
+        ResponsePromise $promise,
+        int $responseJsonFlags = 0,
+        bool $responseAllowInvalidJson = false,
+        bool $responseEmptyStringAsNull = false,
+    ): StreamRules {
+        return $this
+            ->waitRaw($promise)
+            ->getJsonl(
+                allowInvalidJson: $responseAllowInvalidJson,
+                emptyStringAsNull: $responseEmptyStringAsNull,
+                jsonDecodeFlags: $responseJsonFlags,
+            )
+        ;
     }
 
     /**
@@ -315,7 +369,9 @@ class ApiClient
         array $requestHeaders = [],
         array $requestOptions = [],
         int $requestJsonFlags = 0,
-        int $responseJsonFlags = 0
+        int $responseJsonFlags = 0,
+        bool $responseAllowInvalidJson = false,
+        bool $responseEmptyStringAsNull = false,
     ): Webhook {
         return $this->requestObject(
             $apiName,
@@ -329,8 +385,10 @@ class ApiClient
             new ParamsTransformer(),
             $requestHeaders,
             $requestOptions,
-            $requestJsonFlags,
-            $responseJsonFlags,
+            requestJsonFlags: $requestJsonFlags,
+            responseJsonFlags: $responseJsonFlags,
+            responseAllowInvalidJson: $responseAllowInvalidJson,
+            responseEmptyStringAsNull: $responseEmptyStringAsNull,
         )
             ->class(new WebhookTransformer())->notNull()
         ;
@@ -361,7 +419,7 @@ class ApiClient
             $messageParts[] = 'Error type: "'.$problemDetail->type.'"';
         }
         // https://datatracker.ietf.org/doc/html/rfc9457#name-extension-members
-        $extensionMessage = $problemDetailExtensions->property('message')->string()->notEmpty()->nullable(true);
+        $extensionMessage = $problemDetailExtensions->property('message')->string()->notEmpty()->nullable(failAsNull: true);
         if ($extensionMessage !== null) {
             $messageParts[] = $extensionMessage;
         }

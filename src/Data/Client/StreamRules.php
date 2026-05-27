@@ -6,13 +6,18 @@ namespace SimpleAsFuck\ApiToolkit\Data\Client;
 
 use SimpleAsFuck\ApiToolkit\Data\Transformation\Iterator;
 use SimpleAsFuck\Validator\Rule\Custom\UserClassRule;
+use SimpleAsFuck\Validator\Rule\General\Rule;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
+use SimpleAsFuck\Validator\Rule\String\ParseJson;
 
+/**
+ * @template TRule of Rules|ParseJson
+ */
 final readonly class StreamRules
 {
     /**
-     * @param \Iterator<int, Rules> $iterator
+     * @param \Iterator<int, TRule> $iterator
      */
     public function __construct(
         private \Iterator $iterator,
@@ -24,12 +29,12 @@ final readonly class StreamRules
      */
     public function notNull(): \Iterator
     {
-        return new Iterator($this->iterator, static fn (Rules $rules): mixed => $rules->nullable());
+        return new Iterator($this->iterator, static fn (Rule $rule): mixed => $rule->nullable());
     }
 
     /**
      * @template TMapped
-     * @param callable(Rules): TMapped $callable
+     * @param callable(TRule): TMapped $callable
      * @return Stream<TMapped>
      */
     public function of(callable $callable): Stream
@@ -44,7 +49,7 @@ final readonly class StreamRules
      */
     public function ofClass(UserClassRule $rule): Stream
     {
-        return $this->of(static fn (Rules $rules): object => $rules->object()->class($rule)->notNull());
+        return $this->of(static fn (Rule $rules): object => $rules->object()->class($rule)->notNull());
     }
 
     /**
@@ -52,7 +57,7 @@ final readonly class StreamRules
      */
     public function ofObject(): Stream
     {
-        return $this->of(static fn (Rules $rules): object => $rules->object());
+        return $this->of(static fn (Rule $rule): object => $rule->object());
     }
 
     public function valid(): bool
@@ -60,7 +65,10 @@ final readonly class StreamRules
         return $this->iterator->valid();
     }
 
-    public function fetch(): Rules
+    /**
+     * @return TRule
+     */
+    public function fetch(): Rule
     {
         $rules = $this->iterator->current();
         $this->iterator->next();

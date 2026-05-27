@@ -9,8 +9,8 @@ use Psr\Http\Message\StreamInterface;
 use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\StreamRules;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
-use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
-use SimpleAsFuck\Validator\Rule\General\Rules;
+use SimpleAsFuck\Validator\Factory\Validator;
+use SimpleAsFuck\Validator\Rule\String\ParseJson;
 
 final readonly class Response implements ResponseInterface
 {
@@ -20,36 +20,29 @@ final readonly class Response implements ResponseInterface
     ) {
     }
 
-    /**
-     * @param string $version
-     */
-    public function withProtocolVersion($version): self
+    public function withProtocolVersion(string $version): self
     {
         return new self($this->request, $this->response->withProtocolVersion($version));
     }
 
     /**
-     * @param string $name
-     * @param string|string[] $value
+     * @param string|array<string> $value
      */
-    public function withHeader($name, $value): self
+    public function withHeader(string $name, $value): self
     {
         return new self($this->request, $this->response->withHeader($name, $value));
     }
 
     /**
      * @param string $name
-     * @param string|string[] $value
+     * @param string|array<string> $value
      */
-    public function withAddedHeader($name, $value): self
+    public function withAddedHeader(string $name, $value): self
     {
         return new self($this->request, $this->response->withAddedHeader($name, $value));
     }
 
-    /**
-     * @param string $name
-     */
-    public function withoutHeader($name): self
+    public function withoutHeader(string $name): self
     {
         return new self($this->request, $this->response->withoutHeader($name));
     }
@@ -59,11 +52,7 @@ final readonly class Response implements ResponseInterface
         return new self($this->request, $this->response->withBody($body));
     }
 
-    /**
-     * @param int $code
-     * @param string $reasonPhrase
-     */
-    public function withStatus($code, $reasonPhrase = ''): self
+    public function withStatus(int $code, string $reasonPhrase = ''): self
     {
         return new self($this->request, $this->response->withStatus($code, $reasonPhrase));
     }
@@ -82,27 +71,20 @@ final readonly class Response implements ResponseInterface
         return $this->response->getHeaders();
     }
 
-    /**
-     * @param string $name
-     */
-    public function hasHeader($name): bool
+    public function hasHeader(string $name): bool
     {
         return $this->response->hasHeader($name);
     }
 
     /**
-     * @param string $name
      * @return array<string>
      */
-    public function getHeader($name): array
+    public function getHeader(string $name): array
     {
         return $this->response->getHeader($name);
     }
 
-    /**
-     * @param string $name
-     */
-    public function getHeaderLine($name): string
+    public function getHeaderLine(string $name): string
     {
         return $this->response->getHeaderLine($name);
     }
@@ -113,36 +95,43 @@ final readonly class Response implements ResponseInterface
     }
 
     /**
-     * @todo 0.8 return ParseJson insted of Rules
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
      */
-    public function getJson(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
-    {
-        /** @phpstan-ignore-next-line staticMethod.deprecatedClass */
-        return JsonService::jsonDecode(
+    public function getJson(
+        bool $allowInvalidJson = false,
+        bool $emptyStringAsNull = false,
+        int $jsonDecodeFlags = 0,
+    ): ParseJson {
+        return ParseJson::make(
             $this->response->getBody()->getContents(),
             'Response body',
             new ParseResponseException($this->request, $this),
             allowInvalidJson: $allowInvalidJson,
+            emptyStringAsNull: $emptyStringAsNull,
             jsonDecodeFlags: $jsonDecodeFlags,
-        );
+        )
+            ->cache()
+        ;
     }
 
     /**
-     * @todo 0.8 use Validator::jsonl instead of JsonService::jsonlDecode or anothe update
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     * @return StreamRules<ParseJson>
      * @throws ApiException
      */
-    public function getJsonl(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): StreamRules
-    {
+    public function getJsonl(
+        bool $allowInvalidJson = false,
+        bool $emptyStringAsNull = false,
+        int $jsonDecodeFlags = 0,
+    ): StreamRules {
         return new StreamRules(
-            /** @phpstan-ignore-next-line staticMethod.deprecatedClass */
-            JsonService::jsonlDecode(
+            Validator::jsonl(
                 $this->response->getBody(),
                 'Response body',
                 new ParseResponseException($this->request, $this),
                 allowInvalidJson: $allowInvalidJson,
+                emptyStringAsNull: $emptyStringAsNull,
                 jsonDecodeFlags: $jsonDecodeFlags,
             ),
         );

@@ -6,11 +6,11 @@ namespace SimpleAsFuck\ApiToolkit\Data\Server;
 
 use Psr\Http\Message\ServerRequestInterface;
 use SimpleAsFuck\ApiToolkit\Data\Webhook\WebhookRules;
-use SimpleAsFuck\ApiToolkit\Service\Common\JsonService;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 use SimpleAsFuck\Validator\Factory\Exception;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\General\Rules;
+use SimpleAsFuck\Validator\Rule\String\ParseJson;
 
 final readonly class RequestRules
 {
@@ -33,14 +33,17 @@ final readonly class RequestRules
     /**
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      */
-    public function json(bool $allowInvalidJson = false, int $jsonDecodeFlags = 0): Rules
-    {
-        /** @phpstan-ignore-next-line staticMethod.deprecatedClass */
-        return JsonService::jsonDecode(
+    public function json(
+        bool $allowInvalidJson = false,
+        bool $emptyStringAsNull = false,
+        int $jsonDecodeFlags = 0,
+    ): ParseJson {
+        return ParseJson::make(
             $this->request->getBody()->getContents(),
             'Request body',
             $this->exceptionFactory,
             allowInvalidJson: $allowInvalidJson,
+            emptyStringAsNull: $emptyStringAsNull,
             jsonDecodeFlags: $jsonDecodeFlags,
         );
     }

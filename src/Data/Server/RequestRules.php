@@ -45,7 +45,9 @@ final readonly class RequestRules
             allowInvalidJson: $allowInvalidJson,
             emptyStringAsNull: $emptyStringAsNull,
             jsonDecodeFlags: $jsonDecodeFlags,
-        );
+        )
+            ->cache()
+        ;
     }
 
     /**

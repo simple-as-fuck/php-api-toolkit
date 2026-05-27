@@ -19,7 +19,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^13.0 --with psr/log:^3.0 --with symfony/http-foundation:^8.0 --with symfony/http-kernel:^8.0 --with symfony/psr-http-message-bridge:^8.0 --with simple-as-fuck/php-validator:^0.8
@@ -42,7 +42,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install tools
         run: phive install --trust-gpg-keys E82B2FB314E9906E,4AA394086372C20A
@@ -60,7 +60,7 @@ jobs:
         run: vendor/bin/phpunit test/
 
   php84a:
-    name: "php 8.4, laravel 12, validator 0.7"
+    name: "php 8.4, laravel 12"
     runs-on: ubuntu-latest
     container: "nofutur3/php-tests:8.4"
     services:
@@ -71,10 +71,10 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-lowest --with illuminate/support:^12.0 --with simple-as-fuck/php-validator:^0.7.16
+        run: composer update --no-interaction --prefer-lowest --with illuminate/support:^12.0
 
       - name: Run static analysis
         run: vendor/bin/phpstan analyse --memory-limit=-1
@@ -94,7 +94,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest
@@ -117,7 +117,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^10.0
@@ -140,7 +140,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^11.0 --with symfony/http-foundation:^7.0 --with symfony/http-kernel:^7.0 --with symfony/psr-http-message-bridge:^7.0
@@ -163,7 +163,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest
@@ -186,7 +186,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^9.0 --with psr/log:^2.0 --with symfony/http-foundation:^6.0 --with symfony/http-kernel:^6.0 --with symfony/psr-http-message-bridge:^6.0
@@ -209,7 +209,7 @@ jobs:
           MYSQL_DATABASE: database
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: composer update --no-interaction --prefer-lowest --with illuminate/support:^8.81 --with symfony/http-kernel:^5.4 --with symfony/http-foundation:^5.4 --with symfony/psr-http-message-bridge:^2.1

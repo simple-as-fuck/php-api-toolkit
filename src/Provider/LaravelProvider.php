@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Provider;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Http\Client\Factory;
@@ -45,6 +46,7 @@ class LaravelProvider extends ServiceProvider
 
             /** @var Factory $httpFactory */
             $httpFactory = $this->app->make(Factory::class);
+            /** @var Client $httpClient */
             /** @phpstan-ignore-next-line staticMethod.dynamicCall */
             $httpClient = $httpFactory->buildClient();
             /** @var RequestFactoryInterface $requestFactory */
@@ -60,6 +62,7 @@ class LaravelProvider extends ServiceProvider
             $configAdapter = $this->app->make(LaravelAdapter::class);
             /** @var Factory $httpFactory */
             $httpFactory = $this->app->make(Factory::class);
+            /** @var Client $httpClient */
             /** @phpstan-ignore-next-line staticMethod.dynamicCall */
             $httpClient = $httpFactory->buildClient();
 

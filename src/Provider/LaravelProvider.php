@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Provider;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Http\Client\Factory;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\ServiceProvider;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -43,12 +43,14 @@ class LaravelProvider extends ServiceProvider
                 $deprecationLogger = null;
             }
 
-            /** @var Client $client */
-            $client = $this->app->make(Client::class);
+            /** @var Factory $httpFactory */
+            $httpFactory = $this->app->make(Factory::class);
+            /** @phpstan-ignore-next-line staticMethod.dynamicCall */
+            $httpClient = $httpFactory->buildClient();
             /** @var RequestFactoryInterface $requestFactory */
             $requestFactory = $this->app->make(RequestFactoryInterface::class);
 
-            return new ApiClient($apiConfig, $client, $requestFactory, $deprecationLogger);
+            return new ApiClient($apiConfig, $httpClient, $requestFactory, $deprecationLogger);
         });
 
         $this->app->singleton(WebhookClient::class, function (): WebhookClient {
@@ -56,8 +58,10 @@ class LaravelProvider extends ServiceProvider
             $webhookConfig = $this->app->make(WebhookConfig::class);
             /** @var LaravelAdapter $configAdapter */
             $configAdapter = $this->app->make(LaravelAdapter::class);
-            /** @var Client $httpClient */
-            $httpClient = $this->app->make(Client::class);
+            /** @var Factory $httpFactory */
+            $httpFactory = $this->app->make(Factory::class);
+            /** @phpstan-ignore-next-line staticMethod.dynamicCall */
+            $httpClient = $httpFactory->buildClient();
 
             /** @var LogManager $logManager */
             $logManager = $this->app->make(LogManager::class);

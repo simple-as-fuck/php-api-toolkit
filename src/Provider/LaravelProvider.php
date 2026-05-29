@@ -46,9 +46,12 @@ class LaravelProvider extends ServiceProvider
 
             /** @var Factory $httpFactory */
             $httpFactory = $this->app->make(Factory::class);
-            /** @var Client $httpClient */
-            /** @phpstan-ignore-next-line staticMethod.dynamicCall */
-            $httpClient = $httpFactory->buildClient();
+            $httpClient = new Client([
+                /** @phpstan-ignore-next-line staticMethod.dynamicCall */
+                'handler' => $httpFactory->buildHandlerStack(),
+                'laravel_data' => [], // laravel imbeciles
+            ]);
+
             /** @var RequestFactoryInterface $requestFactory */
             $requestFactory = $this->app->make(RequestFactoryInterface::class);
 
@@ -60,11 +63,14 @@ class LaravelProvider extends ServiceProvider
             $webhookConfig = $this->app->make(WebhookConfig::class);
             /** @var LaravelAdapter $configAdapter */
             $configAdapter = $this->app->make(LaravelAdapter::class);
+
             /** @var Factory $httpFactory */
             $httpFactory = $this->app->make(Factory::class);
-            /** @var Client $httpClient */
-            /** @phpstan-ignore-next-line staticMethod.dynamicCall */
-            $httpClient = $httpFactory->buildClient();
+            $httpClient = new Client([
+                /** @phpstan-ignore-next-line staticMethod.dynamicCall */
+                'handler' => $httpFactory->buildHandlerStack(),
+                'laravel_data' => [], // laravel imbeciles
+            ]);
 
             /** @var LogManager $logManager */
             $logManager = $this->app->make(LogManager::class);

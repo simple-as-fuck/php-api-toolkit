@@ -65,6 +65,45 @@ final class ResponseFactory
 
     /**
      * @template TBody
+     * @param iterable<array-key, TBody> $body will be encoded as application/json object to preserve keys as properties in response
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeArrayAssoc(
+        iterable $body,
+        ?Transformer $transformer = null,
+        int $code = HttpCodes::HTTP_OK,
+        array $headers = [],
+    ): StreamedResponse {
+        $headers['Content-Type'] = 'application/json';
+        return new StreamedResponse(
+            static function () use ($body, $transformer) {
+                $dataSeparator = '';
+
+                echo '{';
+
+                foreach ($body as $key => $responseData) {
+                    echo $dataSeparator;
+
+                    if ($transformer !== null) {
+                        $responseData = $transformer->toApi($responseData);
+                    }
+
+                    echo Utils::jsonEncode((string) $key) . ':' . Utils::jsonEncode($responseData);
+
+                    $dataSeparator = ',';
+                }
+
+                echo '}';
+            },
+            $code,
+            $headers,
+        );
+    }
+
+    /**
+     * @template TBody
      * @param iterable<TBody> $body will be encoded as application/jsonl https://jsonlines.org/
      * @param Transformer<TBody>|null $transformer
      * @param int<100,505> $code

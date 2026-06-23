@@ -25,8 +25,30 @@ final class ResponseFactoryTest extends TestCase
     public static function dataProviderMakeArray(): array
     {
         return [
-            ['[548846,"sadasjkfghjsg"]', [548846, 'sadasjkfghjsg']],
+            ['[548846,"sadasjkfghjsg"]', [548846, 'test' => 'sadasjkfghjsg']],
             ['[]', []],
+        ];
+    }
+
+    /**
+     * @param \Iterator<array-key, mixed> $streamedData
+     */
+    #[DataProvider('dataProviderMakeArrayAssoc')]
+    public function testMakeArrayAssoc(string $expectedBody, \Iterator $streamedData): void
+    {
+        $response = ResponseFactory::makeArrayAssoc($streamedData);
+
+        self::assertSame($expectedBody, $response->getBody()->getContents());
+    }
+
+    /**
+     * @return array<array<mixed>>
+     */
+    public static function dataProviderMakeArrayAssoc(): array
+    {
+        return [
+            ['{"0":548846,"test":"sadasjkfghjsg"}', new \ArrayIterator([548846, 'test' => 'sadasjkfghjsg'])],
+            ['{}', new \ArrayIterator()],
         ];
     }
 

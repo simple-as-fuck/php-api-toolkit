@@ -51,7 +51,7 @@ final class ResponseFactory
         $response = self::makeResponse($factory, $code, $headers);
 
         $start = true;
-        return $response->withBody(new PumpStream(function (int $size) use ($body, $transformer, &$start): ?string {
+        return $response->withBody(new PumpStream(function () use ($body, $transformer, &$start): ?string {
             $item = '';
             if ($start) {
                 $start = false;
@@ -76,6 +76,51 @@ final class ResponseFactory
                 $item .= ',';
             } else {
                 $item .= ']';
+            }
+
+            return $item;
+        }));
+    }
+
+    /**
+     * @template TBody
+     * @param \Iterator<array-key, TBody> $body will be encoded as application/json object to preserve keys as properties in response
+     * @param Transformer<TBody>|null $transformer
+     * @param int<100,505> $code
+     * @param array<non-empty-string, string|array<string>> $headers
+     */
+    public static function makeArrayAssoc(\Iterator $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): ResponseInterface
+    {
+        $headers['Content-Type'] = 'application/json';
+        $factory = new HttpFactory();
+        $response = self::makeResponse($factory, $code, $headers);
+
+        $start = true;
+        return $response->withBody(new PumpStream(function () use ($body, $transformer, &$start): ?string {
+            $item = '';
+            if ($start) {
+                $start = false;
+                if (! $body->valid()) {
+                    return '{}';
+                }
+                $item = '{';
+            }
+
+            if (! $body->valid()) {
+                return null;
+            }
+
+            $responseData = $body->current();
+            if ($transformer !== null) {
+                $responseData = $transformer->toApi($responseData);
+            }
+
+            $item .= Utils::jsonEncode((string) $body->key()) . ':' . Utils::jsonEncode($responseData);
+            $body->next();
+            if ($body->valid()) {
+                $item .= ',';
+            } else {
+                $item .= '}';
             }
 
             return $item;

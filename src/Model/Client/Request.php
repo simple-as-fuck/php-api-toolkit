@@ -77,7 +77,7 @@ final class Request
 
         $headers = $this->headers;
         $headers['Content-Type'] = 'application/json';
-        $stream = Utils::streamFor(\GuzzleHttp\Utils::jsonEncode($jsonData, $jsonEncodeFlags));
+        $stream = Utils::streamFor(\json_encode($jsonData, $jsonEncodeFlags | \JSON_THROW_ON_ERROR));
         $request = new self($this->method, $this->url, [], $stream, $headers);
         $request->baseUrl = $this->baseUrl;
         return $request;

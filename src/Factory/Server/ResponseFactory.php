@@ -6,7 +6,6 @@ namespace SimpleAsFuck\ApiToolkit\Factory\Server;
 
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\PumpStream;
-use GuzzleHttp\Utils;
 use Kayex\HttpCodes;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -34,7 +33,7 @@ final class ResponseFactory
             $body = Nullable::toApi($body, $transformer);
         }
 
-        return $response->withBody($factory->createStream(Utils::jsonEncode($body)));
+        return $response->withBody($factory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
     }
 
     /**
@@ -70,7 +69,7 @@ final class ResponseFactory
                 $responseData = $transformer->toApi($responseData);
             }
 
-            $item .= Utils::jsonEncode($responseData);
+            $item .= \json_encode($responseData, \JSON_THROW_ON_ERROR);
             $body->next();
             if ($body->valid()) {
                 $item .= ',';
@@ -115,7 +114,7 @@ final class ResponseFactory
                 $responseData = $transformer->toApi($responseData);
             }
 
-            $item .= Utils::jsonEncode((string) $body->key()) . ':' . Utils::jsonEncode($responseData);
+            $item .= \json_encode((string) $body->key(), \JSON_THROW_ON_ERROR) . ':' . \json_encode($responseData, \JSON_THROW_ON_ERROR);
             $body->next();
             if ($body->valid()) {
                 $item .= ',';
@@ -151,7 +150,7 @@ final class ResponseFactory
                 $responseData = $transformer->toApi($responseData);
             }
 
-            return Utils::jsonEncode($responseData) . "\n";
+            return \json_encode($responseData, \JSON_THROW_ON_ERROR) . "\n";
         }));
     }
 

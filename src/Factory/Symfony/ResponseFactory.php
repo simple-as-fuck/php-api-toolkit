@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Factory\Symfony;
 
-use GuzzleHttp\Utils;
 use Kayex\HttpCodes;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
@@ -50,7 +49,7 @@ final class ResponseFactory
                     }
 
                     /** @var non-empty-string $responseData */
-                    $responseData = Utils::jsonEncode($responseData);
+                    $responseData = \json_encode($responseData, \JSON_THROW_ON_ERROR);
                     echo $responseData;
 
                     $dataSeparator = ',';
@@ -90,7 +89,7 @@ final class ResponseFactory
                         $responseData = $transformer->toApi($responseData);
                     }
 
-                    echo Utils::jsonEncode((string) $key) . ':' . Utils::jsonEncode($responseData);
+                    echo \json_encode((string) $key, \JSON_THROW_ON_ERROR) . ':' . \json_encode($responseData, \JSON_THROW_ON_ERROR);
 
                     $dataSeparator = ',';
                 }
@@ -119,7 +118,7 @@ final class ResponseFactory
                         $responseData = $transformer->toApi($responseData);
                     }
 
-                    echo Utils::jsonEncode($responseData) . "\n";
+                    echo \json_encode($responseData, \JSON_THROW_ON_ERROR) . "\n";
                 }
             },
             $code,

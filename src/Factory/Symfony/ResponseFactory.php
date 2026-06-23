@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Factory\Symfony;
 
 use Kayex\HttpCodes;
+use SimpleAsFuck\ApiToolkit\Service\Transformation\NotNull;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,15 +43,7 @@ final class ResponseFactory
                 echo '[';
 
                 foreach ($body as $responseData) {
-                    echo $dataSeparator;
-
-                    if ($transformer !== null) {
-                        $responseData = $transformer->toApi($responseData);
-                    }
-
-                    /** @var non-empty-string $responseData */
-                    $responseData = \json_encode($responseData, \JSON_THROW_ON_ERROR);
-                    echo $responseData;
+                    echo $dataSeparator . \json_encode(NotNull::toApi($responseData, $transformer), \JSON_THROW_ON_ERROR);
 
                     $dataSeparator = ',';
                 }
@@ -83,13 +76,7 @@ final class ResponseFactory
                 echo '{';
 
                 foreach ($body as $key => $responseData) {
-                    echo $dataSeparator;
-
-                    if ($transformer !== null) {
-                        $responseData = $transformer->toApi($responseData);
-                    }
-
-                    echo \json_encode((string) $key, \JSON_THROW_ON_ERROR) . ':' . \json_encode($responseData, \JSON_THROW_ON_ERROR);
+                    echo $dataSeparator . \json_encode((string) $key, \JSON_THROW_ON_ERROR) . ':' . \json_encode(NotNull::toApi($responseData, $transformer), \JSON_THROW_ON_ERROR);
 
                     $dataSeparator = ',';
                 }
@@ -114,11 +101,7 @@ final class ResponseFactory
         return new StreamedResponse(
             static function () use ($body, $transformer): void {
                 foreach ($body as $responseData) {
-                    if ($transformer !== null) {
-                        $responseData = $transformer->toApi($responseData);
-                    }
-
-                    echo \json_encode($responseData, \JSON_THROW_ON_ERROR) . "\n";
+                    echo \json_encode(NotNull::toApi($responseData, $transformer), \JSON_THROW_ON_ERROR) . "\n";
                 }
             },
             $code,

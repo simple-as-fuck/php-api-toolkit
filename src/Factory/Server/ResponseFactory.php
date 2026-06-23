@@ -10,6 +10,7 @@ use Kayex\HttpCodes;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Result;
+use SimpleAsFuck\ApiToolkit\Service\Transformation\NotNull;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Nullable;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\ResultTransformer;
@@ -29,11 +30,7 @@ final class ResponseFactory
         $factory = new HttpFactory();
         $response = self::makeResponse($factory, $code, $headers);
 
-        if ($transformer !== null) {
-            $body = Nullable::toApi($body, $transformer);
-        }
-
-        return $response->withBody($factory->createStream(\json_encode($body, \JSON_THROW_ON_ERROR)));
+        return $response->withBody($factory->createStream(\json_encode(Nullable::toApi($body, $transformer), \JSON_THROW_ON_ERROR)));
     }
 
     /**
@@ -64,12 +61,7 @@ final class ResponseFactory
                 return null;
             }
 
-            $responseData = $body->current();
-            if ($transformer !== null) {
-                $responseData = $transformer->toApi($responseData);
-            }
-
-            $item .= \json_encode($responseData, \JSON_THROW_ON_ERROR);
+            $item .= \json_encode(NotNull::toApi($body->current(), $transformer), \JSON_THROW_ON_ERROR);
             $body->next();
             if ($body->valid()) {
                 $item .= ',';
@@ -109,12 +101,7 @@ final class ResponseFactory
                 return null;
             }
 
-            $responseData = $body->current();
-            if ($transformer !== null) {
-                $responseData = $transformer->toApi($responseData);
-            }
-
-            $item .= \json_encode((string) $body->key(), \JSON_THROW_ON_ERROR) . ':' . \json_encode($responseData, \JSON_THROW_ON_ERROR);
+            $item .= \json_encode((string) $body->key(), \JSON_THROW_ON_ERROR) . ':' . \json_encode(NotNull::toApi($body->current(), $transformer), \JSON_THROW_ON_ERROR);
             $body->next();
             if ($body->valid()) {
                 $item .= ',';
@@ -144,12 +131,8 @@ final class ResponseFactory
                 return null;
             }
 
-            $responseData = $body->current();
+            $responseData = NotNull::toApi($body->current(), $transformer);
             $body->next();
-            if ($transformer !== null) {
-                $responseData = $transformer->toApi($responseData);
-            }
-
             return \json_encode($responseData, \JSON_THROW_ON_ERROR) . "\n";
         }));
     }

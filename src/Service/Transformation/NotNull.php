@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Transformation;
 
-final class Nullable
+final class NotNull
 {
     /**
      * @template Transformed
-     * @param Transformed|null $transformed
+     * @param Transformed $transformed
      * @param Transformer<Transformed>|null $transformer
-     * @return ($transformer is Transformer<Transformed> ? object|null : mixed) MUST contain json serializable values
+     * @return ($transformer is Transformer<Transformed> ? object : mixed) MUST contain json serializable values
      */
     public static function toApi(mixed $transformed, ?Transformer $transformer): mixed
     {
-        if ($transformed === null) {
-            return null;
+        if ($transformer === null) {
+            return $transformed;
         }
 
-        return NotNull::toApi($transformed, $transformer);
+        return $transformer->toApi($transformed);
     }
 }

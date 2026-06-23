@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
+use SimpleAsFuck\ApiToolkit\Service\Transformation\NotNull;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
@@ -71,13 +72,9 @@ final class Request
      */
     public function withJson(mixed $jsonData, ?Transformer $transformer, int $jsonEncodeFlags = 0): self
     {
-        if ($transformer !== null) {
-            $jsonData = $transformer->toApi($jsonData);
-        }
-
         $headers = $this->headers;
         $headers['Content-Type'] = 'application/json';
-        $stream = Utils::streamFor(\json_encode($jsonData, $jsonEncodeFlags | \JSON_THROW_ON_ERROR));
+        $stream = Utils::streamFor(\json_encode(NotNull::toApi($jsonData, $transformer), $jsonEncodeFlags | \JSON_THROW_ON_ERROR));
         $request = new self($this->method, $this->url, [], $stream, $headers);
         $request->baseUrl = $this->baseUrl;
         return $request;

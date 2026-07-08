@@ -26,7 +26,7 @@ final readonly class Response extends \SimpleAsFuck\ApiToolkit\Data\Common\Respo
         return new ResponseStream($this->withHeader('Content-Type', 'application/jsonl'), $jsonEncodeFlags);
     }
 
-    protected function clone(ResponseInterface $response): self
+    protected function clone(ResponseInterface $response): static
     {
         return new self($response);
     }

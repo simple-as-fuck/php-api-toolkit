@@ -8,6 +8,7 @@ use Kayex\HttpCodes;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ResponseFactory
 {
@@ -32,7 +33,7 @@ final class ResponseFactory
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeArray(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
+    public static function makeArray(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
     {
         if (is_array($body)) {
             $body = new \ArrayIterator($body);
@@ -41,7 +42,8 @@ final class ResponseFactory
         }
 
         $factory = new HttpFoundationFactory();
-        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArray($body, $transformer, $code, $headers));
+        /** @var StreamedResponse */
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArray($body, $transformer, $code, $headers), streamed: true);
     }
 
     /**
@@ -57,7 +59,7 @@ final class ResponseFactory
         ?Transformer $transformer = null,
         int $code = HttpCodes::HTTP_OK,
         array $headers = [],
-    ): Response {
+    ): StreamedResponse {
         if (is_array($body)) {
             $body = new \ArrayIterator($body);
         } elseif (! $body instanceof \Iterator) {
@@ -65,7 +67,8 @@ final class ResponseFactory
         }
 
         $factory = new HttpFoundationFactory();
-        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArrayAssoc($body, $transformer, $code, $headers));
+        /** @var StreamedResponse */
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArrayAssoc($body, $transformer, $code, $headers), streamed: true);
     }
 
     /**
@@ -75,7 +78,7 @@ final class ResponseFactory
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
+    public static function makeStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
     {
         if (is_array($body)) {
             $body = new \ArrayIterator($body);
@@ -84,7 +87,8 @@ final class ResponseFactory
         }
 
         $factory = new HttpFoundationFactory();
-        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeStream($body, $transformer, $code, $headers));
+        /** @var StreamedResponse */
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeStream($body, $transformer, $code, $headers), streamed: true);
     }
 
     /**

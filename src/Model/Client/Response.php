@@ -63,7 +63,7 @@ final readonly class Response extends \SimpleAsFuck\ApiToolkit\Data\Common\Respo
         );
     }
 
-    protected function clone(ResponseInterface $response): self
+    protected function clone(ResponseInterface $response): static
     {
         return new self($this->request, $response);
     }

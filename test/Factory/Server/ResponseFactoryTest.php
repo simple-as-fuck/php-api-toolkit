@@ -36,7 +36,7 @@ final class ResponseFactoryTest extends TestCase
     #[DataProvider('dataProviderMakeArrayAssoc')]
     public function testMakeArrayAssoc(string $expectedBody, \Iterator $streamedData): void
     {
-        $response = ResponseFactory::makeArrayAssoc($streamedData);
+        $response = ResponseFactory::make()->withJson()->arrayAssoc()->of($streamedData);
 
         self::assertSame($expectedBody, $response->getBody()->getContents());
     }

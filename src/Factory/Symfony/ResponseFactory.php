@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Factory\Symfony;
 
 use Kayex\HttpCodes;
-use SimpleAsFuck\ApiToolkit\Service\Transformation\NotNull;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ResponseFactory
 {
     /**
+     * @todo 0.9 $body and $transformer change to not null, you can use \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::make()->withJson()->nullable()
      * @template TBody
      * @param TBody|null $body will be encoded as application/json object
      * @param Transformer<TBody>|null $transformer
@@ -33,29 +32,20 @@ final class ResponseFactory
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeArray(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
+    public static function makeArray(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
     {
-        $headers['Content-Type'] = 'application/json';
-        return new StreamedResponse(
-            static function () use ($body, $transformer) {
-                $dataSeparator = '';
+        if (is_array($body)) {
+            $body = new \ArrayIterator($body);
+        } elseif (! $body instanceof \Iterator) {
+            $body = new \IteratorIterator($body);
+        }
 
-                echo '[';
-
-                foreach ($body as $responseData) {
-                    echo $dataSeparator . \json_encode(NotNull::toApi($responseData, $transformer), \JSON_THROW_ON_ERROR);
-
-                    $dataSeparator = ',';
-                }
-
-                echo ']';
-            },
-            $code,
-            $headers,
-        );
+        $factory = new HttpFoundationFactory();
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArray($body, $transformer, $code, $headers));
     }
 
     /**
+     * @deprecated you can use \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::make()->withJson()->arrayAssoc()->of()
      * @template TBody
      * @param iterable<array-key, TBody> $body will be encoded as application/json object to preserve keys as properties in response
      * @param Transformer<TBody>|null $transformer
@@ -67,25 +57,15 @@ final class ResponseFactory
         ?Transformer $transformer = null,
         int $code = HttpCodes::HTTP_OK,
         array $headers = [],
-    ): StreamedResponse {
-        $headers['Content-Type'] = 'application/json';
-        return new StreamedResponse(
-            static function () use ($body, $transformer) {
-                $dataSeparator = '';
+    ): Response {
+        if (is_array($body)) {
+            $body = new \ArrayIterator($body);
+        } elseif (! $body instanceof \Iterator) {
+            $body = new \IteratorIterator($body);
+        }
 
-                echo '{';
-
-                foreach ($body as $key => $responseData) {
-                    echo $dataSeparator . \json_encode((string) $key, \JSON_THROW_ON_ERROR) . ':' . \json_encode(NotNull::toApi($responseData, $transformer), \JSON_THROW_ON_ERROR);
-
-                    $dataSeparator = ',';
-                }
-
-                echo '}';
-            },
-            $code,
-            $headers,
-        );
+        $factory = new HttpFoundationFactory();
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeArrayAssoc($body, $transformer, $code, $headers));
     }
 
     /**
@@ -95,18 +75,16 @@ final class ResponseFactory
      * @param int<100,505> $code
      * @param array<non-empty-string, string|array<string>> $headers
      */
-    public static function makeStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
+    public static function makeStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): Response
     {
-        $headers['Content-Type'] = 'application/jsonl';
-        return new StreamedResponse(
-            static function () use ($body, $transformer): void {
-                foreach ($body as $responseData) {
-                    echo \json_encode(NotNull::toApi($responseData, $transformer), \JSON_THROW_ON_ERROR) . "\n";
-                }
-            },
-            $code,
-            $headers,
-        );
+        if (is_array($body)) {
+            $body = new \ArrayIterator($body);
+        } elseif (! $body instanceof \Iterator) {
+            $body = new \IteratorIterator($body);
+        }
+
+        $factory = new HttpFoundationFactory();
+        return $factory->createResponse(\SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::makeStream($body, $transformer, $code, $headers));
     }
 
     /**

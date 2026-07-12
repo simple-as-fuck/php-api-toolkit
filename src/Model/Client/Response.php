@@ -20,6 +20,11 @@ final readonly class Response extends \SimpleAsFuck\ApiToolkit\Data\Common\Respo
         parent::__construct($response);
     }
 
+    public function isJson(): bool
+    {
+        return $this->getHeaderLine('Content-Type') === 'application/json';
+    }
+
     /**
      * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
      * @throws ApiException
@@ -39,6 +44,11 @@ final readonly class Response extends \SimpleAsFuck\ApiToolkit\Data\Common\Respo
         )
             ->cache()
         ;
+    }
+
+    public function isJsonl(): bool
+    {
+        return $this->getHeaderLine('Content-Type') === 'application/jsonl';
     }
 
     /**

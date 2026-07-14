@@ -32,12 +32,30 @@ final class ResponseFactoryTest extends TestCase
     {
         return [
             ['[548846,"sadasjkfghjsg"]', [548846, 'test' => 'sadasjkfghjsg']],
-            ['[]', new \ArrayIterator([])],
+            ['[548846,"sadasjkfghjsg"]', new \ArrayIterator([548846, 'test' => 'sadasjkfghjsg'])],
+            ['[548846,"sadasjkfghjsg"]', (static function (): \Generator {
+                yield 548846;
+                yield 'test' => 'sadasjkfghjsg';
+            })()],
+            ['[548846,"sadasjkfghjsg"]', new class () implements \IteratorAggregate {
+                public function getIterator(): \Traversable
+                {
+                    return new \ArrayIterator([548846, 'test' => 'sadasjkfghjsg']);
+                }
+            }],
+            ['[]', new \ArrayIterator()],
+            ['[]', []],
+            ['[]', new class () implements \IteratorAggregate {
+                public function getIterator(): \Traversable
+                {
+                    return new \ArrayIterator();
+                }
+            }],
         ];
     }
 
     /**
-     * @param array<mixed> $streamedData
+     * @param iterable<mixed> $streamedData
      */
     #[DataProvider('dataMakeSteam')]
     public function testMakeSteam(string $expectedBody, iterable $streamedData): void
@@ -58,7 +76,25 @@ final class ResponseFactoryTest extends TestCase
     {
         return [
             ["548846\n\"sadasjkfghjsg\"\n", [548846, 'sadasjkfghjsg']],
+            ["548846\n\"sadasjkfghjsg\"\n", new \ArrayIterator([548846, 'sadasjkfghjsg'])],
+            ["548846\n\"sadasjkfghjsg\"\n", (static function (): \Generator {
+                yield 548846;
+                yield 'test' => 'sadasjkfghjsg';
+            })()],
+            ["548846\n\"sadasjkfghjsg\"\n", new class () implements \IteratorAggregate {
+                public function getIterator(): \Traversable
+                {
+                    return new \ArrayIterator([548846, 'test' => 'sadasjkfghjsg']);
+                }
+            }],
             ['', []],
+            ['', new \ArrayIterator()],
+            ['', new class () implements \IteratorAggregate {
+                public function getIterator(): \Traversable
+                {
+                    return new \ArrayIterator();
+                }
+            }],
         ];
     }
 }

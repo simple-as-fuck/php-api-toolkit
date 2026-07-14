@@ -9,12 +9,12 @@ use SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory;
 final class ResponseFactoryTest extends TestCase
 {
     /**
-     * @param array<mixed> $streamedData
+     * @param \Iterator<mixed> $streamedData
      */
     #[DataProvider('dataProviderMakeArray')]
-    public function testMakeArray(string $expectedBody, array $streamedData): void
+    public function testMakeArray(string $expectedBody, \Iterator $streamedData): void
     {
-        $response = ResponseFactory::makeArray(new \ArrayIterator($streamedData));
+        $response = ResponseFactory::makeArray($streamedData);
 
         self::assertSame($expectedBody, $response->getBody()->getContents());
     }
@@ -25,8 +25,12 @@ final class ResponseFactoryTest extends TestCase
     public static function dataProviderMakeArray(): array
     {
         return [
-            ['[548846,"sadasjkfghjsg"]', [548846, 'test' => 'sadasjkfghjsg']],
-            ['[]', []],
+            ['[548846,"sadasjkfghjsg"]', new \ArrayIterator([548846, 'test' => 'sadasjkfghjsg'])],
+            ['[548846,"sadasjkfghjsg"]', (static function (): \Generator {
+                yield 548846;
+                yield 'test' => 'sadasjkfghjsg';
+            })()],
+            ['[]', new \ArrayIterator()],
         ];
     }
 
@@ -48,17 +52,21 @@ final class ResponseFactoryTest extends TestCase
     {
         return [
             ['{"0":548846,"test":"sadasjkfghjsg"}', new \ArrayIterator([548846, 'test' => 'sadasjkfghjsg'])],
+            ['{"0":548846,"test":"sadasjkfghjsg"}', (static function (): \Generator {
+                yield 548846;
+                yield 'test' => 'sadasjkfghjsg';
+            })()],
             ['{}', new \ArrayIterator()],
         ];
     }
 
     /**
-     * @param array<mixed> $streamedData
+     * @param \Iterator<mixed> $streamedData
      */
     #[DataProvider('dataMakeSteam')]
-    public function testMakeSteam(string $expectedBody, array $streamedData): void
+    public function testMakeSteam(string $expectedBody, \Iterator $streamedData): void
     {
-        $response = ResponseFactory::makeStream(new \ArrayIterator($streamedData));
+        $response = ResponseFactory::makeStream($streamedData);
 
         self::assertSame($expectedBody, $response->getBody()->getContents());
     }
@@ -69,8 +77,12 @@ final class ResponseFactoryTest extends TestCase
     public static function dataMakeSteam(): array
     {
         return [
-            ["548846\n\"sadasjkfghjsg\"\n", [548846, 'sadasjkfghjsg']],
-            ['', []],
+            ["548846\n\"sadasjkfghjsg\"\n", new \ArrayIterator([548846, 'sadasjkfghjsg'])],
+            ["548846\n\"sadasjkfghjsg\"\n", (static function (): \Generator {
+                yield 548846;
+                yield 'test' => 'sadasjkfghjsg';
+            })()],
+            ['', new \ArrayIterator()],
         ];
     }
 }

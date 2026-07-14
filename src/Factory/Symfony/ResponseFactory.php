@@ -35,10 +35,8 @@ final class ResponseFactory
      */
     public static function makeArray(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
     {
-        if (is_array($body)) {
-            $body = new \ArrayIterator($body);
-        } elseif (! $body instanceof \Iterator) {
-            $body = new \IteratorIterator($body);
+        if (! $body instanceof \Iterator) {
+            $body = self::iterableToIterator($body);
         }
 
         $factory = new HttpFoundationFactory();
@@ -60,10 +58,8 @@ final class ResponseFactory
         int $code = HttpCodes::HTTP_OK,
         array $headers = [],
     ): StreamedResponse {
-        if (is_array($body)) {
-            $body = new \ArrayIterator($body);
-        } elseif (! $body instanceof \Iterator) {
-            $body = new \IteratorIterator($body);
+        if (! $body instanceof \Iterator) {
+            $body = self::iterableToIterator($body);
         }
 
         $factory = new HttpFoundationFactory();
@@ -80,10 +76,8 @@ final class ResponseFactory
      */
     public static function makeStream(iterable $body, ?Transformer $transformer = null, int $code = HttpCodes::HTTP_OK, array $headers = []): StreamedResponse
     {
-        if (is_array($body)) {
-            $body = new \ArrayIterator($body);
-        } elseif (! $body instanceof \Iterator) {
-            $body = new \IteratorIterator($body);
+        if (! $body instanceof \Iterator) {
+            $body = self::iterableToIterator($body);
         }
 
         $factory = new HttpFoundationFactory();
@@ -101,5 +95,18 @@ final class ResponseFactory
             $stopDispatching,
             $headers,
         ));
+    }
+
+    /**
+     * @param iterable<mixed> $iterable
+     * @return \Iterator<mixed>
+     */
+    private static function iterableToIterator(iterable $iterable): \Iterator
+    {
+        return (static function () use ($iterable): \Generator {
+            foreach ($iterable as $key => $item) {
+                yield $key => $item;
+            }
+        })();
     }
 }

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -62,14 +62,14 @@ final class ApiClientTest extends TestCase
         $response = new Response(new Request('GET', '/'), $httpFactory->createResponse(400));
 
         return [
-            [ApiException::class, 0, 'Exception message', null, new TransferException('Exception message')],
-            [BadRequestApiException::class, 400, 'Exception message', '', new RequestException('Exception message', $request, $response)],
+            [ApiException::class, 0, 'Exception message', null, new ConnectException('Exception message', $request)],
+            [BadRequestApiException::class, 400, 'Exception message', '', new BadResponseException('Exception message', $request, $response)],
             [
                 BadRequestApiException::class,
                 400,
                 'API test GET / returned error: Json message',
                 '{"message":"Json message"}',
-                new RequestException(
+                new BadResponseException(
                     'Exception message',
                     $request,
                     $response->withBody($httpFactory->createStream('{"message":"Json message"}'))
@@ -80,7 +80,7 @@ final class ApiClientTest extends TestCase
                 400,
                 'API test GET / returned error: Error title: "Json title"',
                 '{"title":"Json title"}',
-                new RequestException(
+                new BadResponseException(
                     'Exception message',
                     $request,
                     $response->withBody($httpFactory->createStream('{"title":"Json title"}'))
@@ -91,7 +91,7 @@ final class ApiClientTest extends TestCase
                 400,
                 'API test GET / returned error: Json message',
                 '{"title":"Json title","message":"Json message"}',
-                new RequestException(
+                new BadResponseException(
                     'Exception message',
                     $request,
                     $response->withBody($httpFactory->createStream('{"title":"Json title","message":"Json message"}'))
@@ -102,7 +102,7 @@ final class ApiClientTest extends TestCase
                 401,
                 'API test GET / returned error: Error type: "/test/error" error instance: "/test/url"',
                 '{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}',
-                new RequestException(
+                new BadResponseException(
                     'Exception message',
                     $request,
                     $response->withStatus(401)->withBody($httpFactory->createStream('{"title":"Json title","type":"/test/error","status":401,"instance":"/test/url"}'))
@@ -113,7 +113,7 @@ final class ApiClientTest extends TestCase
                 403,
                 'API test GET / returned error: Error type: "/test/error" Json message',
                 '{"type":"/test/error","message":"Json message"}',
-                new RequestException(
+                new BadResponseException(
                     'Exception message',
                     $request,
                     $response->withStatus(403)->withBody($httpFactory->createStream('{"type":"/test/error","message":"Json message"}'))

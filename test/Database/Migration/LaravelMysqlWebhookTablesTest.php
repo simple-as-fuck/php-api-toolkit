@@ -13,7 +13,7 @@ final class LaravelMysqlWebhookTablesTest extends TestCase
     {
         $pdo = new \PDO('mysql:dbname=database;host=database', 'root', 'password');
         $connection = new MySqlConnection($pdo);
-        $connectionResolver = $this->createMock(ConnectionResolverInterface::class);
+        $connectionResolver = self::createStub(ConnectionResolverInterface::class);
         $connectionResolver->method('connection')->willReturn($connection);
 
         DB::swap($connectionResolver);

@@ -44,7 +44,7 @@ final class LaravelMysqlRepositoryTest extends TestCase
     {
         self::$connectionResolver->connection('default')->beginTransaction();
 
-        $this->config = $this->createMock(Repository::class);
+        $this->config = self::createStub(Repository::class);
         $this->config->method('get')->willReturn('default');
     }
 

@@ -29,7 +29,7 @@ final class DeprecationsLoggerTest extends TestCase
             $psrLogger->expects(self::once())->method('warning')->with($expectedLogMessage, $expectedContext);
         }
 
-        $config = $this->createMock(Config::class);
+        $config = self::createStub(Config::class);
         $config->method('getDeprecatedHeader')->willReturn('Deprecated');
 
         $logger = new DeprecationsLogger($config, $psrLogger);

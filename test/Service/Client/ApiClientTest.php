@@ -25,11 +25,11 @@ final class ApiClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $config = $this->createMock(Config::class);
-        $client = $this->createMock(Client::class);
-        $httpFactory = new HttpFactory();
-
-        $this->apiClient = new ApiClient($config, $client, $httpFactory);
+        $this->apiClient = new ApiClient(
+            self::createStub(Config::class),
+            self::createStub(Client::class),
+            new HttpFactory(),
+        );
     }
 
     /**
@@ -38,7 +38,7 @@ final class ApiClientTest extends TestCase
     #[DataProvider('dataProviderWaitRawFail')]
     public function testWaitRawFail(string $expectedClass, int $expectedStatusCode, string $expectedMessage, ?string $expectedContent, \Throwable $exception): void
     {
-        $promise = $this->createMock(PromiseInterface::class);
+        $promise = self::createStub(PromiseInterface::class);
         $promise->method('wait')->willThrowException($exception);
         $promise = new ResponsePromise('test', new Request('GET', '/'), $promise);
 

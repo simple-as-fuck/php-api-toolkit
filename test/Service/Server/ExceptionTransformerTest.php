@@ -13,7 +13,7 @@ final class ExceptionTransformerTest extends TestCase
     #[DataProvider('dataProviderToApi')]
     public function testToApi(string $expectedMessage, bool $debug): void
     {
-        $config = $this->createMock(SimpleAsFuck\ApiToolkit\Service\Config\Repository::class);
+        $config = self::createStub(SimpleAsFuck\ApiToolkit\Service\Config\Repository::class);
         $config->method('isDebug')->willReturn($debug);
 
         $transformer = new ExceptionTransformer($config);

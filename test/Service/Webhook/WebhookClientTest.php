@@ -25,13 +25,13 @@ final class WebhookClientTest extends TestCase
     #[DataProvider('dataCallWebhooks')]
     public function testCallWebhooks(array $expectedRetryWebhooks, int $expectedCalls, array $webhooks, int $tries): void
     {
-        $config = $this->createMock(Config::class);
+        $config = self::createStub(Config::class);
         $config->method('getDelayBetweenTries')->willReturn(5);
         $config->method('getMaxTries')->willReturn(6);
         $config->method('getDefaultOptions')->willReturn(Validator::make([RequestOptions::TIMEOUT => 20])->array());
 
         $httpCalls = 0;
-        $httpClient = $this->createMock(\GuzzleHttp\Client::class);
+        $httpClient = self::createStub(\GuzzleHttp\Client::class);
         $httpClient->method('send')->willReturnCallback(static function (RequestInterface $request, array $options) use (&$httpCalls): Response {
             $httpCalls++;
             $jsonObject = Validator::json($request->getBody()->getContents())->object();

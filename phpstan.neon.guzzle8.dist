@@ -24,3 +24,9 @@ parameters:
             identifier: argument.type
             count: 1
             path: src/Service/Webhook/WebhookClient.php
+
+        -
+            message: '#^Parameter \#1 \$config of class GuzzleHttp\\Client constructor expects array\{handler\?\: callable\(Psr\\Http\\Message\\RequestInterface, array\<mixed\>\)\: GuzzleHttp\\Promise\\PromiseInterface\<Psr\\Http\\Message\\ResponseInterface, mixed\>, base_uri\?\: Psr\\Http\\Message\\UriInterface\|string, transport_sharing\?\: string\|null, max_host_connections\?\: int\|null, max_total_connections\?\: int\|null, allow_redirects\?\: array\{max\?\: int, strict\?\: bool, referer\?\: bool, protocols\?\: non\-empty\-array\<string\>, on_redirect\?\: callable\(Psr\\Http\\Message\\RequestInterface, Psr\\Http\\Message\\ResponseInterface, Psr\\Http\\Message\\UriInterface\)\: mixed, track_redirects\?\: bool\}\|bool, auth\?\: array\{0\: string, 1\: string, 2\?\: string\|null\}\|string\|false\|null, body\?\: callable\-object\|Iterator\|resource\|string\|Stringable\|null, \.\.\., \.\.\.\}, array\{handler\: mixed, laravel_data\: array\{\}\} given\.$#'
+            identifier: argument.type
+            count: 2
+            path: src/Provider/LaravelProvider.php

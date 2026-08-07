@@ -34,7 +34,7 @@ class DeprecationsLogger
             $sunset = $response->getHeaderLine('Sunset');
             $deprecatedContext['Sunset'] = ParseDateTime::make(
                 $sunset,
-                \DateTimeInterface::RFC7231,
+                \DateTimeInterface::RFC2822,
                 \DateTimeImmutable::class
             )
                 ->nullable(true)

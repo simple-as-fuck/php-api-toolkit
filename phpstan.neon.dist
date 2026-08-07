@@ -12,3 +12,9 @@ parameters:
         - config
         - src
         - test
+    ignoreErrors:
+        -
+            message: '#^Call to function method_exists\(\) with GuzzleHttp\\Exception\\RequestException and ''getResponse'' will always evaluate to true\.$#'
+            identifier: function.alreadyNarrowedType
+            count: 1
+            path: src/Service/Client/ApiClient.php

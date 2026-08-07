@@ -1,0 +1,26 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
+    - vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
+    - vendor/spaze/phpstan-disallowed-calls/disallowed-insecure-calls.neon
+
+parameters:
+    level: max
+    paths:
+        - config
+        - src
+        - test
+    ignoreErrors:
+        -
+            message: '#^Parameter \#2 \$options of method GuzzleHttp\\ClientInterface\:\:sendAsync\(\) expects array\{base_uri\?\: Psr\\Http\\Message\\UriInterface\|string, allow_redirects\?\: array\{max\?\: int, strict\?\: bool, referer\?\: bool, protocols\?\: non\-empty\-array\<string\>, on_redirect\?\: callable\(Psr\\Http\\Message\\RequestInterface, Psr\\Http\\Message\\ResponseInterface, Psr\\Http\\Message\\UriInterface\)\: mixed, track_redirects\?\: bool\}\|bool, auth\?\: array\{0\: string, 1\: string, 2\?\: string\|null\}\|string\|false\|null, body\?\: callable\-object\|Iterator\|resource\|string\|Stringable\|null, cert\?\: array\{0\: string, 1\?\: string\|null\}\|string, cert_type\?\: string, connect_timeout\?\: float\|int, cookies\?\: GuzzleHttp\\Cookie\\CookieJarInterface\|false, \.\.\., \.\.\.\}, array\<mixed\> given\.$#'
+            identifier: argument.type
+            count: 1
+            path: src/Service/Client/ApiClient.php
+
+        -
+            message: '#^Parameter \#2 \$options of method GuzzleHttp\\Client\:\:send\(\) expects array\{base_uri\?\: Psr\\Http\\Message\\UriInterface\|string, allow_redirects\?\: array\{max\?\: int, strict\?\: bool, referer\?\: bool, protocols\?\: non\-empty\-array\<string\>, on_redirect\?\: callable\(Psr\\Http\\Message\\RequestInterface, Psr\\Http\\Message\\ResponseInterface, Psr\\Http\\Message\\UriInterface\)\: mixed, track_redirects\?\: bool\}\|bool, auth\?\: array\{0\: string, 1\: string, 2\?\: string\|null\}\|string\|false\|null, body\?\: callable\-object\|Iterator\|resource\|string\|Stringable\|null, cert\?\: array\{0\: string, 1\?\: string\|null\}\|string, cert_type\?\: string, connect_timeout\?\: float\|int, cookies\?\: GuzzleHttp\\Cookie\\CookieJarInterface\|false, \.\.\., \.\.\.\}, array\<mixed\> given\.$#'
+            identifier: argument.type
+            count: 1
+            path: src/Service/Webhook/WebhookClient.php

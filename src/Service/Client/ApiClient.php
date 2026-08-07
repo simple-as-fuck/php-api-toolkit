@@ -240,7 +240,15 @@ class ApiClient
             $response = $promise->promise->wait();
             $response = new Response($promise->request, $response);
         } catch (RequestException $exception) {
-            $response = $exception->getResponse();
+            $response = null;
+            /** @todo remove with guzzle 7 support removed, RequestException will be change to ResponseException */
+            if (\method_exists($exception, 'getResponse')) {
+                $r = $exception->getResponse();
+                if ($r instanceof ResponseInterface) {
+                    $response = $r;
+                }
+            }
+
             if ($response !== null) {
                 $this->deprecationsLogger?->logDeprecation($promise->apiName, $promise->request, $response);
 

@@ -106,6 +106,9 @@ final class Request
         return array_key_exists($name, $this->headers);
     }
 
+    /**
+     * @todo 0.9 remove $factory parameter
+     */
     public function createPsr(RequestFactoryInterface $factory): RequestInterface
     {
         if ($this->baseUrl === null) {

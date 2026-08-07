@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleAsFuck\ApiToolkit\Service\Webhook;
 
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
@@ -24,8 +25,12 @@ abstract class WebhookClient
      * @param array<string, string|array<string>> $headers
      * @param array<RequestOptions::*, mixed> $options
      */
-    final public function callWebhooks(iterable $webhooks, array $headers = [], array $options = [], int $tries = 0): void
-    {
+    final public function callWebhooks(
+        iterable $webhooks,
+        #[\SensitiveParameter] array $headers = [],
+        #[\SensitiveParameter] array $options = [],
+        int $tries = 0,
+    ): void {
         $requestHeaders = $headers;
         $requestOptions = $options;
 
@@ -45,7 +50,7 @@ abstract class WebhookClient
             }
         }
 
-        $requestOptions[RequestOptions::HEADERS] = $requestHeaders;
+        $requestHeaders['Content-Type'] = 'application/json';
         $nextTryWebhooks = [];
 
         foreach ($webhooks as $webhook) {
@@ -55,9 +60,13 @@ abstract class WebhookClient
             }
 
             try {
-                $requestOptions[RequestOptions::JSON] = (new WebhookTransformer())->toApi($webhook);
-
-                $response = $this->client->request('POST', $webhook->params->listeningUrl, $requestOptions);
+                $request = new Request(
+                    'POST',
+                    $webhook->params->listeningUrl,
+                    $requestHeaders,
+                    \json_encode((new WebhookTransformer())->toApi($webhook), \JSON_THROW_ON_ERROR)
+                );
+                $response = $this->client->send($request, $requestOptions);
 
                 $callResult = Validator::json($response->getBody()->getContents(), 'Webhook response body', new UnexpectedValueException())
                     ->object()

@@ -7,6 +7,7 @@ use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Params;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
@@ -31,9 +32,9 @@ final class WebhookClientTest extends TestCase
 
         $httpCalls = 0;
         $httpClient = $this->createMock(\GuzzleHttp\Client::class);
-        $httpClient->method('request')->willReturnCallback(static function (string $method, string $uri, array $options) use (&$httpCalls): Response {
+        $httpClient->method('send')->willReturnCallback(static function (RequestInterface $request, array $options) use (&$httpCalls): Response {
             $httpCalls++;
-            $jsonObject = Validator::make($options)->array()->key(RequestOptions::JSON)->object();
+            $jsonObject = Validator::json($request->getBody()->getContents())->object();
             $value = $jsonObject->property('params')->object()->property('attributes')->array()->key(0)->object()->property('value')->string()->nullable();
 
             if ($value === 'fail') {

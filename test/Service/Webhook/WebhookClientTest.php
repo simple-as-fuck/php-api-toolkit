@@ -13,6 +13,7 @@ use SimpleAsFuck\ApiToolkit\Model\Webhook\Priority;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookClient;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\Config;
+use SimpleAsFuck\Validator\Factory\Json;
 use SimpleAsFuck\Validator\Factory\Validator;
 
 #[CoversClass(WebhookClient::class)]
@@ -34,7 +35,7 @@ final class WebhookClientTest extends TestCase
         $httpClient = self::createStub(\GuzzleHttp\Client::class);
         $httpClient->method('send')->willReturnCallback(static function (RequestInterface $request, array $options) use (&$httpCalls): Response {
             $httpCalls++;
-            $jsonObject = Validator::json($request->getBody()->getContents())->object();
+            $jsonObject = Json::make($request->getBody()->getContents())->object();
             $value = $jsonObject->property('params')->object()->property('attributes')->array()->key(0)->object()->property('value')->string()->nullable();
 
             if ($value === 'fail') {

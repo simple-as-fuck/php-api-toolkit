@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace SimpleAsFuck\ApiToolkit\Data\Client;
 
 /**
+ * @todo 0.9 swith template position and make Tkey require
  * @template Tout
+ * @template Tkey = int of array-key
  */
 final readonly class Stream
 {
     /**
-     * @param \Iterator<int, Tout> $iterator
+     * @param \Iterator<Tkey, Tout> $iterator
      */
     public function __construct(
         private \Iterator $iterator,
@@ -18,7 +20,7 @@ final readonly class Stream
     }
 
     /**
-     * @return \Iterator<int, Tout>
+     * @return \Iterator<Tkey, Tout>
      */
     public function notNull(): \Iterator
     {

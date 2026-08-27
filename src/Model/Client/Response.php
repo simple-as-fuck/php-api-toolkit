@@ -8,7 +8,8 @@ use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Data\Client\ApiException;
 use SimpleAsFuck\ApiToolkit\Data\Client\StreamRules;
 use SimpleAsFuck\ApiToolkit\Factory\Client\ParseResponseException;
-use SimpleAsFuck\Validator\Factory\Validator;
+use SimpleAsFuck\Validator\Factory\Json;
+use SimpleAsFuck\Validator\Factory\Jsonl;
 use SimpleAsFuck\Validator\Rule\String\ParseJson;
 
 final readonly class Response extends \SimpleAsFuck\ApiToolkit\Data\Common\Response
@@ -34,16 +35,35 @@ final readonly class Response extends \SimpleAsFuck\ApiToolkit\Data\Common\Respo
         bool $emptyStringAsNull = false,
         int $jsonDecodeFlags = 0,
     ): ParseJson {
-        return ParseJson::make(
+        return Json::make(
             $this->getBody()->getContents(),
             'Response body',
             new ParseResponseException($this->request, $this),
             allowInvalidJson: $allowInvalidJson,
             emptyStringAsNull: $emptyStringAsNull,
             jsonDecodeFlags: $jsonDecodeFlags,
-        )
-            ->cache()
-        ;
+        );
+    }
+
+    /**
+     * @param int $jsonDecodeFlags bitmask https://www.php.net/manual/en/function.json-decode.php
+     * @return StreamRules<ParseJson, array-key>
+     */
+    public function getJsonIterator(
+        bool $allowInvalidJson = false,
+        bool $emptyStringAsNull = false,
+        int $jsonDecodeFlags = 0,
+    ): StreamRules {
+        return new StreamRules(
+            Json::makeIterator(
+                $this->getBody(),
+                'Response body',
+                new ParseResponseException($this->request, $this),
+                allowInvalidJson: $allowInvalidJson,
+                emptyStringAsNull: $emptyStringAsNull,
+                jsonDecodeFlags: $jsonDecodeFlags,
+            ),
+        );
     }
 
     public function isJsonl(): bool
@@ -62,7 +82,7 @@ final readonly class Response extends \SimpleAsFuck\ApiToolkit\Data\Common\Respo
         int $jsonDecodeFlags = 0,
     ): StreamRules {
         return new StreamRules(
-            Validator::jsonl(
+            Jsonl::make(
                 $this->getBody(),
                 'Response body',
                 new ParseResponseException($this->request, $this),

@@ -8,8 +8,8 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
 use SimpleAsFuck\ApiToolkit\Model\Webhook\Webhook;
+use SimpleAsFuck\Validator\Factory\Json;
 use SimpleAsFuck\Validator\Factory\UnexpectedValueException;
-use SimpleAsFuck\Validator\Factory\Validator;
 
 abstract class WebhookClient
 {
@@ -68,7 +68,7 @@ abstract class WebhookClient
                 );
                 $response = $this->client->send($request, $requestOptions);
 
-                $callResult = Validator::json($response->getBody()->getContents(), 'Webhook response body', new UnexpectedValueException())
+                $callResult = Json::make($response->getBody()->getContents(), 'Webhook response body', new UnexpectedValueException())
                     ->object()
                     ->class(new ResultTransformer())
                     ->notNull()

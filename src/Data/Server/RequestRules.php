@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use SimpleAsFuck\ApiToolkit\Data\Webhook\WebhookRules;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
 use SimpleAsFuck\Validator\Factory\Exception;
+use SimpleAsFuck\Validator\Factory\Json;
 use SimpleAsFuck\Validator\Model\Validated;
 use SimpleAsFuck\Validator\Rule\General\Rules;
 use SimpleAsFuck\Validator\Rule\String\ParseJson;
@@ -38,16 +39,14 @@ final readonly class RequestRules
         bool $emptyStringAsNull = false,
         int $jsonDecodeFlags = 0,
     ): ParseJson {
-        return ParseJson::make(
+        return Json::make(
             $this->request->getBody()->getContents(),
             'Request body',
             $this->exceptionFactory,
             allowInvalidJson: $allowInvalidJson,
             emptyStringAsNull: $emptyStringAsNull,
             jsonDecodeFlags: $jsonDecodeFlags,
-        )
-            ->cache()
-        ;
+        );
     }
 
     /**

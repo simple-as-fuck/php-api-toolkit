@@ -35,11 +35,15 @@ use SimpleAsFuck\ApiToolkit\Service\Common\ProblemDetailTransformer;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\ParamsTransformer;
 use SimpleAsFuck\ApiToolkit\Service\Webhook\WebhookTransformer;
+use SimpleAsFuck\Validator\Factory\Json;
 use SimpleAsFuck\Validator\Rule\ArrayRule\ArrayRule;
 use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 use SimpleAsFuck\Validator\Rule\String\ParseJson;
 use SimpleAsFuck\Validator\Rule\String\StringRule;
 
+/**
+ * @todo 0.9 add methods waitIterator, requestIterator
+ */
 class ApiClient
 {
     public function __construct(
@@ -256,7 +260,7 @@ class ApiClient
                 $response = $response->withBody(Utils::streamFor($responseContent));
                 $response = new Response($promise->request, $response);
 
-                $errorObject = ParseJson::make(
+                $errorObject = Json::make(
                     $responseContent,
                     'Response problem detail',
                     new ParseResponseException($promise->request, $response),

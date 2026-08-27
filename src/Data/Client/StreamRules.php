@@ -12,12 +12,14 @@ use SimpleAsFuck\Validator\Rule\Object\ObjectRule;
 use SimpleAsFuck\Validator\Rule\String\ParseJson;
 
 /**
+ * @todo 0.9 swith template position and make Tkey require
  * @template TRule of Rules|ParseJson
+ * @template Tkey = int of array-key
  */
 final readonly class StreamRules
 {
     /**
-     * @param \Iterator<int, TRule> $iterator
+     * @param \Iterator<Tkey, TRule> $iterator
      */
     public function __construct(
         private \Iterator $iterator,
@@ -25,7 +27,7 @@ final readonly class StreamRules
     }
 
     /**
-     * @return \Iterator<int, mixed>
+     * @return \Iterator<Tkey, mixed>
      */
     public function notNull(): \Iterator
     {

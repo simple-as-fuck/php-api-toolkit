@@ -9,6 +9,9 @@ use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\NotNull;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 
+/**
+ * @template Tkey = mixed
+ */
 readonly class ResponseArray
 {
     /**
@@ -22,7 +25,7 @@ readonly class ResponseArray
 
     /**
      * @template TBody
-     * @param \Iterator<TBody> $body will be encoded as application/json array
+     * @param \Iterator<Tkey, TBody> $body will be encoded as application/json array
      * @param Transformer<TBody>|null $transformer
      */
     public function of(\Iterator $body, ?Transformer $transformer = null): ResponseInterface
@@ -58,7 +61,7 @@ readonly class ResponseArray
 
     /**
      * @template TBody
-     * @param \Iterator<TBody> $body
+     * @param \Iterator<Tkey, TBody> $body
      * @param Transformer<TBody> $transformer
      */
     public function ofObject(\Iterator $body, Transformer $transformer): ResponseInterface

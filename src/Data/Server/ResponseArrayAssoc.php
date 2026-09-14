@@ -9,6 +9,9 @@ use Psr\Http\Message\ResponseInterface;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\NotNull;
 use SimpleAsFuck\ApiToolkit\Service\Transformation\Transformer;
 
+/**
+ * @extends ResponseArray<array-key>
+ */
 final readonly class ResponseArrayAssoc extends ResponseArray
 {
     /**

@@ -45,7 +45,6 @@ final class ResponseFactory
     }
 
     /**
-     * @deprecated you can use \SimpleAsFuck\ApiToolkit\Factory\Server\ResponseFactory::make()->withJson()->arrayAssoc()->of()
      * @template TBody
      * @param iterable<array-key, TBody> $body will be encoded as application/json object to preserve keys as properties in response
      * @param Transformer<TBody>|null $transformer

@@ -48,7 +48,6 @@ final class ResponseFactory
     }
 
     /**
-     * @deprecated you can use self::make()->withJson()->arrayAssoc()->of()
      * @template TBody
      * @param \Iterator<array-key, TBody> $body will be encoded as application/json object to preserve keys as properties in response
      * @param Transformer<TBody>|null $transformer

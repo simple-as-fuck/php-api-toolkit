@@ -228,6 +228,8 @@ class ApiClient
             }
         }
 
+        $options['api_name'] = $apiName;
+
         return new ResponsePromise($apiName, $request, $this->client->sendAsync($psrRequest, $options));
     }
 
